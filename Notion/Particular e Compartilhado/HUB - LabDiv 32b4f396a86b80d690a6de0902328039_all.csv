@@ -1,0 +1,83 @@
+﻿Nome da tarefa,Categoria,"Data ",Descrição,Prioridade,Responsável,Status
+"Adicionar 1 hora de estudos para cada hora de materias ",Programar,21/03/2026,,Baixa,Andy Raposo,Concluído
+Ajeitar trilhas do Bach/med,Programar,21/03/2026,,Média,Andy Raposo,Concluído
+Tempo de espera médio para aprovação do adm,Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,falta testar
+"Grupos de estudos no match acadêmico ",Programar,21/03/2026,,Baixa,Andy Raposo,falta testar
+"Grupo de interesse no emaranhamento ",Programar,22/03/2026,,Baixa,Joao Paulo Stangorlini de Carvalho,Concluído
+Ver como e se vale a pena integrar o supabase a vercel,Pesquisar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Descartada
+"Ver mais formas de reunir dados para pesquisa ",Pesquisar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Descartada
+"Streak de estudos ",Programar,,"a pessoa manda o print do app de crescer arvore e isso valida q ela estudou, se tem x blocos de estudo sao x macas por semana. ao fim da semana se nao tiver perde o streak ",Média,Andy Raposo,Descartada
+Quiz por departamento/pesquisador/laboratório,Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Não iniciado
+Implementar o mapa interativo,Programar,," (botão de ir para ao clicar em um setor) + (informações sobre o setor) ",Baixa,Joao Paulo Stangorlini de Carvalho,Não iniciado
+simplificar menus,Programar,22/03/2026,,Alta,Joao Paulo Stangorlini de Carvalho,Concluído
+criar sistema de notificacoes,Programar,22/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+ajeitar o quero uma ic,Programar,22/03/2026,,Baixa,Joao Paulo Stangorlini de Carvalho,Concluído
+ajustes no emaranhamento,Programar,21/03/2026,,Baixa,Joao Paulo Stangorlini de Carvalho,falta testar
+adicionar botao de sincronizacao nas trilhas tambem,Programar,22/03/2026,,Baixa,Joao Paulo Stangorlini de Carvalho,Concluído
+achar as trilhas sumidas,Programar,22/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+fazer a arte vetorial das arvores dos cursos,touch the grass,,,Baixa,Joao Paulo Stangorlini de Carvalho,Não iniciado
+BOT DISCORD - ADMINS,Programar,,,Baixa,Andy Raposo,Em andamento
+"correção no menu esquerdo ",Programar,22/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+mudanças na aba como ingressar,Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,falta testar
+criar formulario de pesquisa,Programar,26/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Em andamento
+mandar email para o ortega,touch the grass,,,Alta,Joao Paulo Stangorlini de Carvalho,Em andamento
+lancar piloto do HUB,touch the grass,,,Alta,Joao Paulo Stangorlini de Carvalho,Não iniciado
+"reuniao com o labdiv ",Programar,26/03/2026,,Alta,Joao Paulo Stangorlini de Carvalho,Concluído
+"Ajustes na telemetria ",Programar,26/03/2026,"Forma de filtrar a telemetria por usuario ",Média,Joao Paulo Stangorlini de Carvalho,Concluído
+Concertar o sincronizar fora do localhost,Programar,26/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+Unificar todo o explorar em uma só aba GCIF,Programar,26/03/2026,,Baixa,Joao Paulo Stangorlini de Carvalho,Concluído
+"Implementar sistema de busca global ",Programar,26/03/2026,,Baixa,Joao Paulo Stangorlini de Carvalho,Concluído
+"ajustar a idv baseada no manual ",Programar,27/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+"por logo do labdiv, ifusp e da usp ",Programar,27/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+"ajustar nomeclatura ifusp e LabDiv junto ",Programar,27/03/2026,,Média,Joao Paulo Stangorlini de Carvalho,Concluído
+Integracao ao IAMAI,Pesquisar,,"adicionar um preview para futura integracao ao IAMAI, 3 ias nas abas (admin, colisor, emissao de luz/formulario de envio)",Alta,Joao Paulo Stangorlini de Carvalho,Descartada
+"falar com os espacos, iniciativas e influencers do IF",touch the grass,26/03/2026,"falar com os espacos e iniciativas do IF pra ver se esta tudo bem em colocalos no hub e se querem alguma alteracao nas suas descricoes ",Média,Joao Paulo Stangorlini de Carvalho,Em andamento
+tornar possivel editar e apagar publicacoes feitas pelo lab,Programar,,,Média,Joao Paulo Stangorlini de Carvalho,falta testar
+conseguir mais pessoas para moderar o HUB,touch the grass,,,Alta,Joao Paulo Stangorlini de Carvalho,Em andamento
+melhorar a wiki do instituto,touch the grass,,"Ver se laboratórios, pesquisadores e informações estao corretas. Perguntar a pesquisadores dos departamentos  ",Alta,Joao Paulo Stangorlini de Carvalho,Não iniciado
+ir para o lab ao clicar em um perfil,Programar,,"na aba comunidade os perfis aparecem acima dos posts e em usuarios em orbita, ao clicar deve ir para o lab do usuario",Baixa,Joao Paulo Stangorlini de Carvalho,falta testar
+Arrumar o sincronizar grade,Programar,,,Média,"Andy Raposo, Joao Paulo Stangorlini de Carvalho",falta testar
+"pagina para seguidores/seguindo ",Programar,,ao clicar em seguidores/seguindo deve ir para uma pagina que mostre eles,Baixa,Joao Paulo Stangorlini de Carvalho,falta testar
+GRADE USP AUTOMATICA,Programar,,,Média,Andy Raposo,Concluído
+"Adequação as Lei brasileiras (LGPD, ECA, MCI, LBI)",Pesquisar,,https://docs.google.com/document/d/1OHMNLgnCpv6qokiTg3OPMJykVdEMdqalePog9qoCQ0A/edit?usp=drive_link,Alta,Joao Paulo Stangorlini de Carvalho,falta testar
+"Ver erro no parental consent ",Programar,,,Alta,Joao Paulo Stangorlini de Carvalho,falta testar
+IA’s LABDIV - FRONTEND,Programar,,"4 IAs: 1- painel admin, 2- formulário de envio, 3- amigo/companheiro no site todo, 4- na aba “O instituto da Wiki.",Média,Joao Paulo Stangorlini de Carvalho,Descartada
+Banco de dados,Programar,,Verificar e revisar o banco de dados que a gente criou até agora,Alta,Andy Raposo,Em andamento
+"Caixa de texto para o usuário por como aquele conhecimento do post pode ser usado em sua vida e essas aplicações, irem aparecendo mediante a aprovação em balõeszinhos ",Programar,,Transformar o aprendido em apreendido,Baixa,Joao Paulo Stangorlini de Carvalho,Descartada
+"Tornar a ia uma educadora freiriana, aprendendo sobre o contexto e cultura do usuário para que assim o eduque ",Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Descartada
+"Indicador visual no formulário de envio de até quantos caracteres ficam visíveis no fluxo ",Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Concluído
+Entender se vale mais a pena a API ou automação no N8N,Pesquisar,,,Baixa,Andy Raposo,Não iniciado
+Adptar o conteúdo para diferentes usuários,Programar,,"Espressar o conteúdo através de signos linguísticos pertencentes a um universo linguistico de um grupo como os nerds, artistas, academicos… e ter as palavras de um traduzidas para os outros ",Alta,Joao Paulo Stangorlini de Carvalho,Em andamento
+Eduardo Nicol - diálogica,Pesquisar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Não iniciado
+"Glossário de palavras ",Programar,,"Tentar fazer uma interface de signos linguísticos comuns das comunidades não só ifuspianas mas das “constelações"" principais do HUB (artística, geral, ...) essa
+Mapear no glossário as palavras geradoras",Alta,Joao Paulo Stangorlini de Carvalho,falta testar
+"Falar com a galera da pesquisa FAPESP ",touch the grass,,,Baixa,Joao Paulo Stangorlini de Carvalho,Não iniciado
+"Ter uma régua tipo Kindle para página completa ",Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,falta testar
+"Balões de reflexão na página completa ",Programar,,"Ao chegar na parte de reflexão sobre ter uma pausa com espaços de exercícios de reflexão Onde o usuário percebe a codificação que aql conteúdo estava, descodifica, reflete e dá então um novo significado... Ter também respostas para que tenhamos uma visão de que aql conteúdo foi significado e como Balões expansível de reflexão ao encostar na régua se espantem ",Alta,Joao Paulo Stangorlini de Carvalho,Em andamento
+"Fazer os primeiros posts ",touch the grass,,,Baixa,Joao Paulo Stangorlini de Carvalho,Em andamento
+Relatório do público alvo no envio,Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Em andamento
+"Contexto do post em questão ",Programar,,,Alta,Joao Paulo Stangorlini de Carvalho,falta testar
+Revisar apresentação (site),touch the grass,,,Baixa,Joao Paulo Stangorlini de Carvalho,Não iniciado
+Wiki de funcionamento da usp,Programar,,https://share.google/m73VzCg6lk3hoH2kZ,Baixa,Joao Paulo Stangorlini de Carvalho,Em andamento
+Adicionar o noether no CGIF/falar com o noether,touch the grass,,,Baixa,Joao Paulo Stangorlini de Carvalho,Em andamento
+deixar pagina completa no estilo da pagina da  apresentação,Programar,,,Média,Joao Paulo Stangorlini de Carvalho,Em andamento
+deixar suporte para envio de um docs/drive e a equipe faz o post a partir,Programar,,,Média,Joao Paulo Stangorlini de Carvalho,Em andamento
+"deixar a pessoa escolher sua constelação linguística ",Programar,,,Média,Joao Paulo Stangorlini de Carvalho,Em andamento
+Adicionar o noether no CGIF/falar com o noether (1),"Programar, touch the grass",,,Baixa,Joao Paulo Stangorlini de Carvalho,Em andamento
+implementar o  glossario,Programar,,,Baixa,Joao Paulo Stangorlini de Carvalho,Em andamento
+CIP IFUSP,,,,,,Não iniciado
+Adicionar link para o sci-hub/scholar/gem,,,,,,Em andamento
+Bloco de minha pesquisa/material base para o post,,,,,,Concluído
+Bloco de fontes para o posto,,,,,,Concluído
+Mudar o envio para ser uma preview em tempo real onde vc monta o posto página completa e miniatura em blocos,,,,,,Concluído
+"Projeto Nascente| design ",,,,,,Não iniciado
+"conectar ao “bluesky”, algoritmo de indexação dele, sendo ele só um “cliente”",,,,,,Não iniciado
+dicas/conselhos de veteranos nas wiki,,,,,,Em andamento
+"sac no cgif ",,,,,,Em andamento
+ter um botao para pedir para adptar o HUB para uma disciplina no observatorio,,,,,,Não iniciado
+metricas do post no laboratorio pessoal,,,,,,Em andamento
+"Cadeadinho, lets encrypty",,,,,,Não iniciado
+dicas/conselhos/informações de veteranos,,,,,,Em andamento
+Bloco pedagógico (relação do objeto divulgado com o mundo),,,,,,Não iniciado
+"Bloco pedagógico novo sobre as relações daquele objeto com o mundo e esse bloco ser dividido em (cultural, político, histórico)",,,,,,Não iniciado
+"a parte de edição do envio ser mais visual onde a pessoa adiciona um objeto (escolhendo quais blocos vai usar para isso) e do objeto ela vai categorizando, apronfundando, contextualizando. sendo um. quem é você o que quer comunicar e o usuario vai montando o post nessa.",,,,,,Não iniciado

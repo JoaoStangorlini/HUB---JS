@@ -1,0 +1,874 @@
+{
+  "kind": "tasks#taskLists",
+  "items": [{
+    "recurrences": [
+      {
+        "schedule": {
+          "end_condition": {"date_boundary": "2024-07-25T00:00:00Z"},
+          "first_instance_date": "2022-08-26T00:00:00Z",
+          "interval": {
+            "interval_multiplier": 1,
+            "monthly": {"day_of_month": 26}
+          },
+          "time_zone": "America/Sao_Paulo"
+        },
+        "kind": "tasks#taskRecurrence",
+        "created": "2023-09-20T05:17:30.004808Z",
+        "id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "title": "Mercado pago(nível 6)"
+      },
+      {
+        "schedule": {
+          "end_condition": {"date_boundary": "2024-07-19T00:00:00Z"},
+          "first_instance_date": "2022-08-20T00:00:00Z",
+          "interval": {
+            "interval_multiplier": 1,
+            "monthly": {"day_of_month": 20}
+          },
+          "time_zone": "America/Sao_Paulo"
+        },
+        "kind": "tasks#taskRecurrence",
+        "created": "2023-09-20T05:17:29.844416Z",
+        "id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "title": "Pagar o mercado pago vence hj"
+      },
+      {
+        "schedule": {
+          "end_condition": {"date_boundary": "2024-07-18T00:00:00Z"},
+          "first_instance_date": "2022-08-19T00:00:00Z",
+          "interval": {
+            "interval_multiplier": 1,
+            "monthly": {"day_of_month": 19}
+          },
+          "time_zone": "America/Sao_Paulo"
+        },
+        "kind": "tasks#taskRecurrence",
+        "created": "2023-09-20T05:17:30.146236Z",
+        "id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "title": "Mercado pago vence dia 20"
+      },
+      {
+        "schedule": {
+          "end_condition": {"date_boundary": "2024-07-17T00:00:00Z"},
+          "first_instance_date": "2022-09-18T00:00:00Z",
+          "interval": {
+            "interval_multiplier": 1,
+            "monthly": {"day_of_month": 18}
+          },
+          "time_zone": "America/Sao_Paulo"
+        },
+        "kind": "tasks#taskRecurrence",
+        "created": "2023-09-20T05:17:30.076313Z",
+        "id": "REhPQUJid2MxYTZicmUyLQ",
+        "title": "Mercado pago(nível 6)"
+      },
+      {
+        "schedule": {
+          "end_condition": {"date_boundary": "2024-07-25T00:00:00Z"},
+          "first_instance_date": "2022-08-26T00:00:00Z",
+          "interval": {
+            "interval_multiplier": 1,
+            "monthly": {"day_of_month": 26}
+          },
+          "time_zone": "America/Sao_Paulo"
+        },
+        "kind": "tasks#taskRecurrence",
+        "created": "2023-09-20T05:17:29.934313Z",
+        "id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "title": "Mercado pago(nível 6)"
+      }
+    ],
+    "visibility_on_web_fullscreen": "HIDDEN",
+    "create_time": "2021-04-14T17:51:57.160131Z",
+    "kind": "tasks#tasks",
+    "id": "MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow",
+    "title": "Minhas tarefas",
+    "updated": "2026-07-06T20:23:58.176815Z",
+    "items": [
+      {
+        "kind": "tasks#task",
+        "created": "2025-12-01T17:14:25.698698Z",
+        "id": "MmYzX215eDB6ejFwNVd5TA",
+        "completed": "2025-12-01T18:37:47.278Z",
+        "title": "Contabilidade",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2025-12-01T18:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2025-12-01T18:37:48.010543Z",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/MmYzX215eDB6ejFwNVd5TA",
+        "status": "completed"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-06-22T21:50:05.874Z",
+        "id": "YTE5ZGV5V2VKUDJVV2NKNQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-05-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-06-26T03:59:12.381455Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/YTE5ZGV5V2VKUDJVV2NKNQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-06-22T21:49:52.276Z",
+        "id": "enJ6M3dGS3RQMExRcWV1WQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-05-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-06-26T03:59:12.136959Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/enJ6M3dGS3RQMExRcWV1WQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-06-03T00:46:57.825Z",
+        "id": "cnZzOHZicnJoX1dxNlNYSg",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-05-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-06-20T03:59:12.135423Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/cnZzOHZicnJoX1dxNlNYSg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-06-03T00:46:58.937Z",
+        "id": "dFlHTDNNTzFJd19HUE5uSw",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-05-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-06-19T03:59:12.128383Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/dFlHTDNNTzFJd19HUE5uSw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-05-23T21:51:04.628Z",
+        "id": "RzFaRzV0aklJVG5WSXN3NA",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-05-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-06-18T03:59:12.131663Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/RzFaRzV0aklJVG5WSXN3NA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-05-23T21:50:05.727Z",
+        "id": "dF9ZMTdtM0NqSGdHQ1RhOQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-04-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-05-26T03:59:12.337887Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/dF9ZMTdtM0NqSGdHQ1RhOQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-05-23T21:49:52.299Z",
+        "id": "THkzNHlxek85a2FMSzVOcg",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-04-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-05-26T03:59:12.140943Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/THkzNHlxek85a2FMSzVOcg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-05-04T00:46:57.719Z",
+        "id": "aktPdklKT0YzbmhiUnZRaQ",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-04-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-05-20T03:59:12.131247Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/aktPdklKT0YzbmhiUnZRaQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-05-04T00:46:58.808Z",
+        "id": "S3NFbm5RWC13eDVyVm1WVg",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-04-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-05-19T03:59:12.154575Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/S3NFbm5RWC13eDVyVm1WVg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-04-23T21:51:04.318Z",
+        "id": "VHpwWnVfQlpTdEdTMEJmbw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-04-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-05-18T03:59:12.136559Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/VHpwWnVfQlpTdEdTMEJmbw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-04-23T21:49:51.850Z",
+        "id": "VXAtVTFTZHo4TER4czNkWQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-03-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-04-26T03:59:12.410975Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/VXAtVTFTZHo4TER4czNkWQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-04-23T21:50:05.593Z",
+        "id": "ZmN6TmZZd0JKZUI2RC1Wbg",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-03-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-04-26T03:59:12.149471Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/ZmN6TmZZd0JKZUI2RC1Wbg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-04-04T00:46:57.450Z",
+        "id": "aTJJTTRfSnI5SEQ1RnNERg",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-03-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-04-20T03:59:12.150047Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/aTJJTTRfSnI5SEQ1RnNERg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-04-04T00:46:58.566Z",
+        "id": "LU4zb0w2enFzczE4OWtYMw",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-03-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-04-19T03:59:12.131615Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/LU4zb0w2enFzczE4OWtYMw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-03-24T21:51:04.208Z",
+        "id": "MUlYakhOOW9wUjB6SDc4Uw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-03-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-04-18T03:59:12.142367Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/MUlYakhOOW9wUjB6SDc4Uw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-03-24T21:50:05.467Z",
+        "id": "Ymw0Wm5WdDcyelViLUZXbQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-02-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-03-26T03:59:12.458623Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/Ymw0Wm5WdDcyelViLUZXbQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-03-24T21:49:51.689Z",
+        "id": "RWxRTWZHTnBIUXZWa3ZLbQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-02-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-03-26T03:59:12.141983Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/RWxRTWZHTnBIUXZWa3ZLbQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-03-05T00:46:57.229Z",
+        "id": "OGpFUEQwRVZfNzJqRnBCSA",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-02-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-03-20T03:59:12.155999Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/OGpFUEQwRVZfNzJqRnBCSA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-03-05T00:46:58.116Z",
+        "id": "MDlFb3ljVk5pQmxxNE5EbQ",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-02-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-03-19T03:59:12.161903Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/MDlFb3ljVk5pQmxxNE5EbQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-02-22T21:51:04.049Z",
+        "id": "ZFhCSl9ZSFRfYjljT0YxWQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-02-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-03-18T03:59:12.145727Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/ZFhCSl9ZSFRfYjljT0YxWQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-02-22T21:50:05.329Z",
+        "id": "WEdRWUNsM0xwTFZVMHJFTg",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-01-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-02-26T03:59:12.364911Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/WEdRWUNsM0xwTFZVMHJFTg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-02-22T21:49:51.382Z",
+        "id": "MmhiR3RkNEw4RWRYejRhVw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-01-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-02-26T03:59:12.146079Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/MmhiR3RkNEw4RWRYejRhVw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-02-03T00:46:57.028Z",
+        "id": "LXA2NzMycXR4VVl6eVBWbw",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-01-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-02-20T03:59:12.149855Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/LXA2NzMycXR4VVl6eVBWbw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-02-03T00:46:57.904Z",
+        "id": "QndfMmJTRndoOGZSWUpEZQ",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-01-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-02-19T03:59:12.137167Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/QndfMmJTRndoOGZSWUpEZQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-01-23T21:51:03.899Z",
+        "id": "a2pPVkFqOUdVR3N0QlRwWQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2024-01-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-02-18T03:59:12.136959Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/a2pPVkFqOUdVR3N0QlRwWQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-01-23T21:50:05.198Z",
+        "id": "RlZSVUE1dDBkWTFEd0xXeA",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-12-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-01-26T03:59:12.363615Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/RlZSVUE1dDBkWTFEd0xXeA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-01-23T21:49:51.329Z",
+        "id": "UEpFRF9tMUhyU0JvS2lhMw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-12-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-01-26T03:59:12.143935Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/UEpFRF9tMUhyU0JvS2lhMw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-01-04T00:46:56.969Z",
+        "id": "a2ZGQzZURGowTVJ3dzNpeg",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-12-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-01-20T03:59:12.151167Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/a2ZGQzZURGowTVJ3dzNpeg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2023-01-04T00:46:57.765Z",
+        "id": "TG5vbWxjWmxFbjdKend5cA",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-12-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-01-19T03:59:12.145919Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/TG5vbWxjWmxFbjdKend5cA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-12-24T21:51:03.755Z",
+        "id": "M05US3VyMDJBQ3A0azNXYw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-12-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2024-01-18T03:59:12.139375Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/M05US3VyMDJBQ3A0azNXYw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-12-24T21:49:50.886Z",
+        "id": "aC1rbnJGN2tTMDVCd1RuQg",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-11-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-12-26T03:59:12.376543Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/aC1rbnJGN2tTMDVCd1RuQg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-12-24T21:50:05.061Z",
+        "id": "NFRnX3ZrRmp2RXBvQ1MyTw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-11-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-12-26T03:59:12.137583Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/NFRnX3ZrRmp2RXBvQ1MyTw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-12-05T00:46:56.531Z",
+        "id": "ZHVtRU1lLVlkU0ZEdXF5cw",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-11-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-12-20T03:59:12.149039Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/ZHVtRU1lLVlkU0ZEdXF5cw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-12-05T00:46:57.501Z",
+        "id": "S0o5TURvZ0xSZTQtVU8wcg",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-11-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-12-19T03:59:12.148943Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/S0o5TURvZ0xSZTQtVU8wcg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-11-24T21:51:03.622Z",
+        "id": "d3VnbHhWMW85LXAtbjhBWA",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-11-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-12-18T03:59:12.139391Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/d3VnbHhWMW85LXAtbjhBWA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-11-24T21:50:04.817Z",
+        "id": "aVN1Rk52c2JTRnJwclEwMQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-10-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-11-26T03:59:12.241183Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/aVN1Rk52c2JTRnJwclEwMQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-11-24T21:49:50.620Z",
+        "id": "QnNISm1YQ1FNajRkVG5HbQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-10-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-11-26T03:59:12.126431Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/QnNISm1YQ1FNajRkVG5HbQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-11-05T00:46:56.429Z",
+        "id": "WjhIaDZ1MlhTUjdLRTRKQg",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-10-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-11-20T03:59:12.139055Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/WjhIaDZ1MlhTUjdLRTRKQg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-11-05T00:46:57.110Z",
+        "id": "WEp1azN0QTN5V0pEcU1NcA",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-10-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-11-19T03:59:12.145759Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/WEp1azN0QTN5V0pEcU1NcA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-10-25T21:51:03.476Z",
+        "id": "MEdHT0NGeDVsYWRwTHM0OQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-10-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-11-18T03:59:12.138191Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/MEdHT0NGeDVsYWRwTHM0OQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-10-25T21:49:50.385Z",
+        "id": "Ukk0WWcwQ2FmSkw2eVRFQg",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-09-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-10-26T03:59:12.364063Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/Ukk0WWcwQ2FmSkw2eVRFQg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-10-25T21:50:04.601Z",
+        "id": "YndZb1NDWk1ZOVp3ZEl3dw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-09-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-10-26T03:59:12.154287Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/YndZb1NDWk1ZOVp3ZEl3dw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-10-06T00:46:56.157Z",
+        "id": "X0JjYXhfTGJ5dnExaXlYNg",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-09-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-10-20T03:59:12.146975Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/X0JjYXhfTGJ5dnExaXlYNg",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-10-06T00:46:56.975Z",
+        "id": "MUdZODFrNnl5eE9jeW84Qw",
+        "title": "Mercado pago vence dia 20",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-09-19T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-10-19T03:59:12.152127Z",
+        "task_recurrence_id": "VnhHdzRnTjY1MGdmMFFqVA",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/MUdZODFrNnl5eE9jeW84Qw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-08-26T21:51:03.205Z",
+        "id": "b1NLVXBMaHVuVThGQWJSNA",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-09-18T11:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-10-18T03:59:12.140415Z",
+        "task_recurrence_id": "REhPQUJid2MxYTZicmUyLQ",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/b1NLVXBMaHVuVThGQWJSNA",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-08-26T21:50:04.362Z",
+        "id": "Qk9ocGJ6RDFuTWQ4MmdVMw",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-08-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-09-26T03:59:12.347983Z",
+        "task_recurrence_id": "SktXQ2ZlUEhKQ1gyYnU2Mg",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/Qk9ocGJ6RDFuTWQ4MmdVMw",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-08-26T21:49:49.957Z",
+        "id": "VV9wXzc2UFkzY2tXWlNqRQ",
+        "title": "Mercado pago(nível 6)",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-08-26T22:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-09-26T03:59:12.153775Z",
+        "task_recurrence_id": "eUJqUXl4bTdUTm5OaG1RYw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/VV9wXzc2UFkzY2tXWlNqRQ",
+        "status": "needsAction"
+      },
+      {
+        "visibility": "PAST_HIDDEN",
+        "kind": "tasks#task",
+        "created": "2022-08-07T00:46:55.619Z",
+        "id": "akM4VlhiV0pZMmtRSGtJNw",
+        "title": "Pagar o mercado pago vence hj",
+        "scheduled_time": [{
+          "current": true,
+          "start": "2023-08-20T03:00:00Z"
+        }],
+        "task_type": "PERSONAL_TASK",
+        "updated": "2023-09-20T05:17:30.857407Z",
+        "task_recurrence_id": "YTQ2a3kzWXlJWWRuNTJNRw",
+        "selfLink": "https://www.googleapis.com/tasks/v1/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow/tasks/akM4VlhiV0pZMmtRSGtJNw",
+        "status": "needsAction"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/tasks/v1/users/@me/lists/MTE2MzUwNjA1Mjk5OTM3NjAxNjA6MDow"
+  }]
+}

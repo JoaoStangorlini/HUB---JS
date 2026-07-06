@@ -1,65 +1,34 @@
-import Image from "next/image";
+/*
+ * Este programa é um software livre; você pode redistribuí-lo e/ou 
+ * modificá-lo sob os termos da Licença Pública Geral GNU Affero (AGPLv3).
+ */
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="flex-1 flex flex-col items-center justify-center p-8">
+      <h1 className="text-5xl font-bold text-[#4B0082] mb-6">Hub Pessoal</h1>
+      <p className="text-lg text-[#A0A0A0] max-w-2xl text-center mb-12">
+        Bem-vindo ao seu ecossistema digital centralizado. Selecione um módulo abaixo para acessar suas ferramentas.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+        <Link href="/tarefas" className="group bg-[#1E1E1E] border border-[#2A2A2A] hover:border-[#FFD700] p-8 rounded-xl transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:-translate-y-1 cursor-pointer flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-[#2A2A2A] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#FFD700]/10">
+             <span className="text-3xl">📋</span>
+          </div>
+          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2">Gerenciador de Tarefas</h2>
+          <p className="text-[#A0A0A0]">Acesse o Kanban para organizar os projetos do HUB, USP e Vida Pessoal.</p>
+        </Link>
+
+        <Link href="/galeria" className="group bg-[#1E1E1E] border border-[#2A2A2A] hover:border-[#FFD700] p-8 rounded-xl transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover:-translate-y-1 cursor-pointer flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-[#2A2A2A] rounded-full flex items-center justify-center mb-4 group-hover:bg-[#FFD700]/10">
+             <span className="text-3xl">📸</span>
+          </div>
+          <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2">Fotografia (Galeria)</h2>
+          <p className="text-[#A0A0A0]">Acesse seu portfólio Pic-Time integrado diretamente no Hub.</p>
+        </Link>
+      </div>
     </div>
   );
 }
