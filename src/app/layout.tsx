@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import "./globals.css";
 
 const openSans = Open_Sans({
@@ -10,7 +9,7 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Hub Pessoal",
+  title: "Stangorlini.web",
   description: "Gerenciador de Tarefas e Projetos",
 };
 
@@ -21,12 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${openSans.variable} antialiased h-full`}>
-      <body className="min-h-full flex flex-col bg-cosmic-bg text-cosmic-text">
-        <Navbar />
+      <body className="min-h-full flex flex-col bg-[#121212] text-[#F5F5F5]">
         <main className="flex-1 flex flex-col">
           {children}
         </main>
-        <Footer />
       </body>
     </html>
   );

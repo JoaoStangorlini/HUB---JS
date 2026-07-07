@@ -1,21 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  /* Luxo Cósmico Palette */
-  --color-cosmic-bg: #0B1320;
-  --color-cosmic-surface: #240046;
-  --color-cosmic-surface-hover: #5A189A;
-  --color-cosmic-accent: #FFB703;
-  --color-cosmic-text: #E0FBFC;
+  /* LabDiv / Portfolio Palette */
+  --color-base-dark: #121212;
+  --color-surface: #1E1E1E;
+  --color-surface-hover: #2D2D2D;
+  --color-purple: #3B1E43;
+  --color-purple-light: #5A2E65;
+  --color-gold: #FFCC00;
+  --color-red: #F14343;
+  --color-blue: #0F4780;
+  
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #A0A0A0;
 
   --font-title: var(--font-bukra), 'Arial Black', sans-serif;
-  --font-body: var(--font-open-sans), sans-serif;
+  --font-body: var(--font-open-sans), 'Open Sans', sans-serif;
 }
 
 @layer base {
   :root {
-    --background: var(--color-cosmic-bg);
-    --foreground: var(--color-cosmic-text);
+    --background: var(--color-base-dark);
+    --foreground: var(--color-text-primary);
   }
 
   body {

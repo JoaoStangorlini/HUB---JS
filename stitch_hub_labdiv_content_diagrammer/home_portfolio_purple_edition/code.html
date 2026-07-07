@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ARCHIVE.01 | Researcher Portfolio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Courier+Prime&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "surface-container": "#1e2024",
+                        "on-secondary-container": "#f9f7ff",
+                        "surface-tint": "#d0bcff",
+                        "on-secondary-fixed-variant": "#4f378b",
+                        "on-error": "#690005",
+                        "surface-variant": "#333539",
+                        "secondary-container": "#4f378b",
+                        "on-tertiary-container": "#b80013",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "primary-container": "#4f378b",
+                        "inverse-on-surface": "#2f3035",
+                        "inverse-primary": "#6750a4",
+                        "secondary": "#d0bcff",
+                        "on-surface": "#e2e2e8",
+                        "on-primary-fixed-variant": "#4f378b",
+                        "on-tertiary": "#690006",
+                        "on-primary-fixed": "#21005d",
+                        "outline-variant": "#49454f",
+                        "on-background": "#e2e2e8",
+                        "tertiary": "#ffeae7",
+                        "inverse-surface": "#e2e2e8",
+                        "surface-container-highest": "#333539",
+                        "outline": "#938f99",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface": "#111318",
+                        "on-secondary-fixed": "#21005d",
+                        "tertiary-container": "#ffc4be",
+                        "surface-container-high": "#282a2e",
+                        "background": "#111318",
+                        "on-primary-container": "#eaddff",
+                        "surface-dim": "#111318",
+                        "error-container": "#93000a",
+                        "primary": "#d0bcff",
+                        "secondary-fixed": "#eaddff",
+                        "on-tertiary-fixed-variant": "#93000d",
+                        "surface-container-low": "#1a1c20",
+                        "on-primary": "#381e72",
+                        "on-surface-variant": "#cac4cf",
+                        "primary-fixed": "#eaddff",
+                        "tertiary-fixed": "#ffdad6",
+                        "on-tertiary-fixed": "#410002",
+                        "on-secondary": "#381e72",
+                        "surface-bright": "#37393e",
+                        "tertiary-fixed-dim": "#ffb4ac",
+                        "surface-container-lowest": "#0c0e12"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "margin-desktop": "48px",
+                        "gutter": "24px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "code-sm": ["Courier Prime"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "code-sm": ["12px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0a0c10;
+            color: #e2e2e8;
+            overflow-x: hidden;
+        }
+
+        .scientific-glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .focus-glass {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .glow-purple {
+            filter: blur(80px);
+            background: #d0bcff;
+            opacity: 0.12;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .glow-blue {
+            filter: blur(80px);
+            background: #0266ff;
+            opacity: 0.1;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .physics-bg {
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .reticle-gauge {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .reticle-gauge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #d0bcff;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            transform: rotate(45deg);
+        }
+
+        .formula-float {
+            font-family: 'Courier Prime', monospace;
+            opacity: 0.1;
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body-md">
+<!-- Ambient Physics Background Elements -->
+<div class="fixed inset-0 physics-bg pointer-events-none opacity-40"></div>
+<div class="formula-float fixed top-24 left-12 text-sm">E = mc²</div>
+<div class="formula-float fixed bottom-48 right-24 text-sm">∇ · E = ρ / ε₀</div>
+<div class="formula-float fixed top-1/2 left-4 text-xs">iℏ ∂/∂t Ψ = Ĥ Ψ</div>
+<div class="glow-purple w-[500px] h-[500px] -top-64 -left-32"></div>
+<div class="glow-blue w-[600px] h-[600px] bottom-0 -right-32"></div>
+<!-- Header / TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10">
+<div class="flex justify-between items-center px-margin-desktop py-unit max-w-container-max mx-auto">
+<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">
+            ARCHIVE.01
+        </div>
+<nav class="hidden md:flex gap-gutter items-center">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 transition-colors duration-300" href="#research">Research</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300" href="#projects">Projects</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300" href="#insights">Insights</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300" href="#about">About</a>
+</nav>
+<div class="flex items-center gap-gutter">
+<button class="px-6 py-2 bg-primary-container text-on-primary-container font-label-md text-label-md rounded-full hover:opacity-90 active:opacity-70 transition-all">
+                Connect
+            </button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto space-y-32">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-7 space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-primary-container/15 text-primary rounded-full font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">science</span>
+                Principal Investigator
+            </div>
+<h1 class="font-display-lg text-display-lg text-white leading-tight">
+                DR. ELARA <span class="text-primary-container">VANCE</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                Bridging computational fluid dynamics with neural architecture search. Dedicated to documenting the intersection of physical laws and algorithmic intelligence.
+            </p>
+<div class="flex gap-4">
+<button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-full font-label-md text-label-md flex items-center gap-2">
+                    View Repository <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="scientific-glass px-8 py-3 rounded-full font-label-md text-label-md flex items-center gap-2">
+                    Download CV
+                </button>
+</div>
+</div>
+<div class="md:col-span-5 relative group">
+<div class="absolute -inset-4 bg-primary-container/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="aspect-square scientific-glass rounded-xl overflow-hidden p-3 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+<img class="w-full h-full object-cover rounded-lg grayscale hover:grayscale-0 transition-all duration-700" data-alt="A cinematic, high-contrast professional portrait of a female scientist in a modern, dark laboratory. She has a thoughtful expression, wearing sleek dark technical clothing. The lighting is dramatic, with vibrant purple and deep blue rim lights highlighting her silhouette against a background of blurred scientific equipment and glass surfaces. The overall aesthetic is polished, premium, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhNI_3GsuHAoQUwAotIb7No55fPgvmwW6wFjmTrfKYD2hgq_FxHvr0R7LFj_fhous5TUIP1RSr1Gpeb4MbD9ON5bPGV7c_0czvcF8yYFkeReJC3X4GIShOq2VvMBkcOoVIqWoWf4_yBjS1DvNh3EaSpAbEnxtDJtGq9kAfb5UZYVvIl8Zi_AntKToDSgVJ-uqsWsBcFiL_CzGGxjkaB1MYyVY-wMmkOfa8V23ppZDxyhSso5hblt0PZuFiBrn4n76KvqvAqQAMzso"/>
+</div>
+</div>
+</section>
+<!-- Featured Projects (Bento Grid) -->
+<section class="space-y-12" id="projects">
+<div class="flex flex-col md:flex-row justify-between items-end gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-white">Featured Contributions</h2>
+<p class="text-on-surface-variant mt-2">Active research documentation and experimental data models.</p>
+</div>
+<div class="flex gap-2">
+<div class="chip flex items-center gap-2 px-4 py-1.5 scientific-glass rounded-full text-primary font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Quantum Computing
+                </div>
+<div class="chip flex items-center gap-2 px-4 py-1.5 scientific-glass rounded-full text-on-surface-variant font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-outline"></span> Data Vis
+                </div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Project 1: Large -->
+<div class="md:col-span-8 scientific-glass p-8 rounded-xl flex flex-col justify-between h-[500px] relative overflow-hidden group">
+<div class="relative z-10 space-y-4">
+<span class="material-symbols-outlined text-primary">database</span>
+<h3 class="font-headline-md text-headline-md text-white">NEURAL_FLUID_01</h3>
+<p class="text-on-surface-variant max-w-md">Applying machine learning to predict turbulent flow patterns in supercritical fluids. Achieving 98.4% accuracy across variable Reynolds numbers.</p>
+</div>
+<div class="relative z-10 flex gap-4">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Accuracy</span>
+<span class="font-headline-md text-headline-md text-white">98.4%</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Compute</span>
+<span class="font-headline-md text-headline-md text-white">4.2 TFlops</span>
+</div>
+</div>
+</div>
+<!-- Project 2: Square -->
+<div class="md:col-span-4 focus-glass p-8 rounded-xl flex flex-col justify-between h-[500px] border-primary-container/30">
+<div class="space-y-4">
+<div class="reticle-gauge flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">light_mode</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white">STEL_MAP</h3>
+<p class="text-on-surface-variant">Deep-space stellar classification using spectral analysis and k-means clustering.</p>
+</div>
+<button class="w-full py-4 border-t border-outline-variant/20 text-primary font-label-md text-label-md text-left flex justify-between items-center group">
+                    EXPLORE DATASET
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Lab Agenda & Events -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-12" id="research">
+<div class="md:col-span-4 space-y-6">
+<h2 class="font-headline-lg text-headline-lg text-white">Lab Briefings</h2>
+<p class="text-on-surface-variant">Scheduled presentations, guest lectures, and laboratory synchronization sessions.</p>
+<div class="p-6 scientific-glass rounded-xl border-l-4 border-primary">
+<div class="text-primary font-label-md text-label-md uppercase tracking-widest mb-2">Next Session</div>
+<div class="text-white font-headline-md text-headline-md">Superfluid Phase Transitions</div>
+<div class="text-on-surface-variant mt-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">schedule</span> June 24, 14:00 GMT
+                </div>
+</div>
+</div>
+<div class="md:col-span-8 space-y-4">
+<div class="grid gap-4">
+<!-- Timeline Item 1 -->
+<div class="flex items-center gap-6 p-6 scientific-glass rounded-xl hover:bg-white/5 transition-colors group">
+<div class="font-code-sm text-on-surface-variant w-24">JULY 2024</div>
+<div class="flex-grow">
+<h4 class="text-white font-bold">International Physics Symposium</h4>
+<p class="text-on-surface-variant text-sm">Keynote: Algorithmic Observation Bias</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-secondary-container/20 text-secondary text-xs">BERLIN, DE</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="flex items-center gap-6 p-6 scientific-glass rounded-xl hover:bg-white/5 transition-colors">
+<div class="font-code-sm text-on-surface-variant w-24">AUG 2024</div>
+<div class="flex-grow">
+<h4 class="text-white font-bold">Open Lab: Neural Dynamics</h4>
+<p class="text-on-surface-variant text-sm">Live demonstration of ARCHIVE.01 processing</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-primary-container/20 text-primary text-xs">VIRTUAL</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="flex items-center gap-6 p-6 scientific-glass rounded-xl hover:bg-white/5 transition-colors">
+<div class="font-code-sm text-on-surface-variant w-24">SEPT 2024</div>
+<div class="flex-grow">
+<h4 class="text-white font-bold">CERN Collaboration Phase II</h4>
+<p class="text-on-surface-variant text-sm">On-site data ingestion and analysis</p>
+</div>
+<div class="px-3 py-1 rounded-full bg-tertiary-container/20 text-tertiary text-xs">GENEVA, CH</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Lab Gallery -->
+<section class="space-y-8" id="insights">
+<h2 class="font-headline-lg text-headline-lg text-white">Visual Archives</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="aspect-square rounded-lg overflow-hidden scientific-glass p-1">
+<img class="w-full h-full object-cover rounded-lg opacity-60 hover:opacity-100 transition-opacity" data-alt="A macro photograph of high-tech laboratory electronics with glowing purple LED indicators and intricate wiring. The lighting is moody and dark, reflecting off semi-transparent glass surfaces." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRMjTtXd0bY9CWx2zw3ZSBbeQTovn5dnlr4HM233XxeMz4j4QBDHsNvD_7vlw16P2weAYHhz6MfRTaR5_kts0oGxEPGze6ikblajlj9utyfjbinEqkUxcKsJyED_Sm9vMlxvGONT2u3VlhwmW7Q-OcsgXSdarsWD2PAZCmdOLynihIzGrB3-zupc-3gliFgfOKKQNN_vc_h0zjNItBXDt-JUtKRgKIu5w6KEuUM0uDToebzKgCzf8SyMQwn39IqKzNnWdzU8gAlWY"/>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden scientific-glass p-1 md:translate-y-8">
+<img class="w-full h-full object-cover rounded-lg opacity-60 hover:opacity-100 transition-opacity" data-alt="An abstract visualization of particle trajectories rendered in vibrant purple and deep blue lines against a pitch-black background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK372OVsOBsVf-BKacXJHvjJPeG6l9mvkml0cMPm0lygVl-y5Y4E2vjH7_UL3muuX_-yrydjKsGWBHQL4batIkJTaj2Y_L5Dy-j3IQr22dl9C25SFJh8lJ6ImKhXGSzQhJnb5AatETeBpioFP9Vgk5Yi7hlVpogajZcbaCW1OL9cUIn1vfrGbMhHb_fDnilF5oWtQTnoKqsKrsRgSHaz8Jy1YcIpYj73cclhDZYEcnCiKRjquBx4dtHsmoVsO1omfPZ6sg_v205nk"/>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden scientific-glass p-1">
+<img class="w-full h-full object-cover rounded-lg opacity-60 hover:opacity-100 transition-opacity" data-alt="A clean, minimalist shot of a laboratory desk with a transparent tablet showing complex mathematical formulas. The room is dark with subtle ambient glows of purple light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAXUNKyC8uND__mEmAFaumyZMaHi0rHeGpNdWoTVXgOJ-u7TmH01dfCvXlDYt1kDX0SYetZs6CQvU1akCLT3-yLXNrZU82IDm3VK8pmPGKoC7A9zVHZ2LeTLze8RljUeUU2vEBTpI6BGPsfOKRU5Ekk6cTi2KP1mZ3sz514-rQSbL4qgwEa4yec_0HnzU5rwk51Tf1nlRMyEIVJq44ElzPsl1OQqAb50aXQFURM_BZO5ib36gDA6VSQ6zeXd6o8j_g80vKpbx-CEQ"/>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden scientific-glass p-1 md:translate-y-8">
+<img class="w-full h-full object-cover rounded-lg opacity-60 hover:opacity-100 transition-opacity" data-alt="Close up of a microscope lens reflecting a digital display of DNA sequences. The colors are dominated by deep blues and vibrant purple highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDRMAiKFpClSHYB0FnfnGc5GssS4jiV6Z5PulRT3MmIUnvsywG-w-n4CAHFB2u40Jb-xB7CAvw-hN80yOfKTzaszRhAW3_7P6l-f4tBa-IBzmKSSfte_ef2_-ScfsmDQ-NNTQS-ymRAq2mYsI1M8I4y4rzD7gXpfzTO_cItlrt8fMYv4An7EKUT4zv-WWStKtwYRjQGsevftAAC1oWM0XUQBIe1FWMbzgS-InjgLqIpxHjIReONzdS-nDDthpuBIaax3KQlA0EjdQ"/>
+</div>
+</div>
+</section>
+<!-- Links Section -->
+<section class="pt-12" id="about">
+<div class="focus-glass p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg text-white">Ready for collaboration?</h2>
+<p class="text-on-surface-variant mt-2 max-w-md">Open for consultation on high-density data modeling and computational physics architecture.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+<a class="bg-primary-container text-on-primary-container py-4 px-8 rounded-full font-label-md text-label-md text-center hover:opacity-90 transition-all flex items-center justify-center gap-2" href="#">
+<span class="material-symbols-outlined">description</span> CURRICULUM VITAE
+                </a>
+<a class="scientific-glass text-white py-4 px-8 rounded-full font-label-md text-label-md text-center hover:bg-white/10 transition-all flex items-center justify-center gap-2" href="#">
+<span class="material-symbols-outlined">terminal</span> VIEW GITHUB
+                </a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-12 border-t border-outline-variant/5">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop gap-gutter max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md text-on-surface font-black">
+            ARCHIVE.01
+        </div>
+<div class="text-on-surface-variant font-label-md text-label-md uppercase tracking-widest">
+            © 2024 SCIENTIFIC ARCHIVE. ALL RIGHTS RESERVED.
+        </div>
+<div class="flex gap-gutter">
+<a class="text-primary font-label-md text-label-md hover:underline transition-all" href="#">LinkedIn</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:underline transition-all" href="#">Twitter</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:underline transition-all" href="#">Scholar</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:underline transition-all" href="#">GitHub</a>
+</div>
+</div>
+</footer>
+<script>
+    // Subtle Mouse Interaction for Glass Cards
+    document.querySelectorAll('.scientific-glass, .focus-glass').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+            
+            // Add a very subtle lighting effect following the mouse
+            card.style.backgroundImage = `radial-gradient(circle 200px at ${x}px ${y}px, rgba(255,255,255,0.05), transparent)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.backgroundImage = '';
+        });
+    });
+
+    // Smooth Scroll for Nav Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Dynamic Header Transparency
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 50) {
+            header.classList.add('bg-surface/90', 'shadow-xl');
+        } else {
+            header.classList.remove('bg-surface/90', 'shadow-xl');
+        }
+    });
+</script>
+</body></html>
