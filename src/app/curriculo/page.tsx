@@ -48,10 +48,7 @@ export default function CurriculoPage() {
               <span className="text-[#FFCC00] font-bold">GitHub:</span>
               <a href="https://github.com/JoaoStangorlini" target="_blank" rel="noreferrer" className="hover:text-white transition-colors underline">/JoaoStangorlini</a>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[#FFCC00] font-bold">CodePen:</span>
-              <a href="https://codepen.io/joao36r" target="_blank" rel="noreferrer" className="hover:text-white transition-colors underline">/joao36r</a>
-            </div>
+
           </div>
         </section>
 
