@@ -75,47 +75,57 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             
-            <a href="https://hub-lab-div.vercel.app" target="_blank" rel="noreferrer" className="md:col-span-4 bg-[#1E1E1E] border border-[#2D2D2D] p-8 rounded-2xl flex flex-col justify-between min-h-[320px] group hover:border-[#F14343] transition-colors">
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-[#F14343] text-white rounded-full flex items-center justify-center mb-6">
-                  <span className="font-bold text-xl">1</span>
-                </div>
-                <h3 className="text-2xl font-['Bukra'] font-bold text-white">O HUB Acadêmico</h3>
-                <p className="text-[#A0A0A0] font-medium">Acesse o sistema integral de gerenciamento e pesquisa.</p>
-              </div>
-              <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#F14343]/50 pt-4 flex justify-between items-center text-[#F14343] font-bold transition-colors">
-                Acessar Plataforma
-                <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
-              </div>
-            </a>
+            {/* O Grande Card com borda gradiente */}
+            <div className="md:col-span-12 rounded-2xl p-[2px] bg-gradient-to-r from-[#F14343] via-[#FFCC00] to-[#0F4780]">
+              <div className="bg-[#1E1E1E] rounded-[14px] h-full grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#2D2D2D] overflow-hidden">
+                
+                <a href="https://hub-lab-div.vercel.app" target="_blank" rel="noreferrer" className="p-8 flex flex-col justify-between min-h-[320px] group hover:bg-[#252525] transition-colors relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#F14343]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="space-y-4 relative z-10">
+                    <div className="w-12 h-12 bg-[#F14343] text-white rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(241,67,67,0.5)]">
+                      <span className="font-bold text-xl">1</span>
+                    </div>
+                    <h3 className="text-2xl font-['Bukra'] font-bold text-white">O HUB Acadêmico</h3>
+                    <p className="text-[#A0A0A0] font-medium">Acesse o sistema integral de gerenciamento e pesquisa.</p>
+                  </div>
+                  <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#F14343]/50 pt-4 flex justify-between items-center text-[#F14343] font-bold transition-colors relative z-10">
+                    Acessar Plataforma
+                    <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
+                  </div>
+                </a>
 
-            <a href="https://hub-lab-div.vercel.app/apresentacao" target="_blank" rel="noreferrer" className="md:col-span-4 bg-[#1E1E1E] border border-[#2D2D2D] p-8 rounded-2xl flex flex-col justify-between min-h-[320px] group hover:border-[#FFCC00] transition-colors">
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-[#FFCC00] text-[#121212] rounded-full flex items-center justify-center mb-6">
-                  <span className="font-bold text-xl">2</span>
-                </div>
-                <h3 className="text-2xl font-['Bukra'] font-bold text-white">Apresentação</h3>
-                <p className="text-[#A0A0A0] font-medium">Conheça a visão, arquitetura e proposta do projeto.</p>
-              </div>
-              <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#FFCC00]/50 pt-4 flex justify-between items-center text-[#FFCC00] font-bold transition-colors">
-                Ver Apresentação
-                <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
-              </div>
-            </a>
+                <a href="https://hub-lab-div.vercel.app/apresentacao" target="_blank" rel="noreferrer" className="p-8 flex flex-col justify-between min-h-[320px] group hover:bg-[#252525] transition-colors relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#FFCC00]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="space-y-4 relative z-10">
+                    <div className="w-12 h-12 bg-[#FFCC00] text-[#121212] rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(255,204,0,0.5)]">
+                      <span className="font-bold text-xl">2</span>
+                    </div>
+                    <h3 className="text-2xl font-['Bukra'] font-bold text-white">Apresentação</h3>
+                    <p className="text-[#A0A0A0] font-medium">Conheça a visão, arquitetura e proposta do projeto.</p>
+                  </div>
+                  <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#FFCC00]/50 pt-4 flex justify-between items-center text-[#FFCC00] font-bold transition-colors relative z-10">
+                    Ver Apresentação
+                    <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
+                  </div>
+                </a>
 
-            <a href="https://hub-lab-div.vercel.app/labdiv" target="_blank" rel="noreferrer" className="md:col-span-4 bg-[#1E1E1E] border border-[#2D2D2D] p-8 rounded-2xl flex flex-col justify-between min-h-[320px] group hover:border-[#0F4780] transition-colors">
-              <div className="space-y-4">
-                <div className="w-12 h-12 bg-[#0F4780] text-white rounded-full flex items-center justify-center mb-6">
-                  <span className="font-bold text-xl">3</span>
-                </div>
-                <h3 className="text-2xl font-['Bukra'] font-bold text-white">Página do LabDiv</h3>
-                <p className="text-[#A0A0A0] font-medium">Explore a documentação, ferramentas e interações.</p>
+                <a href="https://hub-lab-div.vercel.app/labdiv" target="_blank" rel="noreferrer" className="p-8 flex flex-col justify-between min-h-[320px] group hover:bg-[#252525] transition-colors relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#0F4780]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="space-y-4 relative z-10">
+                    <div className="w-12 h-12 bg-[#0F4780] text-white rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(15,71,128,0.5)]">
+                      <span className="font-bold text-xl">3</span>
+                    </div>
+                    <h3 className="text-2xl font-['Bukra'] font-bold text-white">Página do LabDiv</h3>
+                    <p className="text-[#A0A0A0] font-medium">Explore a documentação, ferramentas e interações.</p>
+                  </div>
+                  <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#0F4780]/50 pt-4 flex justify-between items-center text-[#5fa8ff] font-bold transition-colors relative z-10">
+                    Explorar Padrão Ouro
+                    <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
+                  </div>
+                </a>
+
               </div>
-              <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#0F4780]/50 pt-4 flex justify-between items-center text-[#5fa8ff] font-bold transition-colors">
-                Explorar Padrão Ouro
-                <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
-              </div>
-            </a>
+            </div>
 
             <div className="md:col-span-12 bg-[#121212] border border-[#2D2D2D] p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center min-h-[150px] hover:border-[#3B1E43] transition-colors gap-6">
               <div className="space-y-2 text-center md:text-left">
