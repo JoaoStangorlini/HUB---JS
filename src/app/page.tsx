@@ -216,16 +216,49 @@ export default function Home() {
         </section>
         
         {/* Footer / Links */}
-        <section className="pt-12 border-t border-[#2D2D2D]">
-          <div className="bg-[#1E1E1E] p-8 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-[#2D2D2D]">
+        <section className="pt-12 border-t border-[#2D2D2D] space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Card de Agendar Reunião */}
+            <div className="bg-[#1E1E1E] p-8 md:p-10 rounded-2xl flex flex-col justify-between border border-[#2D2D2D] hover:border-[#FFCC00] transition-colors group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-[#FFCC00] text-[#121212] rounded-full flex items-center justify-center mb-6">
+                  <span className="font-bold text-xl">📅</span>
+                </div>
+                <h3 className="text-2xl font-['Bukra'] font-bold text-white">Agendar Reunião</h3>
+                <p className="text-[#A0A0A0]">Marque um horário diretamente na minha agenda para conversarmos sobre novos projetos ou oportunidades.</p>
+              </div>
+              <div className="mt-8">
+                <a href="https://calendar.app.google/tELr1q8ky4G98EL58" target="_blank" rel="noreferrer" className="inline-flex px-8 py-3 bg-[#FFCC00] text-[#121212] text-sm font-bold rounded-md hover:bg-[#e6b800] transition-colors items-center gap-2">
+                  Ver Calendário
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Card de Currículo */}
+            <div className="bg-[#1E1E1E] p-8 md:p-10 rounded-2xl flex flex-col justify-between border border-[#2D2D2D] hover:border-[#9D4EDD] transition-colors group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-[#9D4EDD] text-white rounded-full flex items-center justify-center mb-6">
+                  <span className="font-bold text-xl">📄</span>
+                </div>
+                <h3 className="text-2xl font-['Bukra'] font-bold text-white">Currículo Resumido</h3>
+                <p className="text-[#A0A0A0]">Veja um resumo do meu histórico de formação, experiências profissionais e prêmios.</p>
+              </div>
+              <div className="mt-8">
+                <Link href="/curriculo" className="inline-flex px-8 py-3 bg-[#9D4EDD] text-white text-sm font-bold rounded-md hover:bg-[#7B2CBF] transition-colors items-center gap-2">
+                  Página Completa
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-[#121212] p-8 md:p-12 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 border border-[#2D2D2D]">
             <div className="text-center md:text-left">
               <h2 className="text-2xl font-['Bukra'] font-bold text-white">Pronto para colaboração?</h2>
               <p className="text-[#A0A0A0] mt-2 max-w-xl">Disponível para projetos, parcerias e contratações como Fotógrafo, Desenvolvedor Full-Stack, Professor ou Designer.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto flex-wrap justify-center">
-              <Link href="/curriculo" className="bg-[#9D4EDD] text-white py-3 px-8 rounded-md text-sm font-bold text-center hover:bg-[#7B2CBF] transition-colors">
-                CURRÍCULO
-              </Link>
               <a href="https://wa.me/55119678401823?text=Ol%C3%A1%20Jo%C3%A3o%2C%20vim%20pelo%20seu%20site%20e%20gostaria%20de%20conversar%20sobre%20uma%20colabora%C3%A7%C3%A3o!" target="_blank" rel="noreferrer" className="bg-[#25D366] text-white py-3 px-8 rounded-md text-sm font-bold text-center hover:bg-[#1ebd5a] transition-colors">
                 WHATSAPP
               </a>
