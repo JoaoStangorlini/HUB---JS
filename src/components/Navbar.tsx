@@ -13,7 +13,7 @@ export default function Navbar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   // Removido o useEffect pesado de auth no client-side.
   // O Next.js Server Components injeta as props diretamente na renderização.
@@ -34,17 +34,12 @@ export default function Navbar({
   };
 
   return (
+    <>
     <header className="sticky top-0 w-full z-50 bg-[#121212]/80 backdrop-blur-xl border-b border-[#2D2D2D] shrink-0">
       <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full gap-4">
         
-        {/* Left: Logo and Mobile Menu Button */}
+        {/* Left: Logo */}
         <div className="flex justify-start items-center gap-4">
-          <button 
-            className="md:hidden text-white flex items-center justify-center" 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
-          </button>
           <Link href="/" className="text-xl font-['Bukra'] font-black tracking-tighter text-[#FFCC00]">
             stangorlini.web
           </Link>
@@ -83,48 +78,77 @@ export default function Navbar({
           </div>
           
           {/* Mobile Search Icon */}
-          <button className="lg:hidden text-[#8E8E8E] flex items-center justify-center">
-            <span className="material-symbols-outlined">search</span>
+          <button 
+            className="lg:hidden text-[#8E8E8E] hover:text-white flex items-center justify-center transition-colors"
+            onClick={() => {
+              setIsMobileSearchOpen(!isMobileSearchOpen);
+            }}
+          >
+            <span className="material-symbols-outlined">{isMobileSearchOpen ? 'close' : 'search'}</span>
           </button>
           
           <Link 
             href={targetHref}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#2D2D2D] bg-[#1A1A1A] hover:border-[#9D4EDD] hover:bg-[#9D4EDD]/10 transition-colors group cursor-pointer shrink-0"
+            className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-[#2D2D2D] bg-[#1A1A1A] hover:border-[#9D4EDD] hover:bg-[#9D4EDD]/10 transition-colors group cursor-pointer shrink-0"
           >
-            <div className={`w-2 h-2 rounded-full ${userRole === 'Convidado' ? 'bg-[#8E8E8E]' : userRole === 'ADM' ? 'bg-[#FFCC00]' : 'bg-[#9D4EDD]'}`}></div>
-            <span className="text-[10px] md:text-[11px] font-bold text-[#A0A0A0] group-hover:text-white uppercase tracking-wider truncate max-w-[80px] md:max-w-none">
-              ID: {userRole}
-            </span>
+            <img src={userRole === 'LabDiv' ? "/labdiv-logo.png" : "/perfil.jpeg"} alt="Perfil" className="w-7 h-7 rounded-full object-cover border border-[#2D2D2D] group-hover:border-[#9D4EDD] transition-colors" />
+            <div className="flex items-center gap-1.5">
+              <div className={`w-1.5 h-1.5 rounded-full ${userRole === 'Convidado' ? 'bg-[#8E8E8E]' : userRole === 'ADM' ? 'bg-[#FFCC00]' : 'bg-[#9D4EDD]'}`}></div>
+              <span className="text-[10px] md:text-[11px] font-bold text-[#A0A0A0] group-hover:text-white uppercase tracking-wider truncate max-w-[80px] md:max-w-none">
+                {userRole}
+              </span>
+            </div>
           </Link>
         </div>
 
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#121212]/95 backdrop-blur-xl border-b border-[#2D2D2D] px-6 py-4 flex flex-col gap-6 absolute w-full left-0 top-full shadow-2xl">
-          <nav className="flex flex-col gap-4">
-            {navLinks.map(link => {
-              const isActive = pathname === link.href || (pathname === '/' && link.href === '/');
-              return (
-                <Link 
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`font-medium transition-colors text-lg flex items-center justify-between ${
-                    isActive 
-                      ? 'text-[#9D4EDD] font-bold' 
-                      : 'text-[#A0A0A0] hover:text-[#9D4EDD]'
-                  }`}
-                >
-                  {link.name}
-                  {isActive && <span className="material-symbols-outlined text-[#9D4EDD]">chevron_right</span>}
-                </Link>
-              );
-            })}
-          </nav>
+      {/* Mobile Search Dropdown */}
+      {isMobileSearchOpen && (
+        <div className="lg:hidden bg-[#121212]/95 backdrop-blur-xl border-b border-[#2D2D2D] px-6 py-4 absolute w-full left-0 top-full shadow-2xl flex">
+          <div className="relative w-full">
+            <span className="material-symbols-outlined absolute left-3 top-2 text-[#8E8E8E] text-[20px]">search</span>
+            <input 
+              type="text" 
+              placeholder="Buscar na página..." 
+              onChange={handleSearchChange}
+              autoFocus
+              className="w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-full pl-10 pr-4 py-2 text-white focus:outline-none focus:border-[#9D4EDD] transition-colors"
+            />
+          </div>
         </div>
       )}
     </header>
+
+    {/* Mobile Bottom Floating Nav */}
+    <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+      <div className="bg-[#1A1A1A]/95 backdrop-blur-xl border border-[#2D2D2D] rounded-full p-2 flex items-center gap-1 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        {navLinks.map(link => {
+          const isActive = pathname === link.href || (pathname === '/' && link.href === '/');
+          let icon = '';
+          if (link.name === 'Resumo') icon = 'home';
+          else if (link.name === 'Fotografia') icon = 'photo_camera';
+          else if (link.name === 'Currículo') icon = 'contact_page';
+          else if (link.name === 'Tarefas') icon = 'task_alt';
+          else if (link.name === 'Servidor') icon = 'dns';
+
+          return (
+            <Link 
+              key={link.name}
+              href={link.href}
+              className={`flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
+                isActive 
+                  ? 'bg-[#9D4EDD]/20 text-[#9D4EDD] px-5 py-2.5 gap-2' 
+                  : 'text-[#8E8E8E] hover:text-white px-3 py-2.5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[22px]">{icon}</span>
+              {isActive && <span className="text-xs font-bold whitespace-nowrap">{link.name}</span>}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+    </>
   );
 }

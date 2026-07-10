@@ -40,9 +40,9 @@ export default function Home() {
             <div className="absolute -inset-4 bg-[#FFCC00]/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             <div className="aspect-square bg-[#1E1E1E] border border-[#FFCC00] rounded-2xl overflow-hidden p-2 transform md:rotate-3 hover:rotate-0 transition-transform duration-500">
               <img 
-                className="w-full h-full object-cover rounded-xl grayscale hover:grayscale-0 transition-all duration-700" 
+                className="w-full h-full object-cover rounded-xl saturate-[0.7] hover:saturate-100 transition-all duration-700" 
                 alt="Profile" 
-                src="/hero.jpg" 
+                src="/perfil.jpeg" 
               />
             </div>
           </div>

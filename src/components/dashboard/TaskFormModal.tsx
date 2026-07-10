@@ -14,6 +14,8 @@ interface TaskFormModalProps {
 
 export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
   const [loading, setLoading] = useState(false);
+  const [freqType, setFreqType] = useState('');
+  const [freqDetail, setFreqDetail] = useState('');
   const [formData, setFormData] = useState<Partial<Task>>({
     nome: '',
     status: 'não iniciada',
@@ -29,6 +31,7 @@ export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
 
   useEffect(() => {
     if (task) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         id: task.id,
         nome: task.nome,
@@ -42,6 +45,22 @@ export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
         descricao: task.descricao || '',
         frequencia: task.frequencia || ''
       });
+
+      let fType = '';
+      let fDetail = '';
+      if (task.frequencia) {
+        if (task.frequencia.startsWith('Semanal')) {
+          fType = 'Semanal';
+          fDetail = task.frequencia.split(' - ')[1] || 'Segunda';
+        } else if (task.frequencia.startsWith('Mensal')) {
+          fType = 'Mensal';
+          fDetail = task.frequencia.split(' - ')[1]?.replace('Dia ', '') || '1';
+        } else {
+          fType = task.frequencia;
+        }
+      }
+      setFreqType(fType);
+      setFreqDetail(fDetail);
     } else {
       setFormData({
         nome: '',
@@ -55,6 +74,8 @@ export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
         descricao: '',
         frequencia: ''
       });
+      setFreqType('');
+      setFreqDetail('');
     }
   }, [task, isOpen]);
 
@@ -137,7 +158,64 @@ export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
 
             <div>
               <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Frequência</label>
-              <input placeholder="Ex: Diária, Semanal, Mensal" name="frequencia" value={formData.frequencia || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00]" />
+              <div className="flex gap-2">
+                <select
+                  value={freqType}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFreqType(val);
+                    let newDetail = '';
+                    if (val === 'Semanal') newDetail = 'Segunda';
+                    if (val === 'Mensal') newDetail = '1';
+                    setFreqDetail(newDetail);
+                    
+                    let newFreq = val;
+                    if (val === 'Semanal') newFreq = `Semanal - ${newDetail}`;
+                    if (val === 'Mensal') newFreq = `Mensal - Dia ${newDetail}`;
+                    setFormData(prev => ({ ...prev, frequencia: newFreq }));
+                  }}
+                  className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00]"
+                >
+                  <option value="">Nenhuma</option>
+                  <option value="Diária">Diária</option>
+                  <option value="Semanal">Semanal</option>
+                  <option value="Mensal">Mensal</option>
+                </select>
+                {freqType === 'Semanal' && (
+                  <select
+                    value={freqDetail}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFreqDetail(val);
+                      setFormData(prev => ({ ...prev, frequencia: `Semanal - ${val}` }));
+                    }}
+                    className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00]"
+                  >
+                    <option value="Segunda">Segunda</option>
+                    <option value="Terça">Terça</option>
+                    <option value="Quarta">Quarta</option>
+                    <option value="Quinta">Quinta</option>
+                    <option value="Sexta">Sexta</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
+                  </select>
+                )}
+                {freqType === 'Mensal' && (
+                  <select
+                    value={freqDetail}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFreqDetail(val);
+                      setFormData(prev => ({ ...prev, frequencia: `Mensal - Dia ${val}` }));
+                    }}
+                    className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00]"
+                  >
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                      <option key={d} value={d.toString()}>Dia {d}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
 
             <div>

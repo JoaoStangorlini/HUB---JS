@@ -6,6 +6,18 @@ import { updateMultipleTasks } from '@/app/(dashboard)/actions';
 import { getBadgeColorClass } from './Badge';
 import { CustomSelect } from './CustomSelect';
 
+const CheckboxToggle = ({ field, label, isActive, onToggle }: { field: string, label: string, isActive: boolean, onToggle: (field: string) => void }) => (
+  <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+    <input 
+      type="checkbox" 
+      checked={isActive} 
+      onChange={() => onToggle(field)} 
+      className="accent-[#9D4EDD] w-4 h-4 rounded-sm"
+    />
+    <span className="text-xs text-[#8E8E8E] uppercase tracking-wider font-bold hover:text-white transition-colors">{label}</span>
+  </label>
+);
+
 interface BulkEditModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -83,18 +95,6 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess }: BulkEditM
     }
   };
 
-  const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
-    <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
-      <input 
-        type="checkbox" 
-        checked={activeFields[field]} 
-        onChange={() => handleFieldToggle(field)} 
-        className="accent-[#9D4EDD] w-4 h-4 rounded-sm"
-      />
-      <span className="text-xs text-[#8E8E8E] uppercase tracking-wider font-bold hover:text-white transition-colors">{label}</span>
-    </label>
-  );
-
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
       <div className="bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
@@ -114,49 +114,49 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess }: BulkEditM
             
             {/* Status */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.status ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="status" label="Status" />
+              <CheckboxToggle field="status" label="Status" isActive={!!activeFields.status} onToggle={handleFieldToggle} />
               <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={[{"value":"não iniciada","label":"Não iniciada"},{"value":"em progresso","label":"Em progresso"},{"value":"falta testar","label":"Falta testar"},{"value":"completa","label":"Completa"},{"value":"descartada","label":"Descartada"}]} disabled={!activeFields.status} />
             </div>
 
             {/* Prioridade */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.prioridade ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="prioridade" label="Prioridade" />
+              <CheckboxToggle field="prioridade" label="Prioridade" isActive={!!activeFields.prioridade} onToggle={handleFieldToggle} />
               <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={[{"value":"","label":"Nenhuma"},{"value":"Baixa","label":"Baixa"},{"value":"Média","label":"Média"},{"value":"Alta","label":"Alta"}]} disabled={!activeFields.prioridade} />
             </div>
 
             {/* Categoria */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.categoria ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="categoria" label="Categoria" />
+              <CheckboxToggle field="categoria" label="Categoria" isActive={!!activeFields.categoria} onToggle={handleFieldToggle} />
               <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={[{"value":"","label":"Nenhuma"},{"value":"Programar","label":"Programar"},{"value":"Pesquisar","label":"Pesquisar"},{"value":"touch the grass","label":"Touch the grass"},{"value":"reunir","label":"Reunir"},{"value":"post","label":"Post"},{"value":"outros","label":"Outros"}]} disabled={!activeFields.categoria} />
             </div>
 
             {/* Responsável */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.responsavel ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="responsavel" label="Responsável" />
+              <CheckboxToggle field="responsavel" label="Responsável" isActive={!!activeFields.responsavel} onToggle={handleFieldToggle} />
               <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={[{"value":"","label":"Nenhum"},{"value":"João","label":"João"},{"value":"Andy","label":"Andy"},{"value":"Leo","label":"Leo"},{"value":"Dani","label":"Dani"},{"value":"Lorenzo","label":"Lorenzo"},{"value":"Nacky","label":"Nacky"}]} disabled={!activeFields.responsavel} />
             </div>
 
             {/* Dimensão */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.dimensao ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="dimensao" label="Dimensão" />
+              <CheckboxToggle field="dimensao" label="Dimensão" isActive={!!activeFields.dimensao} onToggle={handleFieldToggle} />
               <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={[{"value":"","label":"Nenhuma"},{"value":"HUB","label":"HUB"},{"value":"urgente","label":"Urgente"},{"value":"USP","label":"USP"},{"value":"filmes/series","label":"Filmes/Series"},{"value":"cin","label":"Cin"},{"value":"tatuagens","label":"Tatuagens"},{"value":"compras","label":"Compras"},{"value":"hobbys","label":"Hobbys"},{"value":"livros","label":"Livros"}]} disabled={!activeFields.dimensao} />
             </div>
 
             {/* Frequência */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.frequencia ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="frequencia" label="Frequência" />
+              <CheckboxToggle field="frequencia" label="Frequência" isActive={!!activeFields.frequencia} onToggle={handleFieldToggle} />
               <input disabled={!activeFields.frequencia} placeholder="Ex: Diária, Semanal, Mensal" name="frequencia" value={formData.frequencia || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] disabled:opacity-50" />
             </div>
 
             {/* Início */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.inicio ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="inicio" label="Início" />
+              <CheckboxToggle field="inicio" label="Início" isActive={!!activeFields.inicio} onToggle={handleFieldToggle} />
               <input disabled={!activeFields.inicio} type="date" name="inicio" value={formData.inicio || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] [color-scheme:dark] disabled:opacity-50" />
             </div>
 
             {/* Prazo */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.prazo ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="prazo" label="Prazo" />
+              <CheckboxToggle field="prazo" label="Prazo" isActive={!!activeFields.prazo} onToggle={handleFieldToggle} />
               <input disabled={!activeFields.prazo} type="date" name="prazo" value={formData.prazo || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] [color-scheme:dark] disabled:opacity-50" />
             </div>
 

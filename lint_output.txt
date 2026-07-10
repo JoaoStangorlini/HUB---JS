@@ -1,0 +1,419 @@
+
+> hub-pessoal@0.1.0 lint
+> eslint
+
+
+/home/stangorlini/HUB - JS/android/app/build/intermediates/assets/debug/mergeDebugAssets/native-bridge.js
+    5:5   warning  'nativeBridge' is assigned a value but never used                                         @typescript-eslint/no-unused-vars
+   36:5   warning  Unused eslint-disable directive (no problems were reported)
+   96:24  warning  'ignored' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  190:25  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  208:29  warning  Unused eslint-disable directive (no problems were reported from 'no-prototype-builtins')
+  296:17  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  302:17  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  306:17  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  310:17  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  365:24  warning  'e' is defined but never used                                                             @typescript-eslint/no-unused-vars
+  852:25  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  865:25  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  922:25  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  926:21  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  983:25  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+  990:21  warning  Expected an assignment or function call and instead saw an expression                     @typescript-eslint/no-unused-expressions
+
+/home/stangorlini/HUB - JS/generate_csv.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/home/stangorlini/HUB - JS/parse_check.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/home/stangorlini/HUB - JS/parse_excel.js
+  1:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  3:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/home/stangorlini/HUB - JS/src/app/(dashboard)/actions.ts
+   28:7   error  'dataToSave' is never reassigned. Use 'const' instead  prefer-const
+   65:22  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  116:22  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+/home/stangorlini/HUB - JS/src/app/(dashboard)/servidor/page.tsx
+   5:10  warning  'Suspense' is defined but never used                                                                                                                   @typescript-eslint/no-unused-vars
+  24:9   error    Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+/home/stangorlini/HUB - JS/src/app/curriculo/page.tsx
+   1:8    warning  'Link' is defined but never used                                 @typescript-eslint/no-unused-vars
+  92:130  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  92:160  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/stangorlini/HUB - JS/src/app/galeria/page.tsx
+  5:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/stangorlini/HUB - JS/src/app/layout.tsx
+  44:9  warning  A font-display parameter is missing (adding `&display=optional` is recommended). See: https://nextjs.org/docs/messages/google-font-display                       @next/next/google-font-display
+  44:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+/home/stangorlini/HUB - JS/src/app/page.tsx
+    2:8   warning  'Image' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   42:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  134:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  137:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  140:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  143:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/home/stangorlini/HUB - JS/src/components/CreateTaskModal.tsx
+  9:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/stangorlini/HUB - JS/src/components/TaskBoard.tsx
+    7:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   29:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:81  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx
+    6:10  warning  'getBadgeColorClass' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   53:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  117:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:117:16
+  115 |             {/* Status */}
+  116 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.status ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 117 |               <CheckboxToggle field="status" label="Status" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  118 |               <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={[{"value":"não iniciada","label":"Não iniciada"},{"value":"em progresso","label":"Em progresso"},{"value":"falta testar","label":"Falta testar"},{"value":"completa","label":"Completa"},{"value":"descartada","label":"Descartada"}]} disabled={!activeFields.status} />
+  119 |             </div>
+  120 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                                                                                       react-hooks/static-components
+  123:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:123:16
+  121 |             {/* Prioridade */}
+  122 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.prioridade ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 123 |               <CheckboxToggle field="prioridade" label="Prioridade" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  124 |               <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={[{"value":"","label":"Nenhuma"},{"value":"Baixa","label":"Baixa"},{"value":"Média","label":"Média"},{"value":"Alta","label":"Alta"}]} disabled={!activeFields.prioridade} />
+  125 |             </div>
+  126 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                                                                                                                                                        react-hooks/static-components
+  129:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:129:16
+  127 |             {/* Categoria */}
+  128 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.categoria ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 129 |               <CheckboxToggle field="categoria" label="Categoria" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  130 |               <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={[{"value":"","label":"Nenhuma"},{"value":"Programar","label":"Programar"},{"value":"Pesquisar","label":"Pesquisar"},{"value":"touch the grass","label":"Touch the grass"},{"value":"reunir","label":"Reunir"},{"value":"post","label":"Post"},{"value":"outros","label":"Outros"}]} disabled={!activeFields.categoria} />
+  131 |             </div>
+  132 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                  react-hooks/static-components
+  135:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:135:16
+  133 |             {/* Responsável */}
+  134 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.responsavel ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 135 |               <CheckboxToggle field="responsavel" label="Responsável" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  136 |               <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={[{"value":"","label":"Nenhum"},{"value":"João","label":"João"},{"value":"Andy","label":"Andy"},{"value":"Leo","label":"Leo"},{"value":"Dani","label":"Dani"},{"value":"Lorenzo","label":"Lorenzo"},{"value":"Nacky","label":"Nacky"}]} disabled={!activeFields.responsavel} />
+  137 |             </div>
+  138 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                                               react-hooks/static-components
+  141:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:141:16
+  139 |             {/* Dimensão */}
+  140 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.dimensao ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 141 |               <CheckboxToggle field="dimensao" label="Dimensão" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  142 |               <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={[{"value":"","label":"Nenhuma"},{"value":"HUB","label":"HUB"},{"value":"urgente","label":"Urgente"},{"value":"USP","label":"USP"},{"value":"filmes/series","label":"Filmes/Series"},{"value":"cin","label":"Cin"},{"value":"tatuagens","label":"Tatuagens"},{"value":"compras","label":"Compras"},{"value":"hobbys","label":"Hobbys"},{"value":"livros","label":"Livros"}]} disabled={!activeFields.dimensao} />
+  143 |             </div>
+  144 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">  react-hooks/static-components
+  147:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:147:16
+  145 |             {/* Frequência */}
+  146 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.frequencia ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 147 |               <CheckboxToggle field="frequencia" label="Frequência" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  148 |               <input disabled={!activeFields.frequencia} placeholder="Ex: Diária, Semanal, Mensal" name="frequencia" value={formData.frequencia || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] disabled:opacity-50" />
+  149 |             </div>
+  150 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                                                                                                                                react-hooks/static-components
+  153:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:153:16
+  151 |             {/* Início */}
+  152 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.inicio ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 153 |               <CheckboxToggle field="inicio" label="Início" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  154 |               <input disabled={!activeFields.inicio} type="date" name="inicio" value={formData.inicio || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] [color-scheme:dark] disabled:opacity-50" />
+  155 |             </div>
+  156 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                                                                                                                                                                      react-hooks/static-components
+  159:16  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:159:16
+  157 |             {/* Prazo */}
+  158 |             <div className={`p-3 rounded-lg border transition-colors ${activeFields.prazo ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+> 159 |               <CheckboxToggle field="prazo" label="Prazo" />
+      |                ^^^^^^^^^^^^^^ This component is created during render
+  160 |               <input disabled={!activeFields.prazo} type="date" name="prazo" value={formData.prazo || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] [color-scheme:dark] disabled:opacity-50" />
+  161 |             </div>
+  162 |
+
+/home/stangorlini/HUB - JS/src/components/dashboard/BulkEditModal.tsx:86:26
+  84 |   };
+  85 |
+> 86 |   const CheckboxToggle = ({ field, label }: { field: string, label: string }) => (
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |       <input 
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 95 |     </label>
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 96 |   );
+     | ^^^^ The component is created during render here
+  97 |
+  98 |   return (
+  99 |     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">                                                                                                                                                                                                                                             react-hooks/static-components
+
+/home/stangorlini/HUB - JS/src/components/dashboard/CustomSelect.tsx
+  15:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/stangorlini/HUB - JS/src/components/dashboard/QuickLinks.tsx
+   3:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  12:7   warning  'GlobeIcon' is assigned a value but never used                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+
+/home/stangorlini/HUB - JS/src/components/dashboard/TaskFormModal.tsx
+   6:10  warning  'getBadgeColorClass' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  34:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/stangorlini/HUB - JS/src/components/dashboard/TaskFormModal.tsx:34:7
+  32 |   useEffect(() => {
+  33 |     if (task) {
+> 34 |       setFormData({
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  35 |         id: task.id,
+  36 |         nome: task.nome,
+  37 |         status: task.status,  react-hooks/set-state-in-effect
+
+/home/stangorlini/HUB - JS/src/components/dashboard/TasksView.tsx
+    9:10  warning  'createClient' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   80:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/stangorlini/HUB - JS/src/components/dashboard/TasksView.tsx:80:5
+  78 |   const [localTasks, setLocalTasks] = useState(initialTasks);
+  79 |   useEffect(() => {
+> 80 |     setLocalTasks(initialTasks);
+     |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  81 |   }, [initialTasks]);
+  82 |
+  83 |   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);  react-hooks/set-state-in-effect
+   84:10  warning  'isUpdatingOrder' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   86:10  warning  'history' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   99:27  warning  'setLocalSearchTerm' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  207:9   error    'targetIndex' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               prefer-const
+  247:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  269:9   error    'newSet' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    prefer-const
+  301:39  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  303:9   error    'newSet' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    prefer-const
+  353:26  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This value was memoized in source but not in compilation output.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/TasksView.tsx:353:26
+  351 |
+  352 |   // Process Tasks: Filter and Sort
+> 353 |   const processedTasks = useMemo(() => {
+      |                          ^^^^^^^^^^^^^^^
+> 354 |     let tasks = [...localTasks];
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 355 |
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 424 |     return tasks;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 425 |   }, [localTasks, searchTerm, selectedStatuses, selectedCategories, selectedUsers, selectedDimensions, sortBy]);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Could not preserve existing memoization
+  426 |
+  427 |   const hasAnyPrazo = useMemo(() => processedTasks.some(t => t.prazo), [processedTasks]);
+  428 |                    react-hooks/preserve-manual-memoization
+  427:73  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+/home/stangorlini/HUB - JS/src/components/dashboard/TasksView.tsx:427:73
+  425 |   }, [localTasks, searchTerm, selectedStatuses, selectedCategories, selectedUsers, selectedDimensions, sortBy]);
+  426 |
+> 427 |   const hasAnyPrazo = useMemo(() => processedTasks.some(t => t.prazo), [processedTasks]);
+      |                                                                         ^^^^^^^^^^^^^^ This dependency may be modified later
+  428 |
+  429 |   return (
+  430 |     <div className="w-full flex flex-col relative">                                                                                                                                                                                                                                                                                                            react-hooks/preserve-manual-memoization
+
+/home/stangorlini/HUB - JS/src/utils/supabase/middleware.ts
+  18:48  warning  'options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/stangorlini/HUB - JS/src/utils/supabase/server.ts
+  18:20  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  27:20  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/stangorlini/HUB - JS/test-supa.js
+  1:1   error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 78 problems (40 errors, 38 warnings)
+  4 errors and 2 warnings potentially fixable with the `--fix` option.
+

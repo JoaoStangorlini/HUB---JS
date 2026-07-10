@@ -15,6 +15,16 @@ function formatDate(dateStr: string | null) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+function getDaysUntil(dateStr: string | null) {
+  if (!dateStr) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadline = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`);
+  deadline.setHours(0, 0, 0, 0);
+  const diffTime = deadline.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
 function getStatusWeight(status: string | null) {
   const s = (status || '').toLowerCase();
   if (s.includes('descartada')) return 1;
@@ -67,6 +77,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   
   const [localTasks, setLocalTasks] = useState(initialTasks);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTasks(initialTasks);
   }, [initialTasks]);
 
@@ -340,7 +351,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   };
 
   // Process Tasks: Filter and Sort
-  const processedTasks = useMemo(() => {
+  const processedTasks = (() => {
     let tasks = [...localTasks];
 
     // 1. Filter Search
@@ -412,7 +423,9 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     });
 
     return tasks;
-  }, [localTasks, searchTerm, selectedStatuses, selectedCategories, selectedUsers, selectedDimensions, sortBy]);
+  })();
+
+  const hasAnyPrazo = processedTasks.some(t => t.prazo);
 
   return (
     <div className="w-full flex flex-col relative">
@@ -656,6 +669,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Criada em</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Início</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Prazo</th>
+              {hasAnyPrazo && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Dias Restantes</th>}
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Concluída em</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Freq.</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Dimensão</th>
@@ -701,6 +715,19 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.created_at)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.inicio)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.prazo)}</td>
+                {hasAnyPrazo && (
+                  <td className="p-4 text-xs">
+                    {task.prazo ? (
+                      (() => {
+                        const days = getDaysUntil(task.prazo);
+                        if (days === null) return '-';
+                        if (days < 0) return <span className="text-[#db4437] font-bold">Atrasada ({-days}d)</span>;
+                        if (days === 0) return <span className="text-[#db4437] font-bold">Hoje!</span>;
+                        return <span className="text-[#FFCC00] font-bold">{days} dias</span>;
+                      })()
+                    ) : '-'}
+                  </td>
+                )}
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.concluida_em)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{task.frequencia || '-'}</td>
                 <td className="p-4"><Badge type="dimensao" value={task.dimensao} /></td>
@@ -773,7 +800,20 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
             <div className="flex items-center justify-between mt-2 border-t border-[#2D2D2D] pt-2 pb-1 text-[9px] text-[#A0A0A0] pl-6 pr-2">
               <span className="truncate">Cria: {formatDate(task.created_at)}</span>
               <span className="truncate">Ini: {formatDate(task.inicio)}</span>
-              <span className="truncate">Fim: {formatDate(task.prazo)}</span>
+              <span className="truncate flex items-center gap-1">
+                Fim: {formatDate(task.prazo)}
+                {task.prazo && (
+                  <span className="ml-1">
+                    ({(() => {
+                      const days = getDaysUntil(task.prazo);
+                      if (days === null) return '';
+                      if (days < 0) return <span className="text-[#db4437] font-bold">Atrasada</span>;
+                      if (days === 0) return <span className="text-[#db4437] font-bold">Hoje</span>;
+                      return <span className="text-[#FFCC00] font-bold">{days}d</span>;
+                    })()})
+                  </span>
+                )}
+              </span>
               <span className="truncate">Concl: {formatDate(task.concluida_em)}</span>
             </div>
           </div>
