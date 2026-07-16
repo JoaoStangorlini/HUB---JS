@@ -1,0 +1,218 @@
+package com.stangorlini.web
+
+import android.app.Activity
+import android.app.AlertDialog
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import org.json.JSONArray
+import org.json.JSONObject
+
+class WidgetActionActivity : Activity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        val action = intent.getStringExtra("action")
+        val taskId = intent.getStringExtra("taskId")
+        
+        if (action == "change_status" && taskId != null) {
+            showStatusDialog(taskId)
+        } else if (action == "change_dimension") {
+            showDimensionDialog()
+        } else if (action == "create_task") {
+            showCreateTaskDialog()
+        } else {
+            finish()
+        }
+    }
+
+    private fun showStatusDialog(taskId: String) {
+        val statuses = arrayOf("Não Iniciada", "Em Progresso", "Atrasada", "Completa", "Descartada")
+        val internalStatuses = arrayOf("nao_iniciada", "em_progresso", "atrasada", "completa", "descartada")
+        
+        val dialogView = layoutInflater.inflate(R.layout.dialog_custom_menu, null)
+        val titleView = dialogView.findViewById<android.widget.TextView>(R.id.dialog_title)
+        val container = dialogView.findViewById<android.widget.LinearLayout>(R.id.dialog_items_container)
+        titleView.text = "Alterar Status"
+
+        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        statuses.forEachIndexed { index, statusName ->
+            val itemView = layoutInflater.inflate(R.layout.item_dialog_option, container, false) as android.widget.TextView
+            itemView.text = statusName
+            itemView.setOnClickListener {
+                val newStatus = internalStatuses[index]
+                savePendingStatusUpdate(taskId, newStatus)
+                optimisticStatusUpdate(taskId, newStatus)
+                launchMainActivity()
+                dialog.dismiss()
+                finish()
+            }
+            container.addView(itemView)
+        }
+        
+        dialog.setOnCancelListener { finish() }
+        dialog.show()
+    }
+
+    private fun showDimensionDialog() {
+        val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+        val dimsJson = prefs.getString("unique_dimensions", "[]")
+        
+        val dimensionsList = mutableListOf<String>()
+        dimensionsList.add("Todas as Dimensões") // Default option
+        
+        try {
+            val arr = JSONArray(dimsJson)
+            for (i in 0 until arr.length()) {
+                dimensionsList.add(arr.getString(i))
+            }
+        } catch (e: Exception) { e.printStackTrace() }
+        
+        val dimsArray = dimensionsList.toTypedArray()
+        
+        val dialogView = layoutInflater.inflate(R.layout.dialog_custom_menu, null)
+        val titleView = dialogView.findViewById<android.widget.TextView>(R.id.dialog_title)
+        val container = dialogView.findViewById<android.widget.LinearLayout>(R.id.dialog_items_container)
+        titleView.text = "Filtrar por Dimensão"
+
+        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        dimsArray.forEachIndexed { index, dimName ->
+            val itemView = layoutInflater.inflate(R.layout.item_dialog_option, container, false) as android.widget.TextView
+            itemView.text = dimName
+            itemView.setOnClickListener {
+                val selectedDim = if (index == 0) "" else dimName
+                prefs.edit().putString("widget_filter_dimension", selectedDim).apply()
+                updateWidgetUI()
+                dialog.dismiss()
+                finish()
+            }
+            container.addView(itemView)
+        }
+        
+        dialog.setOnCancelListener { finish() }
+        dialog.show()
+    }
+    
+    private fun showCreateTaskDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_create_task, null)
+        val inputName = dialogView.findViewById<android.widget.EditText>(R.id.input_task_name)
+        val btnCancel = dialogView.findViewById<android.widget.Button>(R.id.btn_cancel)
+        val btnSave = dialogView.findViewById<android.widget.Button>(R.id.btn_save)
+
+        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        
+        btnSave.setOnClickListener {
+            val taskName = inputName.text.toString().trim()
+            if (taskName.isNotEmpty()) {
+                val tempId = java.util.UUID.randomUUID().toString()
+                savePendingCreateUpdate(tempId, taskName)
+                optimisticCreateUpdate(tempId, taskName)
+                // We do NOT launch MainActivity. Let the user stay on home screen.
+            }
+            dialog.dismiss()
+            finish()
+        }
+        
+        dialog.setOnCancelListener { finish() }
+        dialog.show()
+        
+        // Show keyboard automatically
+        inputName.requestFocus()
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+    }
+
+    private fun savePendingCreateUpdate(taskId: String, taskName: String) {
+        val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+        val pendingJson = prefs.getString("pending_widget_updates", "[]")
+        try {
+            val arr = JSONArray(pendingJson)
+            val obj = JSONObject()
+            obj.put("action", "create")
+            obj.put("taskId", taskId)
+            obj.put("taskName", taskName)
+            arr.put(obj)
+            prefs.edit().putString("pending_widget_updates", arr.toString()).apply()
+        } catch (e: Exception) { e.printStackTrace() }
+    }
+
+    private fun optimisticCreateUpdate(taskId: String, taskName: String) {
+        val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+        val tasksJson = prefs.getString("favorite_tasks", "[]")
+        try {
+            val arr = JSONArray(tasksJson)
+            val newTask = JSONObject()
+            newTask.put("id", taskId)
+            newTask.put("nome", taskName)
+            newTask.put("status", "nao_iniciada")
+            newTask.put("is_favorite", true)
+            // Add at the beginning
+            val newArr = JSONArray()
+            newArr.put(newTask)
+            for (i in 0 until arr.length()) {
+                newArr.put(arr.getJSONObject(i))
+            }
+            prefs.edit().putString("favorite_tasks", newArr.toString()).apply()
+            updateWidgetUI()
+        } catch (e: Exception) { e.printStackTrace() }
+    }
+
+    private fun savePendingStatusUpdate(taskId: String, newStatus: String) {
+        val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+        val pendingJson = prefs.getString("pending_widget_updates", "[]")
+        try {
+            val arr = JSONArray(pendingJson)
+            val obj = JSONObject()
+            obj.put("taskId", taskId)
+            obj.put("status", newStatus)
+            arr.put(obj)
+            prefs.edit().putString("pending_widget_updates", arr.toString()).apply()
+        } catch (e: Exception) { e.printStackTrace() }
+    }
+    
+    private fun optimisticStatusUpdate(taskId: String, newStatus: String) {
+        val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+        val tasksJson = prefs.getString("favorite_tasks", "[]")
+        try {
+            val arr = JSONArray(tasksJson)
+            for (i in 0 until arr.length()) {
+                val task = arr.getJSONObject(i)
+                if (task.optString("id") == taskId) {
+                    task.put("status", newStatus)
+                    break
+                }
+            }
+            prefs.edit().putString("favorite_tasks", arr.toString()).apply()
+            updateWidgetUI()
+        } catch (e: Exception) { e.printStackTrace() }
+    }
+    
+    private fun updateWidgetUI() {
+        val intent = Intent(this, FavoritesWidgetProvider::class.java)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        
+        val widgetManager = AppWidgetManager.getInstance(this)
+        val ids = widgetManager.getAppWidgetIds(ComponentName(this, FavoritesWidgetProvider::class.java))
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        
+        sendBroadcast(intent)
+    }
+
+    private fun launchMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+    }
+}

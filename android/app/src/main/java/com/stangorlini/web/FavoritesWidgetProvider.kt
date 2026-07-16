@@ -29,14 +29,33 @@ class FavoritesWidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.widget_list_view, intent)
             views.setEmptyView(R.id.widget_list_view, R.id.empty_view)
 
-            // Setup intent to launch app on click (e.g. click header)
-            val launchIntent = Intent(context, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-            views.setOnClickPendingIntent(R.id.widget_header, pendingIntent)
+            // Setup intent for Add Button
+            val addIntent = Intent(context, WidgetActionActivity::class.java).apply {
+                putExtra("action", "create_task")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val addPendingIntent = PendingIntent.getActivity(context, 0, addIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            views.setOnClickPendingIntent(R.id.widget_add_button, addPendingIntent)
+
+            // Setup intent for Dimension Title
+            val titleIntent = Intent(context, WidgetActionActivity::class.java).apply {
+                putExtra("action", "change_dimension")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val titlePendingIntent = PendingIntent.getActivity(context, 1, titleIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            views.setOnClickPendingIntent(R.id.widget_title, titlePendingIntent)
             
-            // To allow item clicks
-            val clickIntentTemplate = Intent(context, MainActivity::class.java)
-            val clickPendingIntentTemplate = PendingIntent.getActivity(context, 0, clickIntentTemplate, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            // Set dynamic title based on selected dimension
+            val prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+            val selectedDim = prefs.getString("widget_filter_dimension", "") ?: ""
+            val titleText = if (selectedDim.isEmpty()) "Todas as Dimensões ▼" else "$selectedDim ▼"
+            views.setTextViewText(R.id.widget_title, titleText)
+            
+            // To allow item clicks (we will direct it to WidgetActionActivity)
+            val clickIntentTemplate = Intent(context, WidgetActionActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val clickPendingIntentTemplate = PendingIntent.getActivity(context, 2, clickIntentTemplate, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
             views.setPendingIntentTemplate(R.id.widget_list_view, clickPendingIntentTemplate)
 
             // Tell the AppWidgetManager to perform an update on the current app widget

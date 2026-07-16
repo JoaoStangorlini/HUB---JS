@@ -26,12 +26,23 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
     }
 
     private fun loadData() {
-        // Capacitor Preferences are stored in SharedPreferences under the name "CapacitorStorage"
         val prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
         val tasksJson = prefs.getString("favorite_tasks", "[]")
+        val selectedDim = prefs.getString("widget_filter_dimension", "") ?: ""
         
         try {
-            tasksArray = JSONArray(tasksJson)
+            val allTasks = JSONArray(tasksJson)
+            if (selectedDim.isEmpty()) {
+                tasksArray = allTasks
+            } else {
+                tasksArray = JSONArray()
+                for (i in 0 until allTasks.length()) {
+                    val task = allTasks.getJSONObject(i)
+                    if (task.optString("dimensao", "") == selectedDim) {
+                        tasksArray.put(task)
+                    }
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             tasksArray = JSONArray()
@@ -51,23 +62,58 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
             
             views.setTextViewText(R.id.task_name, name)
             
-            if (prazo.isNotEmpty()) {
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            if (prazo.isNotEmpty() && prazo != "null") {
                 try {
-                    val date = inputFormat.parse(prazo)
-                    val formatted = outputFormat.format(date!!)
-                    views.setTextViewText(R.id.task_date, formatted)
+                    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                    sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                    val date = sdf.parse(prazo)
+                    if (date != null) {
+                        val today = java.util.Calendar.getInstance()
+                        today.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                        today.set(java.util.Calendar.MINUTE, 0)
+                        today.set(java.util.Calendar.SECOND, 0)
+                        today.set(java.util.Calendar.MILLISECOND, 0)
+                        
+                        val target = java.util.Calendar.getInstance()
+                        target.time = date
+                        target.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                        target.set(java.util.Calendar.MINUTE, 0)
+                        target.set(java.util.Calendar.SECOND, 0)
+                        target.set(java.util.Calendar.MILLISECOND, 0)
+                        
+                        val diffMillis = target.timeInMillis - today.timeInMillis
+                        val diffDays = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diffMillis)
+                        
+                        val dateText = when {
+                            diffDays == 0L -> "Hoje"
+                            else -> "${diffDays}d"
+                        }
+                        
+                        views.setTextViewText(R.id.task_date, dateText)
+                        
+                        val textColor = when {
+                            diffDays < 0L -> "#FF4444"
+                            diffDays == 0L || diffDays == 1L -> "#FFD700"
+                            else -> "#E0E0E0"
+                        }
+                        views.setTextColor(R.id.task_date, android.graphics.Color.parseColor(textColor))
+                    }
                 } catch (e: Exception) {
-                    views.setTextViewText(R.id.task_date, prazo)
+                    views.setTextViewText(R.id.task_date, "")
                 }
             } else {
                 views.setTextViewText(R.id.task_date, "")
             }
 
-            // Fill-in Intent for list item click
-            val fillInIntent = Intent()
-            views.setOnClickFillInIntent(R.id.widget_item_container, fillInIntent)
+            // Fill-in Intent for status click
+            val fillInIntent = Intent().apply {
+                putExtra("action", "change_status")
+                putExtra("taskId", task.optString("id", ""))
+            }
+            views.setOnClickFillInIntent(R.id.task_status, fillInIntent)
+            
+            // To allow general item clicks if needed (optional)
+            views.setOnClickFillInIntent(R.id.widget_item_container, Intent())
             
         } catch (e: Exception) {
             e.printStackTrace()

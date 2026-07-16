@@ -10,6 +10,7 @@ import { createClient } from '@/utils/supabase/client';
 import { updateTaskOrders, saveTask } from '@/app/(dashboard)/actions';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
 import { syncTaskNotifications } from '@/lib/notifications';
 
 interface WidgetPluginPlugin {
@@ -100,11 +101,19 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
           id: t.id,
           nome: t.nome,
           prazo: t.prazo,
-          status: t.status
+          status: t.status,
+          dimensao: t.dimensao
         }));
         await Preferences.set({
           key: 'favorite_tasks',
           value: JSON.stringify(widgetTasks)
+        });
+        
+        // Extract and save unique dimensions for the widget filter
+        const dims = Array.from(new Set(localTasks.map(t => t.dimensao).filter(Boolean)));
+        await Preferences.set({
+          key: 'unique_dimensions',
+          value: JSON.stringify(dims)
         });
         
         await WidgetPlugin.updateWidget();
@@ -121,6 +130,71 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
       syncTaskNotifications(localTasks);
     }
   }, [localTasks]);
+
+  // Handle App Open from Widget
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const processWidgetIntents = async () => {
+      try {
+        // 1. Process pending status updates
+        const { value: pendingStr } = await Preferences.get({ key: 'pending_widget_updates' });
+        if (pendingStr && pendingStr !== '[]') {
+          const updates = JSON.parse(pendingStr);
+          if (updates.length > 0) {
+            console.log("Processando fila do widget", updates);
+            await Preferences.set({ key: 'pending_widget_updates', value: '[]' });
+            
+            let newTasks = [...localTasks];
+            let modified = false;
+            
+            for (const update of updates) {
+              if (update.action === 'create') {
+                const { taskId, taskName } = update;
+                const newTask = {
+                  id: taskId,
+                  nome: taskName,
+                  status: 'nao_iniciada',
+                  is_favorite: true,
+                  ordem: 0,
+                  prazo: new Date().toISOString()
+                };
+                newTasks.unshift(newTask as any);
+                modified = true;
+                // Save to Supabase (assuming saveTask creates a new one if UUID is not in DB)
+                saveTask(newTask as any).catch(e => console.error("Erro criando task do widget", e));
+              } else {
+                const { taskId, status } = update;
+                const taskIndex = newTasks.findIndex(t => t.id === taskId);
+                if (taskIndex !== -1) {
+                  newTasks[taskIndex] = { ...newTasks[taskIndex], status };
+                  modified = true;
+                  saveTask({ ...newTasks[taskIndex], status }).catch(e => console.error(e));
+                }
+              }
+            }
+            if (modified) setLocalTasks(newTasks);
+          }
+        }
+      } catch (err) {
+        console.error('Error processing widget intent', err);
+      }
+    };
+
+    // Run immediately
+    processWidgetIntents();
+
+    // Run on resume
+    const listener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        processWidgetIntents();
+      }
+    });
+
+    return () => {
+      listener.then(l => l.remove());
+    };
+  }, [localTasks]); // Depends on localTasks to correctly update states if something changes
 
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
@@ -934,10 +1008,21 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
         )}
       </div>
 
+      {/* Floating Bulk Edit Button (Visible only when tasks are selected) */}
+      {selectedTasks.size > 0 && (
+        <button 
+          onClick={() => setIsBulkEditModalOpen(true)}
+          className="fixed bottom-56 md:bottom-40 right-6 bg-[#9D4EDD] hover:bg-[#8A3BCE] text-[#FFFFFF] p-3 rounded-full shadow-[0_8px_32px_rgba(157,78,221,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group"
+          title="Editar Selecionadas"
+        >
+          <span className="material-symbols-outlined font-bold">edit</span>
+        </button>
+      )}
+
       {/* Floating Add Task Button */}
       <button 
         onClick={handleNew}
-        className="fixed bottom-36 md:bottom-20 right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group"
+        className="fixed bottom-40 md:bottom-24 right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group"
         title="Nova Tarefa"
       >
         <span className="material-symbols-outlined font-bold">add</span>
@@ -946,7 +1031,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
       {/* Floating Scroll to Bottom Button */}
       <button 
         onClick={scrollToBottom}
-        className="fixed bottom-24 md:bottom-6 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
+        className="fixed bottom-24 md:bottom-8 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
         title="Ir para o fundo (Mais Recentes)"
       >
         <span className="material-symbols-outlined">arrow_downward</span>
