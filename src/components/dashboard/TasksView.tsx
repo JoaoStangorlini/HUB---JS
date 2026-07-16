@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Task } from '@/types';
 import { Badge, getBadgeColorClass } from './Badge';
 import { TaskFormModal } from './TaskFormModal';
@@ -817,7 +817,6 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                     </div>
                   </div>
                 )}
-
               </div>
             )}
             </div>
@@ -866,8 +865,8 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
           </thead>
           <tbody>
             {processedTasks.map(task => (
+              <React.Fragment key={task.id}>
               <tr 
-                key={task.id} 
                 draggable={sortBy === 'manual' ? true : undefined}
                 onDragStart={sortBy === 'manual' ? (e) => handleDragStart(e, task.id) : undefined}
                 onDragOver={sortBy === 'manual' ? (e) => handleDragOver(e, task.id) : undefined}
@@ -924,6 +923,19 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                 <td className="p-4 text-xs text-[#A0A0A0]">{task.frequencia || '-'}</td>
                 <td className="p-4"><Badge type="dimensao" value={task.dimensao} /></td>
               </tr>
+              {task.subtasks && task.subtasks.length > 0 && task.subtasks.map(st => (
+                <tr key={st.id} className="bg-[#121212]/50 border-b border-[#2D2D2D]/30 group hover:bg-[#252525]">
+                  <td className="p-2 text-center"></td>
+                  <td className="p-2 text-center"></td>
+                  <td className="p-2 text-sm font-medium break-words" colSpan={hasAnyPrazo ? 12 : 11}>
+                    <div className="flex items-center gap-3 pl-4 border-l-2 border-[#2D2D2D] ml-2 h-full py-1">
+                      <input type="checkbox" className="accent-[#9D4EDD] rounded-sm w-3 h-3 opacity-60" checked={st.completed} readOnly />
+                      <span className={`text-[12px] ${st.completed ? 'text-[#8E8E8E] line-through' : 'text-[#C0C0C0]'}`}>{st.title}</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              </React.Fragment>
             ))}
             {processedTasks.length === 0 && (
               <tr>
