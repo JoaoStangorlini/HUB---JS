@@ -18,6 +18,8 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
   const [loading, setLoading] = useState(false);
   const [freqType, setFreqType] = useState('');
   const [freqDetail, setFreqDetail] = useState('');
+  const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [formData, setFormData] = useState<Partial<Task>>({
     nome: '',
     status: 'não iniciada',
@@ -63,6 +65,7 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
       }
       setFreqType(fType);
       setFreqDetail(fDetail);
+      setSubtasks(task.subtasks || []);
     } else {
       setFormData({
         nome: '',
@@ -78,6 +81,7 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
       });
       setFreqType('');
       setFreqDetail('');
+      setSubtasks([]);
     }
   }, [task, isOpen]);
 
@@ -87,7 +91,7 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
     e.preventDefault();
     setLoading(true);
     try {
-      await saveTask(formData);
+      await saveTask({ ...formData, subtasks });
       onClose();
     } catch (err) {
       alert('Erro ao salvar tarefa: ' + String(err));
@@ -114,9 +118,26 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleAddSubtask = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (newSubtaskTitle.trim() === '') return;
+      setSubtasks([...subtasks, { id: crypto.randomUUID(), title: newSubtaskTitle.trim(), completed: false }]);
+      setNewSubtaskTitle('');
+    }
+  };
+
+  const toggleSubtask = (id: string) => {
+    setSubtasks(subtasks.map(st => st.id === id ? { ...st, completed: !st.completed } : st));
+  };
+
+  const deleteSubtask = (id: string) => {
+    setSubtasks(subtasks.filter(st => st.id !== id));
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+      <div className="bg-[#1A1A1A] border border-[#2D2D2D] rounded-3xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
         
         <div className="flex justify-between items-center p-6 border-b border-[#2D2D2D]">
           <h2 className="text-xl font-bold text-[#FFCC00]">{task ? 'Editar Tarefa' : 'Nova Tarefa'}</h2>
@@ -249,6 +270,41 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
             <div className="md:col-span-2">
               <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Descrição</label>
               <textarea name="descricao" value={formData.descricao || ''} onChange={handleChange} rows={3} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00] resize-y" />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Sub-tarefas</label>
+              <div className="bg-[#121212] border border-[#2D2D2D] rounded-xl p-4">
+                <div className="space-y-2 mb-4 max-h-[150px] overflow-y-auto pr-2">
+                  {subtasks.map(st => (
+                    <div key={st.id} className="flex items-center gap-3 group">
+                      <input 
+                        type="checkbox" 
+                        checked={st.completed} 
+                        onChange={() => toggleSubtask(st.id)}
+                        className="w-4 h-4 rounded-sm border-[#444] bg-[#1a1a1a] checked:bg-[#9D4EDD] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                      />
+                      <span className={`flex-1 text-sm ${st.completed ? 'text-[#8E8E8E] line-through' : 'text-[#E0E0E0]'}`}>{st.title}</span>
+                      <button type="button" onClick={() => deleteSubtask(st.id)} className="text-[#8E8E8E] hover:text-[#db4437] opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  ))}
+                  {subtasks.length === 0 && (
+                    <div className="text-center text-[#8E8E8E] text-xs py-2">Nenhuma sub-tarefa.</div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                    onKeyDown={handleAddSubtask}
+                    placeholder="Adicionar item (pressione Enter)" 
+                    className="flex-1 bg-transparent border border-[#2D2D2D] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#9D4EDD]" 
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

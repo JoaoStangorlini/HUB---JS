@@ -113,7 +113,11 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
             views.setOnClickFillInIntent(R.id.task_status, fillInIntent)
             
             // To allow general item clicks if needed (optional)
-            views.setOnClickFillInIntent(R.id.widget_item_container, Intent())
+            val fillInIntent2 = Intent().apply {
+                putExtra("action", "open_task")
+                putExtra("taskId", task.optString("id", ""))
+            }
+            views.setOnClickFillInIntent(R.id.widget_item_container, fillInIntent2)
             
         } catch (e: Exception) {
             e.printStackTrace()

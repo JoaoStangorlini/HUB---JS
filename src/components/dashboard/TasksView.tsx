@@ -176,6 +176,18 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
             if (modified) setLocalTasks(newTasks);
           }
         }
+
+        // 2. Process open task intent
+        const { value: openTaskId } = await Preferences.get({ key: 'widget_action_open_task' });
+        if (openTaskId) {
+          console.log("Abrindo tarefa a partir do widget:", openTaskId);
+          await Preferences.remove({ key: 'widget_action_open_task' });
+          const taskToOpen = localTasks.find(t => t.id === openTaskId);
+          if (taskToOpen) {
+            setTaskToEdit(taskToOpen);
+            setIsModalOpen(true);
+          }
+        }
       } catch (err) {
         console.error('Error processing widget intent', err);
       }

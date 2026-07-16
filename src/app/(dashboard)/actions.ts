@@ -66,22 +66,21 @@ export async function saveTask(taskData: Partial<Task>) {
     }
   });
 
+  // user_id will be handled by RLS if possible, but let's grab it explicitly to be safe
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user && !dataToSave.user_id) {
+    dataToSave.user_id = user.id;
+  }
+
   if (dataToSave.id) {
-    // Update existing task
+    // Upsert existing or new task with specific ID (optimistic creation)
     const { error } = await supabase
       .from('tasks')
-      .update(dataToSave)
-      .eq('id', dataToSave.id);
+      .upsert(dataToSave, { onConflict: 'id' });
 
     if (error) throw new Error(error.message);
   } else {
-    // Insert new task
-    // user_id will be handled by RLS if possible, but let's grab it explicitly to be safe
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      dataToSave.user_id = user.id;
-    }
-    
+    // Insert new task without ID
     const { error } = await supabase
       .from('tasks')
       .insert([dataToSave]);

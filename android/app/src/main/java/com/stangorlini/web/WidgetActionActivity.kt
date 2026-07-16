@@ -24,6 +24,11 @@ class WidgetActionActivity : Activity() {
             showDimensionDialog()
         } else if (action == "create_task") {
             showCreateTaskDialog()
+        } else if (action == "open_task" && taskId != null) {
+            val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
+            prefs.edit().putString("widget_action_open_task", taskId).apply()
+            launchMainActivity()
+            finish()
         } else {
             finish()
         }
