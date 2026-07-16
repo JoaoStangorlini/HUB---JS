@@ -10,9 +10,11 @@ interface TaskFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   task?: Task | null;
+  uniqueCategories?: string[];
+  uniqueDimensions?: string[];
 }
 
-export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
+export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueDimensions }: TaskFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [freqType, setFreqType] = useState('');
   const [freqDetail, setFreqDetail] = useState('');
@@ -131,30 +133,46 @@ export function TaskFormModal({ isOpen, onClose, task }: TaskFormModalProps) {
               <input required name="nome" value={formData.nome || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00]" />
             </div>
 
-            <div>
-              <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Status</label>
-              <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={[{"value":"não iniciada","label":"Não iniciada"},{"value":"em progresso","label":"Em progresso"},{"value":"falta testar","label":"Falta testar"},{"value":"completa","label":"Completa"},{"value":"descartada","label":"Descartada"}]} />
-            </div>
+            {(() => {
+              const catOptions = [
+                { value: "", label: "Nenhuma" },
+                ...Array.from(new Set([...(["Programar", "Pesquisar", "touch the grass", "reunir", "post", "outros"]), ...(uniqueCategories || [])])).map(c => ({ value: c, label: c }))
+              ];
+              
+              const dimOptions = [
+                { value: "", label: "Nenhuma" },
+                ...Array.from(new Set([...(["HUB", "urgente", "USP", "filmes/series", "cin", "tatuagens", "compras", "hobbys", "livros"]), ...(uniqueDimensions || [])])).map(d => ({ value: d, label: d }))
+              ];
 
-            <div>
-              <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Prioridade</label>
-              <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={[{"value":"","label":"Nenhuma"},{"value":"Baixa","label":"Baixa"},{"value":"Média","label":"Média"},{"value":"Alta","label":"Alta"}]} />
-            </div>
+              return (
+                <>
+                  <div>
+                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Status</label>
+                    <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={[{"value":"não iniciada","label":"Não iniciada"},{"value":"em progresso","label":"Em progresso"},{"value":"falta testar","label":"Falta testar"},{"value":"completa","label":"Completa"},{"value":"descartada","label":"Descartada"}]} />
+                  </div>
 
-            <div>
-              <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Categoria</label>
-              <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={[{"value":"","label":"Nenhuma"},{"value":"Programar","label":"Programar"},{"value":"Pesquisar","label":"Pesquisar"},{"value":"touch the grass","label":"Touch the grass"},{"value":"reunir","label":"Reunir"},{"value":"post","label":"Post"},{"value":"outros","label":"Outros"}]} />
-            </div>
+                  <div>
+                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Prioridade</label>
+                    <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={[{"value":"","label":"Nenhuma"},{"value":"Baixa","label":"Baixa"},{"value":"Média","label":"Média"},{"value":"Alta","label":"Alta"}]} />
+                  </div>
 
-            <div>
-              <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Responsável</label>
-              <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={[{"value":"","label":"Nenhum"},{"value":"João","label":"João"},{"value":"Andy","label":"Andy"},{"value":"Leo","label":"Leo"},{"value":"Dani","label":"Dani"},{"value":"Lorenzo","label":"Lorenzo"},{"value":"Nacky","label":"Nacky"}]} />
-            </div>
+                  <div>
+                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Categoria</label>
+                    <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={catOptions} allowCustom={true} />
+                  </div>
 
-            <div>
-              <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Dimensão</label>
-              <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={[{"value":"","label":"Nenhuma"},{"value":"HUB","label":"HUB"},{"value":"urgente","label":"Urgente"},{"value":"USP","label":"USP"},{"value":"filmes/series","label":"Filmes/Series"},{"value":"cin","label":"Cin"},{"value":"tatuagens","label":"Tatuagens"},{"value":"compras","label":"Compras"},{"value":"hobbys","label":"Hobbys"},{"value":"livros","label":"Livros"}]} />
-            </div>
+                  <div>
+                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Responsável</label>
+                    <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={[{"value":"","label":"Nenhum"},{"value":"João","label":"João"},{"value":"Andy","label":"Andy"},{"value":"Leo","label":"Leo"},{"value":"Dani","label":"Dani"},{"value":"Lorenzo","label":"Lorenzo"},{"value":"Nacky","label":"Nacky"}]} />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Dimensão</label>
+                    <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={dimOptions} allowCustom={true} />
+                  </div>
+                </>
+              );
+            })()}
 
             <div>
               <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Frequência</label>

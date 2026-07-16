@@ -15,16 +15,26 @@ interface CustomSelectProps {
   onChange: (e: any) => void;
   type: 'status' | 'prioridade' | 'categoria' | 'responsavel' | 'dimensao';
   disabled?: boolean;
+  allowCustom?: boolean;
 }
 
-export function CustomSelect({ name, value, options, onChange, type, disabled }: CustomSelectProps) {
+export function CustomSelect({ name, value, options: initialOptions, onChange, type, disabled, allowCustom }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customValue, setCustomValue] = useState('');
+  const [localOptions, setLocalOptions] = useState(initialOptions);
+
+  useEffect(() => {
+    setLocalOptions(initialOptions);
+  }, [initialOptions]);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsAddingCustom(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -34,10 +44,28 @@ export function CustomSelect({ name, value, options, onChange, type, disabled }:
   const handleSelect = (optionValue: string) => {
     onChange({ target: { name, value: optionValue } });
     setIsOpen(false);
+    setIsAddingCustom(false);
+    setCustomValue('');
   };
 
-  const selectedOption = options.find(o => o.value === value);
-  const selectedLabel = selectedOption ? selectedOption.label : '';
+  const handleCustomSubmit = (e?: React.SyntheticEvent) => {
+    if (e) e.preventDefault();
+    if (!customValue.trim()) return;
+    
+    // Add to local options so it displays nicely if they open it again
+    const newOption = { label: customValue.trim(), value: customValue.trim() };
+    if (!localOptions.find(o => o.value === newOption.value)) {
+      setLocalOptions([...localOptions, newOption]);
+    }
+    handleSelect(newOption.value);
+  };
+
+  // Allow displaying a custom value even if it's not in the initial options
+  let selectedLabel = value || '';
+  const selectedOption = localOptions.find(o => o.value === value);
+  if (selectedOption) {
+    selectedLabel = selectedOption.label;
+  }
   
   // Use badge colors for the selected box
   const boxClasses = disabled 
@@ -48,7 +76,12 @@ export function CustomSelect({ name, value, options, onChange, type, disabled }:
     <div className="relative w-full" ref={containerRef}>
       <div 
         className={boxClasses} 
-        onClick={() => !disabled && setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!disabled) {
+            setIsOpen(!isOpen);
+            setIsAddingCustom(false);
+          }
+        }}
       >
         <span>{selectedLabel || 'Selecione...'}</span>
         <span className="material-symbols-outlined text-[18px]">
@@ -57,20 +90,53 @@ export function CustomSelect({ name, value, options, onChange, type, disabled }:
       </div>
 
       {isOpen && !disabled && (
-        <div className="absolute z-[100] mt-1 w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-md shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
-          {options.map((option) => {
-            const itemColorClass = getBadgeColorClass(type, option.value);
-            return (
-              <div
-                key={option.value}
-                onClick={() => handleSelect(option.value)}
-                className={`px-4 py-2 cursor-pointer transition-colors border-l-4 hover:border-l-4 hover:brightness-125 ${itemColorClass}`}
-                style={{ borderLeftColor: 'transparent' }} // Let hover do its thing or keep it clean
-              >
-                {option.label}
-              </div>
-            );
-          })}
+        <div className="absolute z-[100] mt-1 w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-md shadow-2xl overflow-hidden max-h-60 flex flex-col">
+          {isAddingCustom ? (
+            <div className="p-3 flex gap-2 border-b border-[#2D2D2D]">
+              <input 
+                type="text" 
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleCustomSubmit();
+                  }
+                }}
+                placeholder="Novo valor..."
+                autoFocus
+                className="flex-1 bg-[#121212] border border-[#2D2D2D] rounded px-3 py-1 text-sm text-white focus:outline-none focus:border-[#9D4EDD]"
+              />
+              <button type="button" onClick={() => handleCustomSubmit()} className="bg-[#9D4EDD] text-white rounded px-3 py-1 text-sm font-bold hover:bg-[#8338C7]">
+                OK
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-y-auto">
+              {localOptions.map((option) => {
+                const itemColorClass = getBadgeColorClass(type, option.value);
+                return (
+                  <div
+                    key={option.value}
+                    onClick={() => handleSelect(option.value)}
+                    className={`px-4 py-2 cursor-pointer transition-colors border-l-4 hover:border-l-4 hover:brightness-125 ${itemColorClass}`}
+                    style={{ borderLeftColor: 'transparent' }} 
+                  >
+                    {option.label}
+                  </div>
+                );
+              })}
+              {allowCustom && (
+                <div
+                  onClick={() => setIsAddingCustom(true)}
+                  className="px-4 py-2 cursor-pointer transition-colors border-t border-[#2D2D2D] text-[#FFCC00] hover:bg-[#252525] font-bold text-sm flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[16px]">add</span>
+                  Adicionar Novo...
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

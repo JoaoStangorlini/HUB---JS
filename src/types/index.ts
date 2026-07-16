@@ -14,4 +14,5 @@ export interface Task {
   concluida_em: string | null;
   user_id: string;
   ordem_manual?: number;
+  is_favorite?: boolean;
 }

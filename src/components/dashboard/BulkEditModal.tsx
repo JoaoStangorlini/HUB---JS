@@ -23,9 +23,11 @@ interface BulkEditModalProps {
   onClose: () => void;
   taskIds: string[];
   onSuccess: () => void;
+  uniqueCategories?: string[];
+  uniqueDimensions?: string[];
 }
 
-export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess }: BulkEditModalProps) {
+export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess, uniqueCategories, uniqueDimensions }: BulkEditModalProps) {
   const [loading, setLoading] = useState(false);
   
   // Track which fields are active for bulk update
@@ -95,6 +97,16 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess }: BulkEditM
     }
   };
 
+  const catOptions = [
+    { value: "", label: "Nenhuma" },
+    ...Array.from(new Set([...(["Programar", "Pesquisar", "touch the grass", "reunir", "post", "outros"]), ...(uniqueCategories || [])])).map(c => ({ value: c, label: c }))
+  ];
+  
+  const dimOptions = [
+    { value: "", label: "Nenhuma" },
+    ...Array.from(new Set([...(["HUB", "urgente", "USP", "filmes/series", "cin", "tatuagens", "compras", "hobbys", "livros"]), ...(uniqueDimensions || [])])).map(d => ({ value: d, label: d }))
+  ];
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
       <div className="bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
@@ -127,7 +139,7 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess }: BulkEditM
             {/* Categoria */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.categoria ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
               <CheckboxToggle field="categoria" label="Categoria" isActive={!!activeFields.categoria} onToggle={handleFieldToggle} />
-              <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={[{"value":"","label":"Nenhuma"},{"value":"Programar","label":"Programar"},{"value":"Pesquisar","label":"Pesquisar"},{"value":"touch the grass","label":"Touch the grass"},{"value":"reunir","label":"Reunir"},{"value":"post","label":"Post"},{"value":"outros","label":"Outros"}]} disabled={!activeFields.categoria} />
+              <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={catOptions} disabled={!activeFields.categoria} allowCustom={true} />
             </div>
 
             {/* Responsável */}
@@ -139,7 +151,7 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess }: BulkEditM
             {/* Dimensão */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.dimensao ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
               <CheckboxToggle field="dimensao" label="Dimensão" isActive={!!activeFields.dimensao} onToggle={handleFieldToggle} />
-              <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={[{"value":"","label":"Nenhuma"},{"value":"HUB","label":"HUB"},{"value":"urgente","label":"Urgente"},{"value":"USP","label":"USP"},{"value":"filmes/series","label":"Filmes/Series"},{"value":"cin","label":"Cin"},{"value":"tatuagens","label":"Tatuagens"},{"value":"compras","label":"Compras"},{"value":"hobbys","label":"Hobbys"},{"value":"livros","label":"Livros"}]} disabled={!activeFields.dimensao} />
+              <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={dimOptions} disabled={!activeFields.dimensao} allowCustom={true} />
             </div>
 
             {/* Frequência */}

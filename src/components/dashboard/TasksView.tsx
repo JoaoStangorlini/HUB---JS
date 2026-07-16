@@ -8,6 +8,14 @@ import { BulkEditModal } from './BulkEditModal';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { updateTaskOrders, saveTask } from '@/app/(dashboard)/actions';
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import { syncTaskNotifications } from '@/lib/notifications';
+
+interface WidgetPluginPlugin {
+  updateWidget(): Promise<void>;
+}
+const WidgetPlugin = registerPlugin<WidgetPluginPlugin>('WidgetPlugin');
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return '-';
@@ -76,10 +84,43 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   [rawInitialTasks]);
   
   const [localTasks, setLocalTasks] = useState(initialTasks);
+  
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTasks(initialTasks);
   }, [initialTasks]);
+
+  // Sync Favorites to Native Android Widget
+  useEffect(() => {
+    const syncFavorites = async () => {
+      if (!Capacitor.isNativePlatform()) return;
+      try {
+        const favorites = localTasks.filter(t => t.is_favorite);
+        const widgetTasks = favorites.map(t => ({
+          id: t.id,
+          nome: t.nome,
+          prazo: t.prazo,
+          status: t.status
+        }));
+        await Preferences.set({
+          key: 'favorite_tasks',
+          value: JSON.stringify(widgetTasks)
+        });
+        
+        await WidgetPlugin.updateWidget();
+      } catch (err) {
+        console.error('Error syncing favorites to native widget', err);
+      }
+    };
+    syncFavorites();
+  }, [localTasks]);
+
+  // Sync Notifications
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      syncTaskNotifications(localTasks);
+    }
+  }, [localTasks]);
 
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
@@ -119,6 +160,22 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
       left: rect.left,
       value: task[field] || ''
     });
+  };
+
+  const handleFavoriteToggle = async (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
+    const task = localTasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const newValue = !task.is_favorite;
+    const updatedTasks = localTasks.map(t => t.id === taskId ? { ...t, is_favorite: newValue } : t);
+    setLocalTasks(updatedTasks);
+    
+    try {
+      await saveTask({ ...task, is_favorite: newValue });
+    } catch (err: any) {
+      alert("Erro ao atualizar favorito: " + err.message);
+    }
   };
 
   const handleQuickSave = async (taskId: string, field: 'status' | 'responsavel', newValue: string) => {
@@ -493,6 +550,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
               <button onClick={() => setSortBy('status')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'status' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Padrão</button>
               <button onClick={() => setSortBy('status_inv')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'status_inv' ? 'bg-[#FFCC00]/15 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Padrão (inv)</button>
               <button onClick={() => setSortBy('manual')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'manual' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Manual</button>
+              <button onClick={() => setSortBy('prazo')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'prazo' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Prazo</button>
             </div>
 
             {/* Prioridade */}
@@ -736,6 +794,9 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                 <td className="p-4 text-center flex items-center justify-center gap-2">
                   <span className={`material-symbols-outlined text-[#8E8E8E] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity ${sortBy === 'manual' ? 'cursor-grab' : 'cursor-not-allowed'}`} title={sortBy !== 'manual' ? 'Mude para ordenação Manual para arrastar' : 'Arrastar'}>drag_indicator</span>
                   <input type="checkbox" className="accent-[#9D4EDD] rounded-sm" checked={selectedTasks.has(task.id)} onChange={(e) => toggleCheckbox(e, task.id)} />
+                  <button onClick={(e) => handleFavoriteToggle(e, task.id)} className={`transition-colors flex items-center justify-center ${task.is_favorite ? 'text-[#FFCC00]' : 'text-[#8E8E8E] hover:text-[#FFCC00]'}`}>
+                    <span className={`material-symbols-outlined text-[18px] ${task.is_favorite ? 'filled' : ''}`} style={task.is_favorite ? { fontVariationSettings: "'FILL' 1" } : {}}>star</span>
+                  </button>
                 </td>
                 <td className="p-4 text-center">
                   <button 
@@ -802,6 +863,9 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
             className={`border rounded-lg p-4 flex flex-col gap-3 relative transition-colors ${selectedTasks.has(task.id) ? 'bg-[#9D4EDD]/10 border-[#9D4EDD]/30' : 'bg-[#1A1A1A] border-[#FFCC00]/30 hover:border-[#9D4EDD]'} ${draggedTaskId === task.id ? 'opacity-50' : ''} ${dropTargetId === task.id ? (dropPosition === 'top' ? 'border-t-2 border-[#9D4EDD]' : 'border-b-2 border-[#9D4EDD]') : ''}`}
           >
             <div className="absolute top-4 right-4 flex items-center gap-3">
+              <button onClick={(e) => handleFavoriteToggle(e, task.id)} className={`transition-colors flex items-center justify-center ${task.is_favorite ? 'text-[#FFCC00]' : 'text-[#8E8E8E] hover:text-[#FFCC00]'}`}>
+                <span className={`material-symbols-outlined text-[18px] ${task.is_favorite ? 'filled' : ''}`} style={task.is_favorite ? { fontVariationSettings: "'FILL' 1" } : {}}>star</span>
+              </button>
               <input type="checkbox" className="accent-[#9D4EDD] rounded-sm w-4 h-4" checked={selectedTasks.has(task.id)} onChange={(e) => toggleCheckbox(e, task.id)} />
               <button 
                 onClick={() => handleEdit(task)}
@@ -870,6 +934,15 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
         )}
       </div>
 
+      {/* Floating Add Task Button */}
+      <button 
+        onClick={handleNew}
+        className="fixed bottom-36 md:bottom-20 right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group"
+        title="Nova Tarefa"
+      >
+        <span className="material-symbols-outlined font-bold">add</span>
+      </button>
+
       {/* Floating Scroll to Bottom Button */}
       <button 
         onClick={scrollToBottom}
@@ -880,8 +953,8 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
       </button>
 
       {/* Modals */}
-      <TaskFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} task={taskToEdit} />
-      <BulkEditModal isOpen={isBulkEditModalOpen} onClose={() => setIsBulkEditModalOpen(false)} taskIds={Array.from(selectedTasks)} onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedTasks(new Set()); setLastSelectedTaskId(null); }} />
+      <TaskFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} task={taskToEdit} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
+      <BulkEditModal isOpen={isBulkEditModalOpen} onClose={() => setIsBulkEditModalOpen(false)} taskIds={Array.from(selectedTasks)} onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedTasks(new Set()); setLastSelectedTaskId(null); }} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
 
       {/* Quick Edit Dropdown */}
       {quickEdit && (

@@ -23,3 +23,6 @@ ALTER TABLE tasks ADD COLUMN IF NOT EXISTS ordem_manual INTEGER DEFAULT 0;
 -- 4. Renomear dimensão 'pessoal' para 'urgente'
 UPDATE tasks SET dimensao = 'urgente' WHERE dimensao = 'pessoal';
 
+-- 5. Adiciona coluna is_favorite
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN DEFAULT false;
+

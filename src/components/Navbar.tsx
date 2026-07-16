@@ -33,6 +33,15 @@ export default function Navbar({
     router.replace(`${pathname}?q=${encodeURIComponent(val)}`, { scroll: false });
   };
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (pathname === href || (pathname === '/' && href === '/')) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const main = document.querySelector('main');
+      if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
     <header className="sticky top-0 w-full z-50 bg-[#121212]/80 backdrop-blur-xl border-b border-[#2D2D2D] shrink-0">
@@ -58,6 +67,7 @@ export default function Navbar({
                     ? 'text-[#9D4EDD] font-bold border-b-[3px] border-[#FFCC00] pb-1' 
                     : 'text-[#A0A0A0] hover:text-[#9D4EDD]'
                 }`}
+                onClick={(e) => handleNavClick(e, link.href)}
               >
                 {link.name}
               </Link>
@@ -91,7 +101,14 @@ export default function Navbar({
             href={targetHref}
             className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-[#2D2D2D] bg-[#1A1A1A] hover:border-[#9D4EDD] hover:bg-[#9D4EDD]/10 transition-colors group cursor-pointer shrink-0"
           >
-            <img src={userRole === 'LabDiv' ? "/labdiv-logo.png" : "/perfil.jpeg"} alt="Perfil" className="w-7 h-7 rounded-full object-cover border border-[#2D2D2D] group-hover:border-[#9D4EDD] transition-colors" />
+            {userRole === 'Convidado' ? (
+              <div className="w-7 h-7 rounded-full bg-[#1A1A1A] border border-[#2D2D2D] flex items-center justify-center group-hover:border-[#9D4EDD] transition-colors">
+                <span className="material-symbols-outlined text-[16px] text-[#8E8E8E]">person</span>
+              </div>
+            ) : (
+              <img src={userRole === 'LabDiv' ? "/labdiv-logo.png" : "/perfil.jpeg"} alt="Perfil" className="w-7 h-7 rounded-full object-cover border border-[#2D2D2D] group-hover:border-[#9D4EDD] transition-colors" />
+            )}
+
             <div className="flex items-center gap-1.5">
               <div className={`w-1.5 h-1.5 rounded-full ${userRole === 'Convidado' ? 'bg-[#8E8E8E]' : userRole === 'ADM' ? 'bg-[#FFCC00]' : 'bg-[#9D4EDD]'}`}></div>
               <span className="text-[10px] md:text-[11px] font-bold text-[#A0A0A0] group-hover:text-white uppercase tracking-wider truncate max-w-[80px] md:max-w-none">
@@ -141,6 +158,7 @@ export default function Navbar({
                   ? 'bg-[#9D4EDD]/20 text-[#9D4EDD] px-5 py-2.5 gap-2' 
                   : 'text-[#8E8E8E] hover:text-white px-3 py-2.5'
               }`}
+              onClick={(e) => handleNavClick(e, link.href)}
             >
               <span className="material-symbols-outlined text-[22px]">{icon}</span>
               {isActive && <span className="text-xs font-bold whitespace-nowrap">{link.name}</span>}
