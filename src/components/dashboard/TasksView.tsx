@@ -12,6 +12,8 @@ import { Preferences } from '@capacitor/preferences';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
 import { syncTaskNotifications } from '@/lib/notifications';
+import { downloadICS } from '@/utils/ics';
+import { downloadCSV } from '@/utils/csv';
 
 interface WidgetPluginPlugin {
   updateWidget(): Promise<void>;
@@ -916,7 +918,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
                 {/* Section: Visibilidade Dimensões */}
                 {uniqueDimensions.length > 1 && (
-                  <div className="p-4">
+                  <div className="p-4 border-b border-[#2D2D2D]">
                     <h3 className="text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-3">Filtrar: Dimensão</h3>
                     <div className="flex flex-col gap-2">
                       {uniqueDimensions.map(dim => (
@@ -928,6 +930,19 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                     </div>
                   </div>
                 )}
+
+                {/* Section: Exportação */}
+                <div className="p-4 bg-[#1A1A1A]">
+                  <h3 className="text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-3">Exportar ({processedTasks.length} tarefas visíveis)</h3>
+                  <div className="flex gap-2">
+                    <button onClick={() => downloadCSV(processedTasks, 'tarefas_hub.csv')} className="flex-1 flex items-center justify-center gap-2 px-3 py-1.5 border border-[#0f9d58]/50 text-[#0f9d58] rounded hover:bg-[#0f9d58]/10 text-xs font-semibold transition-colors" title="Baixar CSV">
+                      <span className="material-symbols-outlined text-[16px]">table</span> CSV
+                    </button>
+                    <button onClick={() => downloadICS(processedTasks, 'tarefas_hub.ics')} className="flex-1 flex items-center justify-center gap-2 px-3 py-1.5 border border-[#4285f4]/50 text-[#4285f4] rounded hover:bg-[#4285f4]/10 text-xs font-semibold transition-colors" title="Baixar Google Agenda (ICS)">
+                      <span className="material-symbols-outlined text-[16px]">calendar_month</span> Agenda
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
             </div>

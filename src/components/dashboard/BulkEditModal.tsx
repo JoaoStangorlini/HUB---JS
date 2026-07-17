@@ -6,6 +6,7 @@ import { updateMultipleTasks, deleteMultipleTasks } from '@/app/(dashboard)/acti
 import { getBadgeColorClass } from './Badge';
 import { CustomSelect } from './CustomSelect';
 import { downloadICS } from '@/utils/ics';
+import { downloadCSV } from '@/utils/csv';
 
 const CheckboxToggle = ({ field, label, isActive, onToggle }: { field: string, label: string, isActive: boolean, onToggle: (field: string) => void }) => (
   <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
@@ -106,6 +107,12 @@ export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniq
     downloadICS(selectedTasks, 'tarefas_hub.ics');
   };
 
+  const handleExportCSV = () => {
+    const selectedTasks = tasks.filter(t => taskIds.includes(t.id));
+    if (selectedTasks.length === 0) return;
+    downloadCSV(selectedTasks, 'tarefas_hub.csv');
+  };
+
   const handleFieldToggle = (field: string) => {
     setActiveFields(prev => ({ ...prev, [field]: !prev[field] }));
   };
@@ -198,7 +205,11 @@ export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniq
           <div className="mt-8 flex justify-end gap-4">
             <button type="button" onClick={handleExportCalendar} disabled={loading} className="px-6 py-2 border border-[#4285f4]/50 text-[#4285f4] rounded-md hover:bg-[#4285f4]/10 text-sm font-semibold transition-colors mr-auto flex items-center gap-2" title="Exportar para o Google Agenda">
               <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-              Exportar Agenda
+              Agenda
+            </button>
+            <button type="button" onClick={handleExportCSV} disabled={loading} className="px-6 py-2 border border-[#0f9d58]/50 text-[#0f9d58] rounded-md hover:bg-[#0f9d58]/10 text-sm font-semibold transition-colors mr-auto flex items-center gap-2" title="Exportar para CSV">
+              <span className="material-symbols-outlined text-[18px]">table</span>
+              CSV
             </button>
             <button type="button" onClick={handleDelete} disabled={loading} className="px-6 py-2 border border-red-500/50 text-red-500 rounded-md hover:bg-red-500/10 text-sm font-semibold transition-colors flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">delete</span>
