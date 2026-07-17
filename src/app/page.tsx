@@ -25,7 +25,7 @@ export default function Home() {
               <span className="text-[#FFCC00]">STANGORLINI</span>
             </h1>
             <p className="text-lg text-[#A0A0A0] max-w-xl mx-auto md:mx-0">
-              Focando em pesquisa científica, desenvolvimento full-stack e organização acadêmica através do HUB Pessoal e plataformas LabDiv.
+              Focando em pesquisa científica, desenvolvimento full-stack e organização acadêmica através do Stangorlini web e plataformas LabDiv.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
               <a href="https://calendar.app.google/tELr1q8ky4G98EL58" target="_blank" rel="noreferrer" className="bg-[#FFCC00] text-[#121212] px-8 py-3 rounded-md text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#e6b800] transition-colors">
