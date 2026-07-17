@@ -137,3 +137,19 @@ export async function updateMultipleTasks(taskIds: string[], updates: Partial<Ta
   revalidatePath('/labdiv');
   revalidatePath('/servidor');
 }
+
+export async function deleteMultipleTasks(taskIds: string[]) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .in('id', taskIds);
+
+  if (error) {
+    console.error("Erro na exclusão em massa:", error);
+    throw new Error(error.message);
+  }
+
+  revalidatePath('/labdiv');
+  revalidatePath('/servidor');
+}

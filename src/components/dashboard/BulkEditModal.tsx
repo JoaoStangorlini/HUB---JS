@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { Task } from '@/types';
-import { updateMultipleTasks } from '@/app/(dashboard)/actions';
+import { updateMultipleTasks, deleteMultipleTasks } from '@/app/(dashboard)/actions';
 import { getBadgeColorClass } from './Badge';
 import { CustomSelect } from './CustomSelect';
+import { downloadICS } from '@/utils/ics';
 
 const CheckboxToggle = ({ field, label, isActive, onToggle }: { field: string, label: string, isActive: boolean, onToggle: (field: string) => void }) => (
   <label className="flex items-center gap-2 cursor-pointer mb-2 w-fit">
@@ -22,12 +23,13 @@ interface BulkEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   taskIds: string[];
+  tasks: Task[];
   onSuccess: () => void;
   uniqueCategories?: string[];
   uniqueDimensions?: string[];
 }
 
-export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess, uniqueCategories, uniqueDimensions }: BulkEditModalProps) {
+export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniqueCategories, uniqueDimensions }: BulkEditModalProps) {
   const [loading, setLoading] = useState(false);
   
   // Track which fields are active for bulk update
@@ -83,6 +85,25 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess, uniqueCateg
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm(`Tem certeza que deseja excluir as ${taskIds.length} tarefas selecionadas?`)) return;
+    setLoading(true);
+    try {
+      await deleteMultipleTasks(taskIds);
+      onSuccess();
+    } catch (err) {
+      alert('Erro ao excluir tarefas: ' + String(err));
+      setLoading(false);
+    }
+  };
+
+
+  const handleExportCalendar = () => {
+    const selectedTasks = tasks.filter(t => taskIds.includes(t.id));
+    if (selectedTasks.length === 0) return;
+    downloadICS(selectedTasks, 'tarefas_hub.ics');
   };
 
   const handleFieldToggle = (field: string) => {
@@ -175,6 +196,14 @@ export function BulkEditModal({ isOpen, onClose, taskIds, onSuccess, uniqueCateg
           </div>
 
           <div className="mt-8 flex justify-end gap-4">
+            <button type="button" onClick={handleExportCalendar} disabled={loading} className="px-6 py-2 border border-[#4285f4]/50 text-[#4285f4] rounded-md hover:bg-[#4285f4]/10 text-sm font-semibold transition-colors mr-auto flex items-center gap-2" title="Exportar para o Google Agenda">
+              <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+              Exportar Agenda
+            </button>
+            <button type="button" onClick={handleDelete} disabled={loading} className="px-6 py-2 border border-red-500/50 text-red-500 rounded-md hover:bg-red-500/10 text-sm font-semibold transition-colors flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px]">delete</span>
+              Excluir
+            </button>
             <button type="button" onClick={onClose} disabled={loading} className="px-6 py-2 border border-[#2D2D2D] text-white rounded-md hover:bg-[#252525] text-sm font-semibold transition-colors">Cancelar</button>
             <button type="submit" disabled={loading} className="px-6 py-2 bg-[#9D4EDD] text-white rounded-md hover:bg-[#8338C7] text-sm font-bold transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">done_all</span>

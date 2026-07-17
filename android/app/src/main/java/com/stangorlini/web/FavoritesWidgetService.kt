@@ -32,17 +32,43 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
         
         try {
             val allTasks = JSONArray(tasksJson)
-            if (selectedDim.isEmpty()) {
-                tasksArray = allTasks
-            } else {
-                tasksArray = JSONArray()
-                for (i in 0 until allTasks.length()) {
-                    val task = allTasks.getJSONObject(i)
+            val filteredList = mutableListOf<org.json.JSONObject>()
+            for (i in 0 until allTasks.length()) {
+                val task = allTasks.getJSONObject(i)
+                if (selectedDim.isEmpty() || selectedDim == "Todas as Dimensões") {
+                    filteredList.add(task)
+                } else if (selectedDim == "Favoritas") {
+                    if (task.optBoolean("is_favorite", false)) {
+                        filteredList.add(task)
+                    }
+                } else {
                     if (task.optString("dimensao", "") == selectedDim) {
-                        tasksArray.put(task)
+                        filteredList.add(task)
                     }
                 }
             }
+            
+            // Sort by deadline (closest/overdue first)
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            filteredList.sortWith(Comparator { t1, t2 ->
+                val p1 = t1.optString("prazo", "")
+                val p2 = t2.optString("prazo", "")
+                if (p1.isEmpty() && p2.isEmpty()) return@Comparator 0
+                if (p1.isEmpty()) return@Comparator 1
+                if (p2.isEmpty()) return@Comparator -1
+                
+                try {
+                    val d1 = sdf.parse(p1)?.time ?: Long.MAX_VALUE
+                    val d2 = sdf.parse(p2)?.time ?: Long.MAX_VALUE
+                    d1.compareTo(d2)
+                } catch(e: Exception) {
+                    0
+                }
+            })
+
+            tasksArray = JSONArray()
+            filteredList.forEach { tasksArray.put(it) }
         } catch (e: Exception) {
             e.printStackTrace()
             tasksArray = JSONArray()

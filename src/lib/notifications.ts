@@ -2,13 +2,13 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { Task } from '@/types';
 
-// Converts a UUID into a stable 32-bit positive integer
+// Converts a string into a stable 32-bit positive integer
 export const getNumericId = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 };
@@ -30,24 +30,80 @@ export const syncTaskNotifications = async (tasks: Task[]) => {
     }
 
     const notificationsToSchedule = [];
+    const activeTasks = tasks.filter(t => t.status !== 'completa' && t.status !== 'descartada' && t.prazo);
+    
+    // 1. Notificação de 1h antes
+    activeTasks.forEach(task => {
+      const prazoDate = new Date(task.prazo!);
+      if (isNaN(prazoDate.getTime())) return;
+      
+      const oneHourBefore = new Date(prazoDate.getTime() - 60 * 60 * 1000);
+      if (oneHourBefore.getTime() > Date.now()) {
+        notificationsToSchedule.push({
+          title: 'Tarefa em 1 hora!',
+          body: `Sua tarefa "${task.nome}" vence em 1 hora.`,
+          id: getNumericId(task.id + '_1h'),
+          schedule: { at: oneHourBefore },
+          smallIcon: 'ic_stat_name'
+        });
+      }
+    });
 
-    for (const task of tasks) {
-      if (!task.prazo || task.status === 'completa' || task.status === 'descartada') continue;
+    // 2. Resumos diários (7:30, 12:00, 18:00) para os próximos 7 dias
+    const now = new Date();
+    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+      const targetDay = new Date(now);
+      targetDay.setDate(now.getDate() + dayOffset);
+      targetDay.setHours(0, 0, 0, 0);
+      
+      const endOfWeek = new Date(targetDay);
+      const diffToSunday = 7 - targetDay.getDay(); // Sunday as end of week
+      endOfWeek.setDate(targetDay.getDate() + (diffToSunday === 7 ? 0 : diffToSunday));
+      endOfWeek.setHours(23, 59, 59, 999);
 
-      const parts = task.prazo.split('-');
-      if (parts.length !== 3) continue;
+      // Tasks to deliver between targetDay and endOfWeek
+      const weekTasks = activeTasks.filter(t => {
+        const d = new Date(t.prazo!);
+        return d.getTime() >= targetDay.getTime() && d.getTime() <= endOfWeek.getTime();
+      }).sort((a, b) => new Date(a.prazo!).getTime() - new Date(b.prazo!).getTime());
 
-      const scheduleDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 9, 0, 0);
+      if (weekTasks.length > 0) {
+        // Build summary message
+        // Take up to 3 tasks to avoid cutting the text
+        const topTasks = weekTasks.slice(0, 3);
+        const taskNames = topTasks.map(t => {
+            const d = new Date(t.prazo!);
+            const isToday = d.getDate() === targetDay.getDate() && d.getMonth() === targetDay.getMonth();
+            const isTomorrow = new Date(targetDay.getTime() + 86400000).getDate() === d.getDate();
+            const dayStr = isToday ? 'Hoje' : isTomorrow ? 'Amanhã' : d.toLocaleDateString('pt-BR', { weekday: 'short' });
+            return `${t.nome} (${dayStr})`;
+        }).join(', ');
+        
+        let bodyText = `Nesta semana: ${taskNames}`;
+        if (weekTasks.length > 3) bodyText += ` e mais ${weekTasks.length - 3}`;
 
-      if (scheduleDate.getTime() <= Date.now()) continue;
+        const times = [
+          { h: 7, m: 30, id_suffix: '_730' },
+          { h: 12, m: 0, id_suffix: '_1200' },
+          { h: 18, m: 0, id_suffix: '_1800' }
+        ];
 
-      notificationsToSchedule.push({
-        title: 'Prazo Vencendo Hoje',
-        body: `A tarefa "${task.nome}" vence hoje!`,
-        id: getNumericId(task.id),
-        schedule: { at: scheduleDate },
-        smallIcon: 'ic_stat_name'
-      });
+        for (const time of times) {
+          const scheduleDate = new Date(targetDay);
+          scheduleDate.setHours(time.h, time.m, 0, 0);
+          
+          if (scheduleDate.getTime() > Date.now()) {
+            const dateStr = `${targetDay.getFullYear()}${targetDay.getMonth()}${targetDay.getDate()}`;
+            notificationsToSchedule.push({
+              title: `Resumo da Semana (${weekTasks.length} tarefas)`,
+              body: bodyText,
+              id: getNumericId('summary_' + dateStr + time.id_suffix),
+              schedule: { at: scheduleDate },
+              smallIcon: 'ic_stat_name'
+            });
+          }
+        }
+      }
     }
 
     if (notificationsToSchedule.length > 0) {

@@ -7,7 +7,7 @@ import { TaskFormModal } from './TaskFormModal';
 import { BulkEditModal } from './BulkEditModal';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { updateTaskOrders, saveTask } from '@/app/(dashboard)/actions';
+import { updateTaskOrders, saveTask, deleteMultipleTasks, updateMultipleTasks } from '@/app/(dashboard)/actions';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -96,13 +96,14 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     const syncFavorites = async () => {
       if (!Capacitor.isNativePlatform()) return;
       try {
-        const favorites = localTasks.filter(t => t.is_favorite);
+        const favorites = localTasks; // Sync all active tasks, not just favorites
         const widgetTasks = favorites.map(t => ({
           id: t.id,
           nome: t.nome,
           prazo: t.prazo,
           status: t.status,
-          dimensao: t.dimensao
+          dimensao: t.dimensao,
+          is_favorite: t.is_favorite
         }));
         await Preferences.set({
           key: 'favorite_tasks',
@@ -222,7 +223,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
   const [quickEdit, setQuickEdit] = useState<{
     taskId: string;
-    field: 'status' | 'responsavel';
+    field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao';
     top: number;
     left: number;
     value: string | null;
@@ -236,7 +237,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     return () => window.removeEventListener('click', handleClickOutside);
   }, [quickEdit]);
 
-  const handleBadgeClick = (e: React.MouseEvent, task: Task, field: 'status' | 'responsavel') => {
+  const handleBadgeClick = (e: React.MouseEvent, task: Task, field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao') => {
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     setQuickEdit({
@@ -272,17 +273,22 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     }
   };
 
-  const handleQuickSave = async (taskId: string, field: 'status' | 'responsavel', newValue: string) => {
+  const handleQuickSave = async (taskId: string, field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao', newValue: string) => {
     setQuickEdit(null);
-    const task = localTasks.find(t => t.id === taskId);
-    if (!task) return;
 
-    // Atualização otimista simples
-    const updatedTasks = localTasks.map(t => t.id === taskId ? { ...t, [field]: newValue } : t);
+    const isBulkEdit = selectedTasks.has(taskId) && selectedTasks.size > 1;
+    const taskIdsToUpdate = isBulkEdit ? Array.from(selectedTasks) : [taskId];
+
+    const updatedTasks = localTasks.map(t => taskIdsToUpdate.includes(t.id) ? { ...t, [field]: newValue } : t);
     setLocalTasks(updatedTasks);
     
     try {
-      await saveTask({ ...task, [field]: newValue });
+      if (isBulkEdit) {
+        await updateMultipleTasks(taskIdsToUpdate, { [field]: newValue });
+      } else {
+        const task = localTasks.find(t => t.id === taskId);
+        if (task) await saveTask({ ...task, [field]: newValue });
+      }
     } catch (err: any) {
       alert("Erro ao atualizar: " + err.message);
     }
@@ -342,9 +348,25 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   // Global Keybinds (Escape and Ctrl+Z)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Do not trigger if any modal is open
+      if (isModalOpen || isBulkEditModalOpen) return;
+      
       if (e.key === 'Escape') {
         setSelectedTasks(new Set());
         setLastSelectedTaskId(null);
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+        if (selectedTasks.size > 0) {
+          if (confirm(`Tem certeza que deseja excluir as ${selectedTasks.size} tarefas selecionadas?`)) {
+            const taskIds = Array.from(selectedTasks);
+            deleteMultipleTasks(taskIds).then(() => {
+              setSelectedTasks(new Set());
+              setLastSelectedTaskId(null);
+            }).catch(err => alert("Erro ao excluir tarefas: " + err.message));
+          }
+        }
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
         setHistory(prev => {
@@ -362,7 +384,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isModalOpen, isBulkEditModalOpen, selectedTasks, localTasks]);
 
   const handleEdit = (task: Task) => {
     // Inject subtasks if this is a parent task
@@ -465,7 +487,11 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   };
 
   const handleNew = () => {
-    setTaskToEdit(null);
+    if (selectedDimensions.length === 1 && selectedDimensions[0] !== 'favoritas') {
+      setTaskToEdit({ id: crypto.randomUUID(), status: 'não iniciada', prioridade: 'Baixa', categoria: 'Programar', dimensao: selectedDimensions[0] } as any);
+    } else {
+      setTaskToEdit(null);
+    }
     setIsModalOpen(true);
   };
 
@@ -689,7 +715,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
         <div className="flex flex-col items-end gap-3 w-full mb-2">
           
           {/* Row 1: Ordenação */}
-          <div className="flex w-full overflow-x-auto hide-scrollbar items-center justify-start md:justify-end gap-3 shrink-0 pb-1">
+          <div className="flex w-full overflow-x-auto hide-scrollbar items-center justify-start gap-3 shrink-0 pb-1">
             <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Ordem:</span>
             
             {/* Ordem Global */}
@@ -709,12 +735,12 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
           </div>
 
           {/* Row 2: Status (Visibilidade) */}
-          <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start md:justify-end">
+          <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
             <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Visibilidade:</span>
             
             <button
                 onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1
+                className={`h-[26px] px-2 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center gap-1
                   ${showFavoritesOnly ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#FFCC00]/50 hover:text-white'}`}
             >
                 <span className={`material-symbols-outlined text-[14px] ${showFavoritesOnly ? 'text-[#FFCC00]' : ''}`}>star</span>
@@ -722,7 +748,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
             <button
                 onClick={() => setShowDraftsOnly(!showDraftsOnly)}
-                className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1
+                className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center gap-1
                   ${showDraftsOnly ? 'bg-[#8E8E8E]/20 border-[#8E8E8E] text-[#8E8E8E]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#8E8E8E]/50 hover:text-white'}`}
             >
                 <span className={`material-symbols-outlined text-[14px] ${showDraftsOnly ? 'text-[#8E8E8E]' : ''}`}>draft</span> Rascunhos
@@ -732,7 +758,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
               <button 
                 key={s} 
                 onClick={() => toggleFilter(selectedStatuses, setSelectedStatuses, s)}
-                className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0
+                className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center
                   ${selectedStatuses.includes(s) ? getBadgeColorClass('status', s) : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
               >
                 {s}
@@ -741,13 +767,13 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
           </div>
 
           {/* Row 3: Responsáveis */}
-          <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start md:justify-end">
+          <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
             <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Responsáveis:</span>
             {uniqueUsers.map(u => (
               <button 
                 key={u} 
                 onClick={() => toggleFilter(selectedUsers, setSelectedUsers, u)}
-                className={`px-3 py-1 text-[11px] rounded-full border transition-colors font-bold flex items-center gap-1 shrink-0
+                className={`h-[26px] px-3 text-[11px] rounded-full border transition-colors font-bold flex items-center justify-center gap-1 shrink-0
                   ${selectedUsers.includes(u) ? getBadgeColorClass('responsavel', u) : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
               >
                 <span className="material-symbols-outlined text-[12px]">person</span> {u}
@@ -757,13 +783,20 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
           {/* Row 3.5: Dimensões (Apenas no servidor onde há mais de 1 dimensão) */}
           {uniqueDimensions.length > 1 && (
-            <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start md:justify-end">
+            <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
               <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Dimensões:</span>
-              {uniqueDimensions.map(d => (
+              <button 
+                  onClick={() => setSelectedDimensions([])}
+                  className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0
+                    ${selectedDimensions.length === 0 ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
+                >
+                  Todas
+                </button>
+                {uniqueDimensions.map(d => (
                 <button 
                   key={d} 
                   onClick={() => toggleFilter(selectedDimensions, setSelectedDimensions, d)}
-                  className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0
+                  className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center
                     ${selectedDimensions.includes(d) ? getBadgeColorClass('dimensao', d) : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
                 >
                   {d}
@@ -917,7 +950,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
         <table className="w-full text-left border-collapse min-w-[1400px]">
           <thead className="bg-[#252525] border-b border-[#2D2D2D] sticky top-0 z-10">
             <tr>
-              <th className="p-4 w-[60px] text-center">
+              <th className="p-4 w-[100px] text-center">
                 <input type="checkbox" className="accent-[#9D4EDD] rounded-sm" onChange={(e) => {
                   if (e.target.checked) {
                     setSelectedTasks(new Set(processedTasks.map(t => t.id)));
@@ -954,12 +987,14 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                 onClick={(e) => handleRowClick(e, task.id)}
                 className={`transition-colors group ${selectedTasks.has(task.id) ? 'bg-[#9D4EDD]/10' : 'hover:bg-[#252525]'} ${draggedTaskId === task.id ? 'opacity-50' : ''} ${dropTargetId === task.id ? (dropPosition === 'top' ? 'border-t-2 border-[#9D4EDD]' : 'border-b-2 border-[#9D4EDD]') : 'border-b border-[#FFCC00]/30 hover:border-[#9D4EDD]'}`}
               >
-                <td className="p-4 text-center flex items-center justify-center gap-2">
-                  <span className={`material-symbols-outlined text-[#8E8E8E] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity ${sortBy === 'manual' ? 'cursor-grab' : 'cursor-not-allowed'}`} title={sortBy !== 'manual' ? 'Mude para ordenação Manual para arrastar' : 'Arrastar'}>drag_indicator</span>
-                  <input type="checkbox" className="accent-[#9D4EDD] rounded-sm" checked={selectedTasks.has(task.id)} onChange={(e) => toggleCheckbox(e, task.id)} />
-                  <button onClick={(e) => handleFavoriteToggle(e, task.id)} className={`transition-colors flex items-center justify-center ${task.is_favorite ? 'text-[#FFCC00]' : 'text-[#8E8E8E] hover:text-[#FFCC00]'}`}>
-                    <span className={`material-symbols-outlined text-[18px] ${task.is_favorite ? 'filled' : ''}`} style={task.is_favorite ? { fontVariationSettings: "'FILL' 1" } : {}}>star</span>
-                  </button>
+                <td className="p-4">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className={`material-symbols-outlined text-[#8E8E8E] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity ${sortBy === 'manual' ? 'cursor-grab' : 'cursor-not-allowed'}`} title={sortBy !== 'manual' ? 'Mude para ordenação Manual para arrastar' : 'Arrastar'}>drag_indicator</span>
+                    <input type="checkbox" className="accent-[#9D4EDD] rounded-sm" checked={selectedTasks.has(task.id)} onChange={(e) => toggleCheckbox(e, task.id)} />
+                    <button onClick={(e) => handleFavoriteToggle(e, task.id)} className={`transition-colors flex items-center justify-center ${task.is_favorite ? 'text-[#FFCC00]' : 'text-[#8E8E8E] hover:text-[#FFCC00]'}`}>
+                      <span className={`material-symbols-outlined text-[18px] ${task.is_favorite ? 'filled' : ''}`} style={task.is_favorite ? { fontVariationSettings: "'FILL' 1" } : {}}>star</span>
+                    </button>
+                  </div>
                 </td>
                 <td className="p-4 text-center">
                   <button 
@@ -987,8 +1022,8 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                   </div>
                 </td>
                 <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'status')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar status"><Badge type="status" value={task.status} /></div></td>
-                <td className="p-4"><Badge type="prioridade" value={task.prioridade} /></td>
-                <td className="p-4"><Badge type="categoria" value={task.categoria} /></td>
+                <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'prioridade')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar prioridade"><Badge type="prioridade" value={task.prioridade} /></div></td>
+                <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'categoria')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar categoria"><Badge type="categoria" value={task.categoria} /></div></td>
                 <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'responsavel')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar responsável"><Badge type="responsavel" value={task.responsavel} /></div></td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.created_at)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.inicio)}</td>
@@ -1008,7 +1043,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                 )}
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.concluida_em)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{task.frequencia || '-'}</td>
-                <td className="p-4"><Badge type="dimensao" value={task.dimensao} /></td>
+                <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'dimensao')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar dimensão"><Badge type="dimensao" value={task.dimensao} /></div></td>
               </tr>
               </React.Fragment>
             ))}
@@ -1079,10 +1114,10 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
               </div>
               <div className="flex justify-between items-center text-center gap-1">
                 <div className="flex-1 flex justify-center overflow-hidden" onClick={(e) => handleBadgeClick(e, task, 'status')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block"><Badge type="status" value={task.status} /></div></div>
-                <div className="flex-1 flex justify-center overflow-hidden"><Badge type="prioridade" value={task.prioridade} /></div>
-                <div className="flex-1 flex justify-center overflow-hidden"><Badge type="categoria" value={task.categoria} /></div>
+                <div className="flex-1 flex justify-center overflow-hidden" onClick={(e) => handleBadgeClick(e, task, 'prioridade')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block"><Badge type="prioridade" value={task.prioridade} /></div></div>
+                <div className="flex-1 flex justify-center overflow-hidden" onClick={(e) => handleBadgeClick(e, task, 'categoria')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block"><Badge type="categoria" value={task.categoria} /></div></div>
                 <div className="flex-1 flex justify-center overflow-hidden" onClick={(e) => handleBadgeClick(e, task, 'responsavel')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block"><Badge type="responsavel" value={task.responsavel} /></div></div>
-                <div className="flex-1 flex justify-center overflow-hidden"><Badge type="dimensao" value={task.dimensao} /></div>
+                <div className="flex-1 flex justify-center overflow-hidden" onClick={(e) => handleBadgeClick(e, task, 'dimensao')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block"><Badge type="dimensao" value={task.dimensao} /></div></div>
               </div>
             </div>
 
@@ -1149,7 +1184,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
       {/* Modals */}
       <TaskFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} task={taskToEdit} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
-      <BulkEditModal isOpen={isBulkEditModalOpen} onClose={() => setIsBulkEditModalOpen(false)} taskIds={Array.from(selectedTasks)} onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedTasks(new Set()); setLastSelectedTaskId(null); }} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
+      <BulkEditModal isOpen={isBulkEditModalOpen} onClose={() => setIsBulkEditModalOpen(false)} taskIds={Array.from(selectedTasks)} tasks={localTasks} onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedTasks(new Set()); setLastSelectedTaskId(null); }} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
 
       {/* Quick Edit Dropdown */}
       {quickEdit && (
@@ -1159,26 +1194,31 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
           onClick={(e) => e.stopPropagation()}
         >
           <div className="max-h-[250px] overflow-y-auto flex flex-col py-1">
-            {quickEdit.field === 'status' 
-              ? ["não iniciada","em progresso","falta testar","completa","descartada"].map(option => (
-                  <button 
-                    key={option}
-                    className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value?.toLowerCase() === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`}
-                    onClick={() => handleQuickSave(quickEdit.taskId, 'status', option)}
-                  >
+            {quickEdit.field === 'status' && ["não iniciada","em progresso","falta testar","completa","descartada"].map(option => (
+                  <button key={option} className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value?.toLowerCase() === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`} onClick={() => handleQuickSave(quickEdit.taskId, 'status', option)}>
                     {option.charAt(0).toUpperCase() + option.slice(1)}
                   </button>
-                ))
-              : ["João","Andy","Leo","Dani","Lorenzo","Nacky"].map(option => (
-                  <button 
-                    key={option}
-                    className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`}
-                    onClick={() => handleQuickSave(quickEdit.taskId, 'responsavel', option)}
-                  >
+            ))}
+            {quickEdit.field === 'responsavel' && ["João","Andy","Leo","Dani","Lorenzo","Nacky"].map(option => (
+                  <button key={option} className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`} onClick={() => handleQuickSave(quickEdit.taskId, 'responsavel', option)}>
                     {option}
                   </button>
-                ))
-            }
+            ))}
+            {quickEdit.field === 'prioridade' && ["Alta", "Média", "Baixa", ""].map(option => (
+                  <button key={option} className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`} onClick={() => handleQuickSave(quickEdit.taskId, 'prioridade', option)}>
+                    {option || "Nenhuma"}
+                  </button>
+            ))}
+            {quickEdit.field === 'categoria' && Array.from(new Set([...uniqueCategories, ""])).map(option => (
+                  <button key={option} className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`} onClick={() => handleQuickSave(quickEdit.taskId, 'categoria', option)}>
+                    {option || "Nenhuma"}
+                  </button>
+            ))}
+            {quickEdit.field === 'dimensao' && Array.from(new Set([...uniqueDimensions.filter(d => d !== 'favoritas'), ""])).map(option => (
+                  <button key={option} className={`text-left px-3 py-2 text-xs hover:bg-[#252525] transition-colors ${quickEdit.value === option ? 'text-[#9D4EDD] font-bold bg-[#9D4EDD]/10' : 'text-[#E0E0E0]'}`} onClick={() => handleQuickSave(quickEdit.taskId, 'dimensao', option)}>
+                    {option || "Nenhuma"}
+                  </button>
+            ))}
           </div>
         </div>
       )}

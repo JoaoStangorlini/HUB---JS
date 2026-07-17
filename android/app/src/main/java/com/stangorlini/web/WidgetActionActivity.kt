@@ -72,7 +72,8 @@ class WidgetActionActivity : Activity() {
         val dimsJson = prefs.getString("unique_dimensions", "[]")
         
         val dimensionsList = mutableListOf<String>()
-        dimensionsList.add("Todas as Dimensões") // Default option
+        dimensionsList.add("Todas as Dimensões")
+        dimensionsList.add("Favoritas")
         
         try {
             val arr = JSONArray(dimsJson)
