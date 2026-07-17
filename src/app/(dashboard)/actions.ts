@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { Task } from '@/types';
+import { Task, TaskColumn } from '@/types';
 
 export async function updateTaskOrders(updates: { id: string, ordem_manual: number }[]) {
   const supabase = await createClient();
@@ -152,4 +152,127 @@ export async function deleteMultipleTasks(taskIds: string[]) {
 
   revalidatePath('/labdiv');
   revalidatePath('/servidor');
+}
+
+export async function getTaskColumns(): Promise<TaskColumn[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('task_columns')
+    .select('*')
+    .order('order_num', { ascending: true });
+
+  if (error) {
+    console.error("Erro ao carregar colunas:", error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function saveTaskColumn(column: TaskColumn) {
+  const supabase = await createClient();
+  
+  const { error } = await supabase
+    .from('task_columns')
+    .upsert({
+      id: column.id,
+      key: column.key,
+      name: column.name,
+      type: column.type,
+      options: column.options,
+      is_native: column.is_native,
+      order_num: column.order_num
+    });
+
+  if (error) {
+    console.error("Erro ao salvar coluna:", error);
+    throw new Error(error.message);
+  }
+  
+  revalidatePath('/servidor');
+  revalidatePath('/labdiv');
+  revalidatePath('/');
+}
+
+export async function updateOptionNameCascade(columnKey: string, isNative: boolean, oldVal: string, newVal: string) {
+  const supabase = await createClient();
+  
+  if (isNative) {
+     const { error } = await supabase
+       .from('tasks')
+       .update({ [columnKey]: newVal } as any)
+       .eq(columnKey, oldVal);
+     if (error) throw new Error(error.message);
+  } else {
+     const { data: tasks } = await supabase.from('tasks').select('id, custom_fields').contains('custom_fields', { [columnKey]: oldVal });
+     if (tasks && tasks.length > 0) {
+       for (const t of tasks) {
+         const updatedFields = { ...t.custom_fields, [columnKey]: newVal };
+         await supabase.from('tasks').update({ custom_fields: updatedFields }).eq('id', t.id);
+       }
+     }
+  }
+  
+  revalidatePath('/');
+}
+
+export async function getUserProfile() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+
+  if (!data) {
+    // Create one if it doesn't exist
+    const newProfile = { id: user.id, quick_links: [], quick_filters: ['responsavel', 'dimensao'], quick_sorts: ['status', 'prazo', 'prioridade', 'manual'] };
+    await supabase.from('user_profiles').insert(newProfile);
+    return newProfile;
+  }
+
+  return data;
+}
+
+export async function saveQuickLinks(links: any[]) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({ quick_links: links })
+    .eq('id', user.id);
+
+  if (error) throw new Error(error.message);
+  
+  revalidatePath('/aurtistic');
+}
+
+export async function saveQuickPreferences(quickFilters: string[], quickSorts: string[]) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase
+    .from('user_profiles')
+    .upsert({ id: user.id, quick_filters: quickFilters, quick_sorts: quickSorts });
+
+  if (error) {
+    console.error("Erro ao salvar quick preferences:", error);
+    throw new Error(error.message);
+  }
+
+  revalidatePath('/labdiv');
+  revalidatePath('/servidor');
+  revalidatePath('/aurtistic');
+  revalidatePath('/tarefas');
+  revalidatePath('/');
 }

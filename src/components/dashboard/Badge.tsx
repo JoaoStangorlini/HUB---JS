@@ -1,11 +1,6 @@
 import React from 'react';
 
-type BadgeType = 'status' | 'prioridade' | 'categoria' | 'responsavel' | 'dimensao';
-
-interface BadgeProps {
-  type: BadgeType;
-  value: string | null;
-}
+type BadgeType = 'status' | 'prioridade' | 'categoria' | 'responsavel' | 'dimensao' | string;
 
 export function getBadgeColorClass(type: BadgeType, value: string | null): string {
   if (!value) return 'bg-[#2D2D2D] text-[#A0A0A0] border-[#353534]';
@@ -58,10 +53,40 @@ export function getBadgeColorClass(type: BadgeType, value: string | null): strin
   return colorClass;
 }
 
-export function Badge({ type, value }: BadgeProps) {
-  if (!value) return <span className="text-gray-500">-</span>;
-  const colorClass = getBadgeColorClass(type, value);
+interface BadgeProps {
+  type: BadgeType | string;
+  value: string | null;
+  customColor?: string | null;
+}
 
+export function Badge({ type, value, customColor }: BadgeProps) {
+  if (!value) return <span className="text-gray-500">-</span>;
+  
+  if (customColor) {
+    // Generate an RGBA for background (opacity 15%)
+    let r=0, g=0, b=0;
+    if (customColor.startsWith('#')) {
+      const hex = customColor.replace('#', '');
+      if (hex.length === 6) {
+        r = parseInt(hex.substring(0, 2), 16);
+        g = parseInt(hex.substring(2, 4), 16);
+        b = parseInt(hex.substring(4, 6), 16);
+      }
+    }
+    const bg = `rgba(${r},${g},${b},0.15)`;
+    const border = `rgba(${r},${g},${b},0.3)`;
+    
+    return (
+      <span 
+        className="inline-block max-w-full truncate px-2 py-1 text-[11px] rounded-md font-medium border"
+        style={{ backgroundColor: bg, color: customColor, borderColor: border }}
+      >
+        {value}
+      </span>
+    );
+  }
+
+  const colorClass = getBadgeColorClass(type as BadgeType, value);
   return (
     <span className={`inline-block max-w-full truncate px-2 py-1 text-[11px] rounded-md font-medium border ${colorClass}`}>
       {value}

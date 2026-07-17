@@ -3,6 +3,7 @@ import { TasksView } from '@/components/dashboard/TasksView';
 import { QuickLinks } from '@/components/dashboard/QuickLinks';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
+import { getTaskColumns, getUserProfile } from '@/app/(dashboard)/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,7 @@ export default async function ServidorPage() {
   const { data: tasks, error } = await supabase
     .from('tasks')
     .select('*')
+    .or('is_personal.is.null,is_personal.eq.false')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -43,6 +45,9 @@ export default async function ServidorPage() {
     );
   }
 
+  const columns = await getTaskColumns();
+  const profile = await getUserProfile();
+
   return (
     <div className="min-h-full flex flex-col p-4 md:p-8 bg-[#121212]">
       <div className="mb-4 md:mb-6 shrink-0">
@@ -52,7 +57,7 @@ export default async function ServidorPage() {
       </div>
 
       <div>
-        <TasksView initialTasks={tasks || []} />
+        <TasksView initialTasks={tasks || []} initialColumns={columns} initialQuickFilters={profile?.quick_filters || ['responsavel', 'dimensao']} initialQuickSorts={profile?.quick_sorts || ['status', 'prazo', 'prioridade', 'manual']} />
       </div>
     </div>
   );

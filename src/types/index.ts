@@ -1,4 +1,22 @@
+export interface TaskColumnOption {
+  value: string;
+  label: string;
+  color?: string;
+  id?: string;
+}
+
+export interface TaskColumn {
+  id: string;
+  key: string;
+  name: string;
+  type: 'select' | 'text' | 'date' | 'checkbox';
+  options: TaskColumnOption[];
+  is_native: boolean;
+  order_num: number;
+}
+
 export interface Task {
+  is_personal?: boolean;
   id: string;
   created_at: string;
   nome: string;
@@ -16,4 +34,5 @@ export interface Task {
   ordem_manual?: number;
   is_favorite?: boolean;
   parent_id?: string | null;
+  custom_fields?: Record<string, any>;
 }

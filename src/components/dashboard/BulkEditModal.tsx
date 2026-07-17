@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Task } from '@/types';
+import { Task, TaskColumn } from '@/types';
 import { updateMultipleTasks, deleteMultipleTasks } from '@/app/(dashboard)/actions';
 import { getBadgeColorClass } from './Badge';
 import { CustomSelect } from './CustomSelect';
@@ -28,9 +28,11 @@ interface BulkEditModalProps {
   onSuccess: () => void;
   uniqueCategories?: string[];
   uniqueDimensions?: string[];
+  columns?: TaskColumn[];
+  onEditColumn?: (col: TaskColumn) => void;
 }
 
-export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniqueCategories, uniqueDimensions }: BulkEditModalProps) {
+export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniqueCategories, uniqueDimensions, columns = [], onEditColumn }: BulkEditModalProps) {
   const [loading, setLoading] = useState(false);
   
   // Track which fields are active for bulk update
@@ -125,15 +127,55 @@ export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniq
     }
   };
 
-  const catOptions = [
-    { value: "", label: "Nenhuma" },
-    ...Array.from(new Set([...(["Programar", "Pesquisar", "touch the grass", "reunir", "post", "outros"]), ...(uniqueCategories || [])])).map(c => ({ value: c, label: c }))
-  ];
+  // Helper to get options for a column key
+  const getColumnOptions = (key: string, defaultOptions: any[] = []) => {
+    const col = columns.find(c => c.key === key);
+    if (!col) return defaultOptions;
+    return col.options.map(o => ({ label: o.label, value: o.value, color: o.color }));
+  };
+
+  const statusOptions = getColumnOptions('status', [
+    { label: 'Não iniciada', value: 'não iniciada' },
+    { label: 'Em progresso', value: 'em progresso' },
+    { label: 'Falta testar', value: 'falta testar' },
+    { label: 'Completa', value: 'completa' },
+    { label: 'Descartada', value: 'descartada' }
+  ]);
   
-  const dimOptions = [
-    { value: "", label: "Nenhuma" },
-    ...Array.from(new Set([...(["HUB", "urgente", "USP", "filmes/series", "cin", "tatuagens", "compras", "hobbys", "livros"]), ...(uniqueDimensions || [])])).map(d => ({ value: d, label: d }))
-  ];
+  const prioridadeOptions = getColumnOptions('prioridade', [
+    { label: 'Nenhuma', value: '' },
+    { label: 'Baixa', value: 'Baixa' },
+    { label: 'Média', value: 'Média' },
+    { label: 'Alta', value: 'Alta' }
+  ]);
+  
+  const responsavelOptions = getColumnOptions('responsavel', [
+    { label: 'Nenhum', value: '' },
+    { label: 'João', value: 'João' },
+    { label: 'Andy', value: 'Andy' },
+    { label: 'Leo', value: 'Leo' },
+    { label: 'Dani', value: 'Dani' },
+    { label: 'Lorenzo', value: 'Lorenzo' },
+    { label: 'Nacky', value: 'Nacky' }
+  ]);
+
+  const categoriaOptions = getColumnOptions('categoria', 
+    (uniqueCategories && uniqueCategories.length > 0) 
+      ? [{label: 'Nenhuma', value: ''}, ...uniqueCategories.filter(c => c).map(c => ({label: c, value: c}))]
+      : []
+  );
+
+  const dimensaoOptions = getColumnOptions('dimensao',
+    (uniqueDimensions && uniqueDimensions.length > 0)
+      ? [{label: 'Nenhuma', value: ''}, ...uniqueDimensions.filter(d => d !== 'favoritas' && d).map(d => ({label: d, value: d}))]
+      : []
+  );
+
+  const handleEditCol = (key: string) => {
+    if (!onEditColumn) return;
+    const col = columns.find(c => c.key === key);
+    if (col) onEditColumn(col);
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
@@ -155,31 +197,31 @@ export function BulkEditModal({ isOpen, onClose, taskIds, tasks, onSuccess, uniq
             {/* Status */}
             <div className={`p-3 rounded-lg border transition-colors ${activeFields.status ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
               <CheckboxToggle field="status" label="Status" isActive={!!activeFields.status} onToggle={handleFieldToggle} />
-              <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={[{"value":"não iniciada","label":"Não iniciada"},{"value":"em progresso","label":"Em progresso"},{"value":"falta testar","label":"Falta testar"},{"value":"completa","label":"Completa"},{"value":"descartada","label":"Descartada"}]} disabled={!activeFields.status} />
+              <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={statusOptions} disabled={!activeFields.status} allowCustom={true} onEditColumn={columns.find(c => c.key === 'status') ? () => handleEditCol('status') : undefined} />
             </div>
 
             {/* Prioridade */}
-            <div className={`p-3 rounded-lg border transition-colors ${activeFields.prioridade ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="prioridade" label="Prioridade" isActive={!!activeFields.prioridade} onToggle={handleFieldToggle} />
-              <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={[{"value":"","label":"Nenhuma"},{"value":"Baixa","label":"Baixa"},{"value":"Média","label":"Média"},{"value":"Alta","label":"Alta"}]} disabled={!activeFields.prioridade} />
+            <div className={`p-3 border rounded-md transition-colors ${activeFields.prioridade ? 'border-[#9D4EDD] bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+              <CheckboxToggle field="prioridade" label="Prioridade" isActive={activeFields.prioridade} onToggle={handleFieldToggle} />
+              <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={prioridadeOptions} disabled={!activeFields.prioridade} allowCustom={true} onEditColumn={columns.find(c => c.key === 'prioridade') ? () => handleEditCol('prioridade') : undefined} />
             </div>
 
             {/* Categoria */}
-            <div className={`p-3 rounded-lg border transition-colors ${activeFields.categoria ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="categoria" label="Categoria" isActive={!!activeFields.categoria} onToggle={handleFieldToggle} />
-              <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={catOptions} disabled={!activeFields.categoria} allowCustom={true} />
+            <div className={`p-3 border rounded-md transition-colors ${activeFields.categoria ? 'border-[#9D4EDD] bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+              <CheckboxToggle field="categoria" label="Categoria" isActive={activeFields.categoria} onToggle={handleFieldToggle} />
+              <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={categoriaOptions} allowCustom={true} disabled={!activeFields.categoria} onEditColumn={columns.find(c => c.key === 'categoria') ? () => handleEditCol('categoria') : undefined} />
             </div>
 
             {/* Responsável */}
-            <div className={`p-3 rounded-lg border transition-colors ${activeFields.responsavel ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="responsavel" label="Responsável" isActive={!!activeFields.responsavel} onToggle={handleFieldToggle} />
-              <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={[{"value":"","label":"Nenhum"},{"value":"João","label":"João"},{"value":"Andy","label":"Andy"},{"value":"Leo","label":"Leo"},{"value":"Dani","label":"Dani"},{"value":"Lorenzo","label":"Lorenzo"},{"value":"Nacky","label":"Nacky"}]} disabled={!activeFields.responsavel} />
+            <div className={`p-3 border rounded-md transition-colors ${activeFields.responsavel ? 'border-[#9D4EDD] bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+              <CheckboxToggle field="responsavel" label="Responsável" isActive={activeFields.responsavel} onToggle={handleFieldToggle} />
+              <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={responsavelOptions} disabled={!activeFields.responsavel} allowCustom={true} onEditColumn={columns.find(c => c.key === 'responsavel') ? () => handleEditCol('responsavel') : undefined} />
             </div>
 
             {/* Dimensão */}
-            <div className={`p-3 rounded-lg border transition-colors ${activeFields.dimensao ? 'border-[#9D4EDD]/50 bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
-              <CheckboxToggle field="dimensao" label="Dimensão" isActive={!!activeFields.dimensao} onToggle={handleFieldToggle} />
-              <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={dimOptions} disabled={!activeFields.dimensao} allowCustom={true} />
+            <div className={`p-3 border rounded-md transition-colors ${activeFields.dimensao ? 'border-[#9D4EDD] bg-[#9D4EDD]/5' : 'border-[#2D2D2D]'}`}>
+              <CheckboxToggle field="dimensao" label="Dimensão" isActive={activeFields.dimensao} onToggle={handleFieldToggle} />
+              <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={dimensaoOptions} allowCustom={true} disabled={!activeFields.dimensao} onEditColumn={columns.find(c => c.key === 'dimensao') ? () => handleEditCol('dimensao') : undefined} />
             </div>
 
             {/* Frequência */}

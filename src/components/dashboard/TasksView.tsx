@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Task } from '@/types';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { Task, TaskColumn } from '@/types';
 import { Badge, getBadgeColorClass } from './Badge';
 import { TaskFormModal } from './TaskFormModal';
 import { BulkEditModal } from './BulkEditModal';
+import { OptionsEditorModal } from './OptionsEditorModal';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { updateTaskOrders, saveTask, deleteMultipleTasks, updateMultipleTasks } from '@/app/(dashboard)/actions';
+import { updateTaskOrders, saveTask, deleteMultipleTasks, updateMultipleTasks, saveTaskColumn } from '@/app/(dashboard)/actions';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -78,10 +79,12 @@ const HighlightedText = ({ text, highlight }: { text: string | null, highlight: 
   );
 };
 
-export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Task[] }) {
+export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], isPersonalScope = false, initialQuickFilters = ['responsavel', 'dimensao'], initialQuickSorts = ['status', 'prazo', 'prioridade', 'manual'] }: { initialTasks: Task[], initialColumns?: TaskColumn[], isPersonalScope?: boolean, initialQuickFilters?: string[], initialQuickSorts?: string[] }) {
 
   const searchParams = useSearchParams();
   const globalQuery = searchParams.get('q') || '';
+  
+  const [columns, setColumns] = useState<TaskColumn[]>(initialColumns);
   
   // Normalizar os dados que vêm do banco (migração temporária na UI)
   const initialTasks = useMemo(() => 
@@ -123,6 +126,24 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
         await Preferences.set({
           key: 'unique_dimensions',
           value: JSON.stringify(dims)
+        });
+
+        // Save status colors mapping for Widget pencil icons
+        const statusColors: Record<string, string> = {
+          'completa': '#0f9d58',
+          'concluída': '#0f9d58',
+          'concluida': '#0f9d58',
+          'falta testar': '#f4b400',
+          'descartada': '#db4437',
+          'em progresso': '#4285f4',
+          'em andamento': '#4285f4',
+          'não iniciada': '#E0E0E0',
+          'nao iniciada': '#E0E0E0',
+          'rascunho': '#8E8E8E'
+        };
+        await Preferences.set({
+          key: 'status_colors',
+          value: JSON.stringify(statusColors)
         });
         
         await WidgetPlugin.updateWidget();
@@ -228,6 +249,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
+  const [editingColumn, setEditingColumn] = useState<TaskColumn | null>(null);
 
   const [quickEdit, setQuickEdit] = useState<{
     taskId: string;
@@ -305,6 +327,10 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
   // Filters UI State
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+
+  const [isColumnsMenuOpen, setIsColumnsMenuOpen] = useState(false);
+  const columnsMenuRef = useRef<HTMLDivElement>(null);
+
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
   const toggleExpand = (e: React.MouseEvent, taskId: string) => {
@@ -323,7 +349,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   // Se a Navbar global mandar ?q=... nós usamos ela. Senão a local.
   const searchTerm = globalQuery || localSearchTerm;
   
-  type SortOption = 'status' | 'status_inv' | 'prazo' | 'categoria' | 'prioridade_desc' | 'prioridade_asc' | 'manual';
+  type SortOption = 'status' | 'status_inv' | 'prazo' | 'categoria' | 'prioridade_desc' | 'prioridade_asc' | 'manual' | string;
   const [sortBy, setSortBy] = useState<SortOption>('status');
 
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
@@ -332,6 +358,13 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectedDimensions, setSelectedDimensions] = useState<string[]>([]);
+
+  // Quick Filters & Custom Filters
+  const [quickFilters, setQuickFilters] = useState<string[]>(initialQuickFilters || ['responsavel', 'dimensao']);
+  const [quickSorts, setQuickSorts] = useState<string[]>(initialQuickSorts || ['status', 'prazo', 'prioridade', 'manual']);
+  const [isQuickFiltersModalOpen, setIsQuickFiltersModalOpen] = useState(false);
+  const [quickFiltersTab, setQuickFiltersTab] = useState<'visibilidade' | 'ordem'>('visibilidade');
+  const [customFilters, setCustomFilters] = useState<Record<string, string[]>>({});
 
   // Selection
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
@@ -347,6 +380,9 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     function handleClickOutside(event: MouseEvent) {
       if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
         setIsFilterMenuOpen(false);
+      }
+      if (columnsMenuRef.current && !columnsMenuRef.current.contains(event.target as Node)) {
+        setIsColumnsMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -495,11 +531,16 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
   };
 
   const handleNew = () => {
+    let newTask: any = { id: crypto.randomUUID(), status: 'não iniciada', prioridade: 'Baixa', categoria: 'Programar' };
+    
     if (selectedDimensions.length === 1 && selectedDimensions[0] !== 'favoritas') {
-      setTaskToEdit({ id: crypto.randomUUID(), status: 'não iniciada', prioridade: 'Baixa', categoria: 'Programar', dimensao: selectedDimensions[0] } as any);
-    } else {
-      setTaskToEdit(null);
+      newTask.dimensao = selectedDimensions[0];
     }
+    if (isPersonalScope) {
+      newTask.is_personal = true;
+    }
+    
+    setTaskToEdit(newTask);
     setIsModalOpen(true);
   };
 
@@ -581,15 +622,42 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     }
   };
 
-  // Dynamic filter options
-  const uniqueStatuses = useMemo(() => Array.from(new Set(initialTasks.map(t => t.status).filter(Boolean))) as string[], [initialTasks]);
-  const uniqueCategories = useMemo(() => Array.from(new Set(initialTasks.map(t => t.categoria).filter(Boolean))) as string[], [initialTasks]);
-  const uniqueUsers = useMemo(() => Array.from(new Set([...initialTasks.map(t => t.responsavel).filter(Boolean), 'Dani', 'Leo'])) as string[], [initialTasks]).sort();
+  const uniqueStatuses = useMemo(() => {
+    const statusCol = initialColumns.find(c => c.key === 'status');
+    const predefined = statusCol ? statusCol.options.map(o => o.value) : ['não iniciada', 'em progresso', 'falta testar', 'completa', 'descartada'];
+    const fromTasks = initialTasks.map(t => t.status).filter(Boolean) as string[];
+    return Array.from(new Set([...predefined, ...fromTasks]));
+  }, [initialTasks, initialColumns]);
+
+  const uniqueCategories = useMemo(() => {
+    const catCol = initialColumns.find(c => c.key === 'categoria');
+    const predefined = catCol ? catCol.options.map(o => o.value) : ['Programar', 'Design', 'Marketing', 'Geral'];
+    const fromTasks = initialTasks.map(t => t.categoria).filter(Boolean) as string[];
+    return Array.from(new Set([...predefined, ...fromTasks]));
+  }, [initialTasks, initialColumns]);
+
+  const uniqueUsers = useMemo(() => {
+    const userCol = initialColumns.find(c => c.key === 'responsavel');
+    const predefined = userCol ? userCol.options.map(o => o.value) : ['João', 'Andy', 'Leo', 'Dani', 'Lorenzo', 'Nacky'];
+    const fromTasks = initialTasks.map(t => t.responsavel).filter(Boolean) as string[];
+    return Array.from(new Set([...predefined, ...fromTasks])).sort();
+  }, [initialTasks, initialColumns]);
+
   const uniqueDimensions = useMemo(() => {
-    const dims = Array.from(new Set(initialTasks.map(t => t.dimensao).filter(Boolean))) as string[];
-    dims.push('favoritas');
+    const dimCol = initialColumns.find(c => c.key === 'dimensao');
+    const predefined = dimCol ? dimCol.options.map(o => o.value) : ['HUB', 'Aurtistic'];
+    const fromTasks = initialTasks.map(t => t.dimensao).filter(Boolean) as string[];
+    let dims = Array.from(new Set([...predefined, ...fromTasks]));
+    
+    // Remove "favoritas" que estava repetido com visibilidade
+    dims = dims.filter(d => d !== 'favoritas');
+    
+    if (isPersonalScope) {
+      dims = dims.filter(d => !['HUB', 'cin', 'stangorlini.web', 'tatuagens'].includes(d));
+    }
+    
     return dims.sort();
-  }, [initialTasks]);
+  }, [initialTasks, initialColumns, isPersonalScope]);
 
   const toggleFilter = (list: string[], setList: (l: string[]) => void, value: string) => {
     if (list.includes(value)) {
@@ -597,6 +665,14 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
     } else {
       setList([...list, value]);
     }
+  };
+
+  const toggleCustomFilter = (key: string, value: string) => {
+    setCustomFilters(prev => {
+      const current = prev[key] || [];
+      const updated = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
+      return { ...prev, [key]: updated };
+    });
   };
 
   // Process Tasks: Filter and Sort
@@ -676,6 +752,14 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
             primaryDiff = getStatusWeight(a.status) - getStatusWeight(b.status);
           }
           break;
+        default:
+          if (sortBy.startsWith('custom_')) {
+            const colKey = sortBy.replace('custom_', '');
+            const vA = (a.custom_fields as any)?.[colKey] || '';
+            const vB = (b.custom_fields as any)?.[colKey] || '';
+            primaryDiff = vA.localeCompare(vB);
+          }
+          break;
       }
 
       if (primaryDiff !== 0) return primaryDiff;
@@ -715,32 +799,64 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
       
       {/* Header & Toolbar */}
       <div className="flex flex-col gap-4 mb-6 shrink-0">
-        <div className="flex items-center mb-2">
-          <h2 className="text-xl font-bold text-white tracking-wide">Tarefas</h2>
+        <div className="flex items-center mb-2 justify-between">
+          <h3 className="text-sm font-bold text-[#8E8E8E] uppercase tracking-wider flex items-center gap-2">
+            Filtros Rápidos
+            <button onClick={() => setIsQuickFiltersModalOpen(true)} className="text-[#A0A0A0] hover:text-[#9D4EDD] transition-colors" title="Configurar Filtros Rápidos">
+              <span className="material-symbols-outlined text-[16px]">settings</span>
+            </button>
+          </h3>
         </div>
 
         {/* Toolbar de Filtros Rápidos */}
         <div className="flex flex-col items-end gap-3 w-full mb-2">
           
-          {/* Row 1: Ordenação */}
-          <div className="flex w-full overflow-x-auto hide-scrollbar items-center justify-start gap-3 shrink-0 pb-1">
-            <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Ordem:</span>
-            
-            {/* Ordem Global */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button onClick={() => setSortBy('status')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'status' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Padrão</button>
-              <button onClick={() => setSortBy('status_inv')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'status_inv' ? 'bg-[#FFCC00]/15 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Padrão (inv)</button>
-              <button onClick={() => setSortBy('manual')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'manual' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Manual</button>
-              <button onClick={() => setSortBy('prazo')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'prazo' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Prazo</button>
-            </div>
+          {/* Row 1: Ordenação dinâmica */}
+          {quickSorts.length > 0 && (
+            <div className="flex w-full overflow-x-auto hide-scrollbar items-center justify-start gap-3 shrink-0 pb-1">
+              <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Ordem:</span>
+              
+              <div className="flex items-center gap-2 shrink-0">
+                {quickSorts.map(sortKey => {
+                  if (sortKey === 'status') {
+                    return (
+                      <React.Fragment key="status">
+                        <button onClick={() => setSortBy('status')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'status' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Padrão</button>
+                        <button onClick={() => setSortBy('status_inv')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'status_inv' ? 'bg-[#FFCC00]/15 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Padrão (inv)</button>
+                      </React.Fragment>
+                    );
+                  }
+                  if (sortKey === 'manual') {
+                    return <button key="manual" onClick={() => setSortBy('manual')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'manual' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Manual</button>;
+                  }
+                  if (sortKey === 'prazo') {
+                    return <button key="prazo" onClick={() => setSortBy('prazo')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'prazo' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Prazo</button>;
+                  }
+                  if (sortKey === 'prioridade') {
+                    return (
+                      <React.Fragment key="prioridade">
+                        <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider hidden sm:inline ml-1">Prio:</span>
+                        <button onClick={() => setSortBy('prioridade_desc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_desc' ? getBadgeColorClass('prioridade', 'alta') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[14px]">arrow_upward</span> Alta</button>
+                        <button onClick={() => setSortBy('prioridade_asc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_asc' ? getBadgeColorClass('prioridade', 'baixa') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[14px]">arrow_downward</span> Baixa</button>
+                      </React.Fragment>
+                    );
+                  }
+                  if (sortKey === 'categoria') {
+                    return <button key="categoria" onClick={() => setSortBy('categoria')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'categoria' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Categoria (A-Z)</button>;
+                  }
+                  
+                  const col = columns.find(c => c.key === sortKey);
+                  if (col) {
+                    return (
+                      <button key={sortKey} onClick={() => setSortBy(`custom_${sortKey}`)} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === `custom_${sortKey}` ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>{col.name} (A-Z)</button>
+                    );
+                  }
 
-            {/* Prioridade */}
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider hidden sm:inline">Prio:</span>
-              <button onClick={() => setSortBy('prioridade_desc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_desc' ? getBadgeColorClass('prioridade', 'alta') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[14px]">arrow_upward</span> Alta</button>
-              <button onClick={() => setSortBy('prioridade_asc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_asc' ? getBadgeColorClass('prioridade', 'baixa') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[14px]">arrow_downward</span> Baixa</button>
+                  return null;
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Row 2: Status (Visibilidade) */}
           <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
@@ -774,44 +890,74 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
             ))}
           </div>
 
-          {/* Row 3: Responsáveis */}
-          <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
-            <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Responsáveis:</span>
-            {uniqueUsers.map(u => (
-              <button 
-                key={u} 
-                onClick={() => toggleFilter(selectedUsers, setSelectedUsers, u)}
-                className={`h-[26px] px-3 text-[11px] rounded-full border transition-colors font-bold flex items-center justify-center gap-1 shrink-0
-                  ${selectedUsers.includes(u) ? getBadgeColorClass('responsavel', u) : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
-              >
-                <span className="material-symbols-outlined text-[12px]">person</span> {u}
-              </button>
-            ))}
-          </div>
+          {/* Filtros Customizados baseados no quickFilters */}
+          {quickFilters.map(filterKey => {
+            const col = columns.find(c => c.key === filterKey);
+            // Casos nativos que usam unique do hook
+            let options: string[] = [];
+            let isSelected: (val: string) => boolean = () => false;
+            let onToggle: (val: string) => void = () => {};
+            let isHidden = false;
 
-          {/* Row 3.5: Dimensões (Apenas no servidor onde há mais de 1 dimensão) */}
-          {uniqueDimensions.length > 1 && (
-            <div className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
-              <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">Dimensões:</span>
-              <button 
-                  onClick={() => setSelectedDimensions([])}
-                  className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0
-                    ${selectedDimensions.length === 0 ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
-                >
-                  Todas
-                </button>
-                {uniqueDimensions.map(d => (
-                <button 
-                  key={d} 
-                  onClick={() => toggleFilter(selectedDimensions, setSelectedDimensions, d)}
-                  className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center
-                    ${selectedDimensions.includes(d) ? getBadgeColorClass('dimensao', d) : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          )}
+            if (filterKey === 'responsavel') {
+              options = uniqueUsers;
+              isSelected = (v) => selectedUsers.includes(v);
+              onToggle = (v) => toggleFilter(selectedUsers, setSelectedUsers, v);
+              if (isPersonalScope) isHidden = true;
+            } else if (filterKey === 'dimensao') {
+              options = uniqueDimensions;
+              isSelected = (v) => selectedDimensions.includes(v);
+              onToggle = (v) => toggleFilter(selectedDimensions, setSelectedDimensions, v);
+            } else if (filterKey === 'status') {
+              options = uniqueStatuses;
+              isSelected = (v) => selectedStatuses.includes(v);
+              onToggle = (v) => toggleFilter(selectedStatuses, setSelectedStatuses, v);
+            } else if (filterKey === 'categoria') {
+              options = uniqueCategories;
+              isSelected = (v) => selectedCategories.includes(v);
+              onToggle = (v) => toggleFilter(selectedCategories, setSelectedCategories, v);
+            } else if (col) {
+              // Coluna dinâmica
+              options = col.options.map(o => o.value);
+              isSelected = (v) => (customFilters[filterKey] || []).includes(v);
+              onToggle = (v) => toggleCustomFilter(filterKey, v);
+            }
+
+            if (isHidden || options.length === 0) return null;
+
+            return (
+              <div key={filterKey} className="flex w-full overflow-x-auto hide-scrollbar items-center gap-2 shrink-0 pb-1 justify-start">
+                <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">
+                  {col ? col.name : filterKey}:
+                </span>
+                {filterKey === 'dimensao' && options.length > 1 && (
+                  <button 
+                    onClick={() => setSelectedDimensions([])}
+                    className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0
+                      ${selectedDimensions.length === 0 ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
+                  >
+                    Todas
+                  </button>
+                )}
+                {options.map(o => (
+                  <button 
+                    key={o} 
+                    onClick={() => onToggle(o)}
+                    className={`h-[26px] px-3 text-[11px] ${filterKey === 'responsavel' ? 'rounded-full' : 'rounded-md'} border transition-colors font-bold flex items-center justify-center gap-1 shrink-0
+                      ${isSelected(o) ? getBadgeColorClass(filterKey, o) : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
+                  >
+                    {filterKey === 'responsavel' && <span className="material-symbols-outlined text-[12px]">person</span>}
+                    {o}
+                  </button>
+                ))}
+              </div>
+            );
+          })}
+
+          {/* Titulo Tarefas */}
+          <div className="w-full flex items-center justify-between mt-4 mb-2">
+            <h2 className="text-sm font-bold text-[#8E8E8E] uppercase tracking-wider">Tarefas</h2>
+          </div>
 
           {/* Row 4: Botão de Filtros */}
           <div className="flex flex-col md:flex-row w-full items-end md:items-center justify-end gap-3 shrink-0 pb-1 z-30">
@@ -910,17 +1056,19 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
 
                 {/* Section: Visibilidade Responsável */}
-                <div className="p-4 border-b border-[#2D2D2D]">
-                  <h3 className="text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-3">Filtrar: Responsável</h3>
-                  <div className="flex flex-col gap-2">
-                    {uniqueUsers.map(user => (
-                      <label key={user} className="flex items-center gap-2 text-sm text-white cursor-pointer hover:text-[#9D4EDD] transition-colors">
-                        <input type="checkbox" checked={selectedUsers.includes(user)} onChange={() => toggleFilter(selectedUsers, setSelectedUsers, user)} className="accent-[#9D4EDD] rounded-sm" />
-                        {user}
-                      </label>
-                    ))}
+                {!isPersonalScope && (
+                  <div className="p-4 border-b border-[#2D2D2D]">
+                    <h3 className="text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-3">Filtrar: Responsável</h3>
+                    <div className="flex flex-col gap-2">
+                      {uniqueUsers.map(user => (
+                        <label key={user} className="flex items-center gap-2 text-sm text-white cursor-pointer hover:text-[#9D4EDD] transition-colors">
+                          <input type="checkbox" checked={selectedUsers.includes(user)} onChange={() => toggleFilter(selectedUsers, setSelectedUsers, user)} className="accent-[#9D4EDD] rounded-sm" />
+                          {user}
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Section: Visibilidade Dimensões */}
                 {uniqueDimensions.length > 1 && (
@@ -953,6 +1101,61 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
             )}
             </div>
             
+              <div className="relative">
+                <button 
+                  onClick={() => setIsColumnsMenuOpen(!isColumnsMenuOpen)}
+                  className="bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-colors border border-[#404040]"
+                >
+                  <span className="material-symbols-outlined text-[18px]">view_column</span>
+                  Editar Colunas
+                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                </button>
+
+                {isColumnsMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-2xl z-50 overflow-hidden flex flex-col">
+                    <div className="p-3 border-b border-[#2D2D2D]">
+                      <h3 className="text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2">Colunas</h3>
+                      <div className="flex flex-col gap-1 max-h-[250px] overflow-y-auto">
+                        {columns.map(col => (
+                          <div key={col.id} className="flex justify-between items-center group px-2 py-1.5 hover:bg-[#252525] rounded-md transition-colors">
+                            <span className="text-sm text-white truncate max-w-[150px]">{col.name}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsColumnsMenuOpen(false);
+                                setEditingColumn(col);
+                              }}
+                              className="text-[#8E8E8E] hover:text-[#FFCC00] transition-colors opacity-0 group-hover:opacity-100 flex items-center justify-center p-1"
+                              title="Editar Coluna"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">edit</span>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        setIsColumnsMenuOpen(false);
+                        setEditingColumn({
+                          id: crypto.randomUUID(),
+                          key: `custom_${Date.now()}`,
+                          name: 'Nova Coluna',
+                          type: 'select',
+                          options: [],
+                          is_native: false,
+                          order_num: 0
+                        });
+                      }}
+                      className="px-4 py-3 cursor-pointer transition-colors text-[#FFCC00] hover:bg-[#252525] font-bold text-sm flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">add</span>
+                      Adicionar Nova Coluna
+                    </button>
+                  </div>
+                )}
+              </div>
               <button 
                 onClick={handleNew}
                 className="bg-[#FFCC00] text-[#121212] font-bold text-sm px-4 py-2 rounded-md hover:bg-[#e6b800] transition-colors shadow-sm shrink-0"
@@ -965,6 +1168,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
 
         </div>
       </div>
+
 
       {/* Desktop View (Table) */}
       <div ref={desktopContainerRef} style={{ overflowAnchor: 'none' }} className="hidden md:block overflow-x-auto bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg relative">
@@ -985,7 +1189,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Status</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Prioridade</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Categoria</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Responsável</th>
+              {!isPersonalScope && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Responsável</th>}
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Criada em</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Início</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Prazo</th>
@@ -1045,7 +1249,7 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
                 <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'status')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar status"><Badge type="status" value={task.status} /></div></td>
                 <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'prioridade')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar prioridade"><Badge type="prioridade" value={task.prioridade} /></div></td>
                 <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'categoria')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar categoria"><Badge type="categoria" value={task.categoria} /></div></td>
-                <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'responsavel')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar responsável"><Badge type="responsavel" value={task.responsavel} /></div></td>
+                {!isPersonalScope && <td className="p-4" onClick={(e) => handleBadgeClick(e, task, 'responsavel')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block" title="Clique para alterar responsável"><Badge type="responsavel" value={task.responsavel} /></div></td>}
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.created_at)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.inicio)}</td>
                 <td className="p-4 text-xs text-[#A0A0A0]">{formatDate(task.prazo)}</td>
@@ -1206,6 +1410,8 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
         <span className="material-symbols-outlined font-bold">add</span>
       </button>
 
+
+
       {/* Floating Scroll to Bottom Button */}
       <button 
         onClick={scrollToBottom}
@@ -1216,8 +1422,37 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
       </button>
 
       {/* Modals */}
-      <TaskFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} task={taskToEdit} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
-      <BulkEditModal isOpen={isBulkEditModalOpen} onClose={() => setIsBulkEditModalOpen(false)} taskIds={Array.from(selectedTasks)} tasks={localTasks} onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedTasks(new Set()); setLastSelectedTaskId(null); }} uniqueCategories={uniqueCategories} uniqueDimensions={uniqueDimensions} />
+      <TaskFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        task={taskToEdit} 
+        uniqueCategories={uniqueCategories} 
+        uniqueDimensions={uniqueDimensions}
+        columns={columns}
+        onEditColumn={(col) => setEditingColumn(col)}
+      />
+      <BulkEditModal 
+        isOpen={isBulkEditModalOpen} 
+        onClose={() => setIsBulkEditModalOpen(false)} 
+        taskIds={Array.from(selectedTasks)} 
+        tasks={localTasks} 
+        onSuccess={() => { setIsBulkEditModalOpen(false); setSelectedTasks(new Set()); setLastSelectedTaskId(null); }} 
+        uniqueCategories={uniqueCategories} 
+        uniqueDimensions={uniqueDimensions}
+        columns={columns}
+        onEditColumn={(col) => setEditingColumn(col)}
+      />
+      
+      {editingColumn && (
+        <OptionsEditorModal
+          column={editingColumn}
+          onClose={() => setEditingColumn(null)}
+          onSave={async (updatedColumn) => {
+            await saveTaskColumn(updatedColumn);
+            setColumns(prev => prev.map(c => c.id === updatedColumn.id ? updatedColumn : c));
+          }}
+        />
+      )}
 
       {/* Quick Edit Dropdown */}
       {quickEdit && (
@@ -1255,6 +1490,145 @@ export function TasksView({ initialTasks: rawInitialTasks }: { initialTasks: Tas
           </div>
         </div>
       )}
+      {/* Modal Quick Filters */}
+      {isQuickFiltersModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1A1A1A] border border-[#2D2D2D] rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-[#2D2D2D] flex items-center justify-between bg-[#121212]">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#FFCC00]">settings</span>
+                Filtros Rápidos
+              </h2>
+              <button 
+                onClick={() => setIsQuickFiltersModalOpen(false)}
+                className="text-[#8E8E8E] hover:text-white transition-colors flex items-center justify-center p-1 rounded-full hover:bg-[#2D2D2D]"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            
+            <div className="flex w-full border-b border-[#2D2D2D] bg-[#1A1A1A]">
+               <button className={`flex-1 py-3 text-sm font-bold transition-colors ${quickFiltersTab === 'visibilidade' ? 'text-[#FFCC00] border-b-2 border-[#FFCC00]' : 'text-[#8E8E8E] hover:text-white'}`} onClick={() => setQuickFiltersTab('visibilidade')}>Visibilidade</button>
+               <button className={`flex-1 py-3 text-sm font-bold transition-colors ${quickFiltersTab === 'ordem' ? 'text-[#FFCC00] border-b-2 border-[#FFCC00]' : 'text-[#8E8E8E] hover:text-white'}`} onClick={() => setQuickFiltersTab('ordem')}>Ordem</button>
+            </div>
+            
+            <div className="p-4 flex flex-col gap-3 max-h-[60vh] overflow-y-auto">
+              
+              {quickFiltersTab === 'visibilidade' ? (
+                <>
+                  <p className="text-xs text-[#A0A0A0] mb-2">Selecione quais colunas você quer que apareçam como botões para filtrar as tarefas.</p>
+                  
+                  {['status', 'categoria', 'responsavel', 'dimensao'].map(key => {
+                    if (isPersonalScope && key === 'responsavel') return null;
+                    const isSelected = quickFilters.includes(key);
+                    const labels: Record<string, string> = {
+                      'status': 'Status',
+                      'categoria': 'Categoria',
+                      'responsavel': 'Responsável',
+                      'dimensao': 'Dimensão'
+                    };
+                    return (
+                      <label key={key} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-[#252525] rounded-md transition-colors">
+                        <input type="checkbox" className="accent-[#FFCC00] w-4 h-4 cursor-pointer" checked={isSelected} onChange={(e) => {
+                            let newFilters = [...quickFilters];
+                            if (e.target.checked) newFilters.push(key);
+                            else newFilters = newFilters.filter(k => k !== key);
+                            setQuickFilters(newFilters);
+                          }}
+                        />
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#8E8E8E] group-hover:text-[#A0A0A0]'}`}>{labels[key]}</span>
+                      </label>
+                    );
+                  })}
+
+                  {columns.length > 0 && <hr className="border-[#2D2D2D] my-2" />}
+
+                  {columns.map(col => {
+                    if (col.type !== 'select') return null;
+                    const isSelected = quickFilters.includes(col.key);
+                    return (
+                      <label key={col.id} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-[#252525] rounded-md transition-colors">
+                        <input type="checkbox" className="accent-[#FFCC00] w-4 h-4 cursor-pointer" checked={isSelected} onChange={(e) => {
+                            let newFilters = [...quickFilters];
+                            if (e.target.checked) newFilters.push(col.key);
+                            else newFilters = newFilters.filter(k => k !== col.key);
+                            setQuickFilters(newFilters);
+                          }}
+                        />
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#8E8E8E] group-hover:text-[#A0A0A0]'}`}>{col.name}</span>
+                      </label>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  <p className="text-xs text-[#A0A0A0] mb-2">Selecione quais colunas podem ser usadas para ordenar a visualização das tarefas (Linha ORDEM).</p>
+                  
+                  {['status', 'prazo', 'prioridade', 'categoria', 'manual'].map(key => {
+                    const isSelected = quickSorts.includes(key);
+                    const labels: Record<string, string> = {
+                      'status': 'Status (Padrão)',
+                      'prazo': 'Prazo',
+                      'prioridade': 'Prioridade',
+                      'categoria': 'Categoria',
+                      'manual': 'Manual (Arrastar)'
+                    };
+                    return (
+                      <label key={key} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-[#252525] rounded-md transition-colors">
+                        <input type="checkbox" className="accent-[#FFCC00] w-4 h-4 cursor-pointer" checked={isSelected} onChange={(e) => {
+                            let newSorts = [...quickSorts];
+                            if (e.target.checked) newSorts.push(key);
+                            else newSorts = newSorts.filter(k => k !== key);
+                            setQuickSorts(newSorts);
+                          }}
+                        />
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#8E8E8E] group-hover:text-[#A0A0A0]'}`}>{labels[key]}</span>
+                      </label>
+                    );
+                  })}
+
+                  {columns.length > 0 && <hr className="border-[#2D2D2D] my-2" />}
+
+                  {columns.map(col => {
+                    const isSelected = quickSorts.includes(col.key);
+                    return (
+                      <label key={col.id} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-[#252525] rounded-md transition-colors">
+                        <input type="checkbox" className="accent-[#FFCC00] w-4 h-4 cursor-pointer" checked={isSelected} onChange={(e) => {
+                            let newSorts = [...quickSorts];
+                            if (e.target.checked) newSorts.push(col.key);
+                            else newSorts = newSorts.filter(k => k !== col.key);
+                            setQuickSorts(newSorts);
+                          }}
+                        />
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#8E8E8E] group-hover:text-[#A0A0A0]'}`}>{col.name} (A-Z)</span>
+                      </label>
+                    );
+                  })}
+                </>
+              )}
+
+            </div>
+
+            <div className="p-4 border-t border-[#2D2D2D] bg-[#121212] flex justify-end">
+              <button
+                onClick={async () => {
+                  try {
+                    const { saveQuickPreferences } = await import('@/app/(dashboard)/actions');
+                    await saveQuickPreferences(quickFilters, quickSorts);
+                    setIsQuickFiltersModalOpen(false);
+                  } catch(e: any) {
+                    alert('Erro ao salvar preferências: ' + e.message);
+                  }
+                }}
+                className="bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold py-2 px-6 rounded-md transition-colors text-sm"
+              >
+                Salvar Preferências
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

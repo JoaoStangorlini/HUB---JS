@@ -6,6 +6,7 @@ import { Badge, getBadgeColorClass } from './Badge';
 interface Option {
   label: string;
   value: string;
+  color?: string;
 }
 
 interface CustomSelectProps {
@@ -13,12 +14,13 @@ interface CustomSelectProps {
   value: string;
   options: Option[];
   onChange: (e: any) => void;
-  type: 'status' | 'prioridade' | 'categoria' | 'responsavel' | 'dimensao';
+  type: string;
   disabled?: boolean;
   allowCustom?: boolean;
+  onEditColumn?: () => void;
 }
 
-export function CustomSelect({ name, value, options: initialOptions, onChange, type, disabled, allowCustom }: CustomSelectProps) {
+export function CustomSelect({ name, value, options: initialOptions, onChange, type, disabled, allowCustom, onEditColumn }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [customValue, setCustomValue] = useState('');
@@ -84,11 +86,30 @@ export function CustomSelect({ name, value, options: initialOptions, onChange, t
         }}
       >
         <div>
-          {value ? <Badge type={type} value={selectedLabel} /> : <span className="text-[#8E8E8E]">Selecione...</span>}
+          {selectedOption ? (
+            <Badge type={type} value={selectedOption.label} customColor={selectedOption.color} />
+          ) : value ? (
+            <Badge type={type} value={selectedLabel} />
+          ) : (
+            <span className="text-[#8E8E8E]">Selecione...</span>
+          )}
         </div>
-        <span className="material-symbols-outlined text-[18px] text-[#8E8E8E]">
-          {isOpen ? 'expand_less' : 'expand_more'}
-        </span>
+        <div className="flex items-center">
+          {onEditColumn && (
+            <span 
+              className="material-symbols-outlined text-[16px] text-[#8E8E8E] mr-2 hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditColumn();
+              }}
+            >
+              edit
+            </span>
+          )}
+          <span className="material-symbols-outlined text-[18px] text-[#8E8E8E]" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
+            expand_more
+          </span>
+        </div>
       </div>
 
       {isOpen && !disabled && (
@@ -122,17 +143,34 @@ export function CustomSelect({ name, value, options: initialOptions, onChange, t
                     onClick={() => handleSelect(option.value)}
                     className="px-4 py-2 cursor-pointer transition-colors hover:bg-[#252525] flex items-center"
                   >
-                    <Badge type={type} value={option.label} />
+                    <Badge type={type} value={option.label} customColor={option.color} />
                   </div>
                 );
               })}
-              {allowCustom && (
-                <div
-                  onClick={() => setIsAddingCustom(true)}
-                  className="px-4 py-2 cursor-pointer transition-colors border-t border-[#2D2D2D] text-[#FFCC00] hover:bg-[#252525] font-bold text-sm flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-[16px]">add</span>
-                  Adicionar Novo...
+              
+              {(allowCustom || onEditColumn) && (
+                <div className="flex border-t border-[#2D2D2D]">
+                  {allowCustom && (
+                    <div
+                      onClick={() => setIsAddingCustom(true)}
+                      className="flex-1 px-4 py-2 cursor-pointer transition-colors text-[#FFCC00] hover:bg-[#252525] font-bold text-sm flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">add</span>
+                      Adicionar Novo
+                    </div>
+                  )}
+                  {onEditColumn && (
+                    <div
+                      onClick={() => {
+                        setIsOpen(false);
+                        onEditColumn();
+                      }}
+                      className="px-4 py-2 cursor-pointer transition-colors text-[#8E8E8E] hover:bg-[#252525] hover:text-white border-l border-[#2D2D2D] flex items-center justify-center"
+                      title="Editar Coluna"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">edit</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

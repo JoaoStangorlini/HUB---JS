@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Task } from '@/types';
+import { Task, TaskColumn } from '@/types';
 import { saveTask, deleteTask } from '@/app/(dashboard)/actions';
 import { getBadgeColorClass } from './Badge';
 import { CustomSelect } from './CustomSelect';
@@ -12,9 +12,11 @@ interface TaskFormModalProps {
   task?: (Task & { subtasks?: Task[] }) | null;
   uniqueCategories?: string[];
   uniqueDimensions?: string[];
+  columns?: TaskColumn[];
+  onEditColumn?: (col: TaskColumn) => void;
 }
 
-export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueDimensions }: TaskFormModalProps) {
+export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueDimensions, columns = [], onEditColumn }: TaskFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [freqType, setFreqType] = useState('');
   const [freqDetail, setFreqDetail] = useState('');
@@ -185,6 +187,56 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
     }
   };
 
+  // Helper to get options for a column key
+  const getColumnOptions = (key: string, defaultOptions: any[] = []) => {
+    const col = columns.find(c => c.key === key);
+    if (!col) return defaultOptions;
+    return col.options.map(o => ({ label: o.label, value: o.value, color: o.color }));
+  };
+
+  const statusOptions = getColumnOptions('status', [
+    { label: 'Não iniciada', value: 'não iniciada' },
+    { label: 'Em progresso', value: 'em progresso' },
+    { label: 'Falta testar', value: 'falta testar' },
+    { label: 'Completa', value: 'completa' },
+    { label: 'Descartada', value: 'descartada' }
+  ]);
+  
+  const prioridadeOptions = getColumnOptions('prioridade', [
+    { label: 'Nenhuma', value: '' },
+    { label: 'Baixa', value: 'Baixa' },
+    { label: 'Média', value: 'Média' },
+    { label: 'Alta', value: 'Alta' }
+  ]);
+  
+  const responsavelOptions = getColumnOptions('responsavel', [
+    { label: 'Nenhum', value: '' },
+    { label: 'João', value: 'João' },
+    { label: 'Andy', value: 'Andy' },
+    { label: 'Leo', value: 'Leo' },
+    { label: 'Dani', value: 'Dani' },
+    { label: 'Lorenzo', value: 'Lorenzo' },
+    { label: 'Nacky', value: 'Nacky' }
+  ]);
+
+  const categoriaOptions = getColumnOptions('categoria', 
+    (uniqueCategories && uniqueCategories.length > 0) 
+      ? [{label: 'Nenhuma', value: ''}, ...uniqueCategories.filter(c => c).map(c => ({label: c, value: c}))]
+      : []
+  );
+
+  const dimensaoOptions = getColumnOptions('dimensao',
+    (uniqueDimensions && uniqueDimensions.length > 0)
+      ? [{label: 'Nenhuma', value: ''}, ...uniqueDimensions.filter(d => d !== 'favoritas' && d).map(d => ({label: d, value: d}))]
+      : []
+  );
+
+  const handleEditCol = (key: string) => {
+    if (!onEditColumn) return;
+    const col = columns.find(c => c.key === key);
+    if (col) onEditColumn(col);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
       <div className="bg-[#1A1A1A] border border-[#2D2D2D] rounded-3xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
@@ -204,46 +256,47 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
               <input required name="nome" value={formData.nome || ''} onChange={handleChange} className="w-full bg-[#121212] border border-[#2D2D2D] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[#FFCC00]" />
             </div>
 
-            {(() => {
-              const catOptions = [
-                { value: "", label: "Nenhuma" },
-                ...Array.from(new Set([...(["Programar", "Pesquisar", "touch the grass", "reunir", "post", "outros"]), ...(uniqueCategories || [])])).map(c => ({ value: c, label: c }))
-              ];
-              
-              const dimOptions = [
-                { value: "", label: "Nenhuma" },
-                ...Array.from(new Set([...(["HUB", "urgente", "USP", "filmes/series", "cin", "tatuagens", "compras", "hobbys", "livros", "stangorlini.web", "fotografia"]), ...(uniqueDimensions || [])])).map(d => ({ value: d, label: d }))
-              ];
+            <>
+              <div>
+                <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Status</label>
+                <CustomSelect 
+                  name="status" 
+                  value={formData.status || 'não iniciada'} 
+                  options={statusOptions} 
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  type="status"
+                  onEditColumn={columns.find(c => c.key === 'status') ? () => handleEditCol('status') : undefined}
+                />
+              </div>
 
-              return (
-                <>
-                  <div>
-                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Status</label>
-                    <CustomSelect name="status" value={formData.status || ''} onChange={handleChange} type="status" options={[{"value":"não iniciada","label":"Não iniciada"},{"value":"em progresso","label":"Em progresso"},{"value":"falta testar","label":"Falta testar"},{"value":"completa","label":"Completa"},{"value":"descartada","label":"Descartada"}]} />
-                  </div>
+              <div>
+                <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Prioridade</label>
+                <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={prioridadeOptions} allowCustom={true} onEditColumn={columns.find(c => c.key === 'prioridade') ? () => handleEditCol('prioridade') : undefined} />
+              </div>
 
-                  <div>
-                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Prioridade</label>
-                    <CustomSelect name="prioridade" value={formData.prioridade || ''} onChange={handleChange} type="prioridade" options={[{"value":"","label":"Nenhuma"},{"value":"Baixa","label":"Baixa"},{"value":"Média","label":"Média"},{"value":"Alta","label":"Alta"}]} />
-                  </div>
+              <div>
+                <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Categoria</label>
+                <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={categoriaOptions} allowCustom={true} onEditColumn={columns.find(c => c.key === 'categoria') ? () => handleEditCol('categoria') : undefined} />
+              </div>
 
-                  <div>
-                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Categoria</label>
-                    <CustomSelect name="categoria" value={formData.categoria || ''} onChange={handleChange} type="categoria" options={catOptions} allowCustom={true} />
-                  </div>
+              <div>
+                <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Responsável</label>
+                <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={responsavelOptions} allowCustom={true} onEditColumn={columns.find(c => c.key === 'responsavel') ? () => handleEditCol('responsavel') : undefined} />
+              </div>
 
-                  <div>
-                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Responsável</label>
-                    <CustomSelect name="responsavel" value={formData.responsavel || ''} onChange={handleChange} type="responsavel" options={[{"value":"","label":"Nenhum"},{"value":"João","label":"João"},{"value":"Andy","label":"Andy"},{"value":"Leo","label":"Leo"},{"value":"Dani","label":"Dani"},{"value":"Lorenzo","label":"Lorenzo"},{"value":"Nacky","label":"Nacky"}]} />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Dimensão</label>
-                    <CustomSelect name="dimensao" value={formData.dimensao || ''} onChange={handleChange} type="dimensao" options={dimOptions} allowCustom={true} />
-                  </div>
-                </>
-              );
-            })()}
+              <div>
+                <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Dimensão</label>
+                <CustomSelect 
+                  name="dimensao" 
+                  value={formData.dimensao || ''} 
+                  options={dimensaoOptions} 
+                  onChange={e => setFormData({ ...formData, dimensao: e.target.value })}
+                  type="dimensao"
+                  allowCustom
+                  onEditColumn={columns.find(c => c.key === 'dimensao') ? () => handleEditCol('dimensao') : undefined}
+                />
+              </div>
+            </>
 
             <div>
               <label className="block text-xs text-[#8E8E8E] uppercase tracking-wider mb-2">Frequência</label>

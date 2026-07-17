@@ -70,17 +70,22 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#2D2D2D] flex-1">
                   
-                  <a href="https://hub-lab-div.vercel.app" target="_blank" rel="noreferrer" className="p-8 flex flex-col justify-between min-h-[320px] group hover:bg-[#252525] transition-colors relative overflow-hidden">
+                  <div className="p-8 flex flex-col justify-between min-h-[320px] group hover:bg-[#252525] transition-colors relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-b from-[#F14343]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div className="space-y-4 relative z-10">
                       <h3 className="text-2xl font-['Bukra'] font-bold text-white">O HUB</h3>
                       <p className="text-[#A0A0A0] font-medium">Acesse o HUB de comunicação cientifica do IFUSP.</p>
                     </div>
-                    <div className="mt-8 border-t border-[#2D2D2D] group-hover:border-[#F14343]/50 pt-4 flex justify-between items-center text-[#F14343] font-bold transition-colors relative z-10">
-                      Acessar Plataforma
-                      <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
+                    <div className="mt-8 pt-4 flex flex-col gap-3 relative z-10">
+                      <a href="https://hub-lab-div.vercel.app" target="_blank" rel="noreferrer" className="w-full text-center py-2 bg-[#F14343]/10 text-[#F14343] hover:bg-[#F14343]/20 border border-[#F14343]/30 rounded-md font-bold transition-colors">
+                        Acessar o Site
+                      </a>
+                      <a href="#" className="w-full text-center py-2 bg-[#F14343] text-white hover:bg-[#d63a3a] rounded-md font-bold transition-colors flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[20px]">android</span>
+                        Baixar o App
+                      </a>
                     </div>
-                  </a>
+                  </div>
 
                 <a href="https://hub-lab-div.vercel.app/apresentacao" target="_blank" rel="noreferrer" className="p-8 flex flex-col justify-between min-h-[320px] group hover:bg-[#252525] transition-colors relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-b from-[#FFCC00]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -110,6 +115,54 @@ export default function Home() {
               </div> {/* fecha o flex flex-col */}
             </div> {/* fecha o card gradient */}
 
+
+            {/* Aurtistic Planner Card */}
+            <div className="md:col-span-12 rounded-2xl p-[2px] bg-gradient-to-r from-[#9D4EDD] to-[#FFCC00]">
+              <div className="bg-[#1E1E1E] rounded-[14px] flex flex-col md:flex-row items-center justify-between p-8 hover:bg-[#252525] transition-colors gap-6 group">
+                <div className="space-y-4 text-center md:text-left flex-1">
+                  <div className="flex items-center justify-center md:justify-start gap-3">
+                    <span className="material-symbols-outlined text-4xl text-[#FFCC00]">psychology</span>
+                    <h3 className="text-3xl font-['Bukra'] font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FFCC00] to-[#9D4EDD]">
+                      Aurtistic Planner
+                    </h3>
+                  </div>
+                  <p className="text-[#A0A0A0] max-w-3xl">Um ecossistema focado e livre de distrações para organização pessoal. Planeje suas tarefas e rotinas no seu próprio ritmo.</p>
+                </div>
+                <div className="shrink-0 flex flex-col gap-3 min-w-[200px]">
+                  <Link href="/aurtistic" className="w-full text-center px-6 py-3 bg-[#FFCC00]/10 text-[#FFCC00] hover:bg-[#FFCC00]/20 border border-[#FFCC00]/30 rounded-lg font-bold transition-colors">
+                    Acessar o Site
+                  </Link>
+                  <a href="#" className="w-full text-center px-6 py-3 bg-[#FFCC00] text-[#121212] hover:bg-[#e6b800] rounded-lg font-bold transition-colors flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-[20px]">android</span>
+                    Baixar o App
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Stangorlini.web Card */}
+            <div className="md:col-span-12 rounded-2xl p-[2px] bg-gradient-to-r from-[#FFCC00]/50 to-[#FFCC00]">
+              <div className="bg-[#1E1E1E] rounded-[14px] flex flex-col md:flex-row items-center justify-between p-8 hover:bg-[#252525] transition-colors gap-6 group">
+                <div className="space-y-4 text-center md:text-left flex-1">
+                  <div className="flex items-center justify-center md:justify-start gap-3">
+                    <span className="material-symbols-outlined text-4xl text-[#FFCC00]">terminal</span>
+                    <h3 className="text-3xl font-['Bukra'] font-black text-[#FFCC00]">
+                      stangorlini.web
+                    </h3>
+                  </div>
+                  <p className="text-[#A0A0A0] max-w-3xl">Meu portfólio pessoal e plataforma de currículo. O ecossistema principal que conecta todos os meus projetos, galerias e ferramentas.</p>
+                </div>
+                <div className="shrink-0 flex flex-col gap-3 min-w-[200px]">
+                  <Link href="/" className="w-full text-center px-6 py-3 bg-[#FFCC00]/10 text-[#FFCC00] hover:bg-[#FFCC00]/20 border border-[#FFCC00]/30 rounded-lg font-bold transition-colors">
+                    Acessar o Site
+                  </Link>
+                  <a href="#" className="w-full text-center px-6 py-3 bg-[#FFCC00] text-[#121212] hover:bg-[#e6b800] rounded-lg font-bold transition-colors flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-[20px]">android</span>
+                    Baixar o App
+                  </a>
+                </div>
+              </div>
+            </div>
             <div className="md:col-span-12 bg-[#121212] border border-[#FFCC00] p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center min-h-[150px] hover:border-[#F5F5F5] transition-colors gap-6">
               <div className="space-y-2 text-center md:text-left">
                 <h3 className="text-xl font-['Bukra'] font-bold text-white">Projetos & Código Fonte (GitHub)</h3>

@@ -14,22 +14,30 @@ class FavoritesWidgetService : RemoteViewsService() {
     }
 }
 
-private fun getStatusColor(statusName: String): Int {
-    val text = statusName.lowercase().trim()
-    val colorStr = when {
-        text.contains("completa") -> "#0f9d58"
-        text.contains("testar") -> "#f4b400"
-        text.contains("descartada") -> "#db4437"
-        text.contains("progresso") -> "#4285f4"
-        text.contains("iniciada") -> "#E0E0E0"
-        text.contains("rascunho") -> "#8E8E8E"
-        else -> "#FFCC00"
-    }
-    return android.graphics.Color.parseColor(colorStr)
-}
 
 class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
     private var tasksArray = JSONArray()
+    private var statusColorsMap = org.json.JSONObject()
+
+    private fun getStatusColor(statusName: String): Int {
+        val text = statusName.lowercase().trim()
+        val defaultColor = "#FFCC00"
+        
+        if (statusColorsMap.has(text)) {
+            val c = statusColorsMap.optString(text, defaultColor)
+            try { return android.graphics.Color.parseColor(c) } catch(e: Exception) {}
+        }
+        
+        val keys = statusColorsMap.keys()
+        while(keys.hasNext()) {
+            val k = keys.next().lowercase()
+            if (text.contains(k)) {
+               val c = statusColorsMap.optString(k, defaultColor)
+               try { return android.graphics.Color.parseColor(c) } catch(e: Exception) {}
+            }
+        }
+        return android.graphics.Color.parseColor(defaultColor)
+    }
 
     override fun onCreate() {
         loadData()
@@ -42,9 +50,11 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
     private fun loadData() {
         val prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
         val tasksJson = prefs.getString("favorite_tasks", "[]")
+        val colorsJson = prefs.getString("status_colors", "{}")
         val selectedDim = prefs.getString("widget_filter_dimension", "") ?: ""
         
         try {
+            statusColorsMap = org.json.JSONObject(colorsJson ?: "{}")
             val allTasks = JSONArray(tasksJson)
             val filteredList = mutableListOf<org.json.JSONObject>()
             for (i in 0 until allTasks.length()) {

@@ -1,0 +1,1 @@
+-- 4_quick_filters_sorts.sql\nALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS quick_sorts JSONB DEFAULT '["status", "prazo", "prioridade", "manual"]'::jsonb;
