@@ -43,12 +43,15 @@ class WidgetActionActivity : Activity() {
         val container = dialogView.findViewById<android.widget.LinearLayout>(R.id.dialog_items_container)
         titleView.text = "Alterar Status"
 
-        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val dialog = android.app.Dialog(this)
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
         
         statuses.forEachIndexed { index, statusName ->
             val itemView = layoutInflater.inflate(R.layout.item_dialog_option, container, false) as android.widget.TextView
             itemView.text = statusName
+            itemView.setTextColor(getStatusColor(statusName))
             itemView.setOnClickListener {
                 val newStatus = internalStatuses[index]
                 savePendingStatusUpdate(taskId, newStatus)
@@ -85,12 +88,19 @@ class WidgetActionActivity : Activity() {
         val container = dialogView.findViewById<android.widget.LinearLayout>(R.id.dialog_items_container)
         titleView.text = "Filtrar por Dimensão"
 
-        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val dialog = android.app.Dialog(this)
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
         
         dimsArray.forEachIndexed { index, dimName ->
             val itemView = layoutInflater.inflate(R.layout.item_dialog_option, container, false) as android.widget.TextView
             itemView.text = dimName
+            if (index == 0) {
+                itemView.setTextColor(android.graphics.Color.parseColor("#E0E0E0"))
+            } else {
+                itemView.setTextColor(getDimensionColor(dimName))
+            }
             itemView.setOnClickListener {
                 val selectedDim = if (index == 0) "" else dimName
                 prefs.edit().putString("widget_filter_dimension", selectedDim).apply()
@@ -111,8 +121,10 @@ class WidgetActionActivity : Activity() {
         val btnCancel = dialogView.findViewById<android.widget.Button>(R.id.btn_cancel)
         val btnSave = dialogView.findViewById<android.widget.Button>(R.id.btn_save)
 
-        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val dialog = android.app.Dialog(this)
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
         
         btnCancel.setOnClickListener {
             dialog.dismiss()
@@ -219,5 +231,35 @@ class WidgetActionActivity : Activity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(intent)
+    }
+
+    private fun getDimensionColor(dimName: String): Int {
+        val text = dimName.lowercase().trim()
+        val colorStr = when {
+            text.contains("usp") -> "#4da8ff"
+            text.contains("hub") -> "#9D4EDD"
+            text.contains("urgente") -> "#F14343"
+            text.contains("livros") -> "#FFCC00"
+            text.contains("filmes") || text.contains("series") || text.contains("séries") -> "#FFE066"
+            text.contains("tatuagens") || text.contains("tattoo") -> "#D39BFE"
+            text.contains("cin") -> "#E0E0E0"
+            text.contains("compras") -> "#69F0AE"
+            text.contains("hobbys") || text.contains("hobby") -> "#0f9d58"
+            else -> "#FFCC00"
+        }
+        return android.graphics.Color.parseColor(colorStr)
+    }
+
+    private fun getStatusColor(statusName: String): Int {
+        val text = statusName.lowercase().trim()
+        val colorStr = when {
+            text.contains("completa") -> "#0f9d58"
+            text.contains("testar") -> "#f4b400"
+            text.contains("descartada") -> "#db4437"
+            text.contains("progresso") -> "#4285f4"
+            text.contains("iniciada") -> "#E0E0E0"
+            else -> "#A0A0A0"
+        }
+        return android.graphics.Color.parseColor(colorStr)
     }
 }
