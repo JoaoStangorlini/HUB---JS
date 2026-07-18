@@ -106,14 +106,25 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
       
       // 2. Save all local subtasks
       for (const st of localSubtasks) {
-        // Inherit everything from parent that isn't explicitly set differently
-        const subtaskToSave = {
-          ...formData, // inherit all parent properties (dimensao, prioridade, etc)
-          ...st,       // overwrite with subtask specific properties (nome, id, completed status, etc)
-          parent_id: parentId, // link to parent
-        };
-        // Clean up some fields that shouldn't be inherited or have special meaning
-        if (!st.status) subtaskToSave.status = formData.status || 'não iniciada';
+        let subtaskToSave: Partial<Task>;
+        
+        if (!st.created_at) {
+          // New subtask: inherit everything from parent
+          subtaskToSave = {
+            ...formData,
+            ...st,
+            parent_id: parentId,
+          };
+          if (!st.status) subtaskToSave.status = formData.status || 'não iniciada';
+        } else {
+          // Existing subtask: backend handles propagation, we only save what the modal edits
+          subtaskToSave = {
+            id: st.id,
+            nome: st.nome,
+            status: st.status || 'não iniciada',
+            parent_id: parentId,
+          };
+        }
         
         await saveTask(subtaskToSave);
       }

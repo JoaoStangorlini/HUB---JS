@@ -74,11 +74,39 @@ export async function saveTask(taskData: Partial<Task>) {
 
   if (dataToSave.id) {
     // Upsert existing or new task with specific ID (optimistic creation)
+    const { data: originalTask } = await supabase.from('tasks').select('*').eq('id', dataToSave.id).single();
+
     const { error } = await supabase
       .from('tasks')
       .upsert(dataToSave, { onConflict: 'id' });
 
     if (error) throw new Error(error.message);
+
+    // Propagate changes to child tasks
+    if (originalTask) {
+       const fieldsToPropagate: Partial<Task> = {};
+       const propagateKeys = ['dimensao', 'categoria', 'prazo', 'responsavel', 'prioridade', 'status'];
+       propagateKeys.forEach(k => {
+          const newVal = (dataToSave as any)[k];
+          const oldVal = (originalTask as any)[k];
+          if (newVal !== undefined && newVal !== oldVal) {
+              (fieldsToPropagate as any)[k] = newVal;
+          }
+       });
+       
+       if (fieldsToPropagate.status === 'completa') fieldsToPropagate.concluida_em = dataToSave.concluida_em;
+       if (fieldsToPropagate.status && fieldsToPropagate.status !== 'completa') fieldsToPropagate.concluida_em = null;
+
+       const customNew = JSON.stringify(dataToSave.custom_fields || {});
+       const customOld = JSON.stringify(originalTask.custom_fields || {});
+       if (customNew !== customOld && dataToSave.custom_fields !== undefined) {
+           fieldsToPropagate.custom_fields = dataToSave.custom_fields;
+       }
+
+       if (Object.keys(fieldsToPropagate).length > 0) {
+           await supabase.from('tasks').update(fieldsToPropagate).eq('parent_id', dataToSave.id);
+       }
+    }
   } else {
     // Insert new task without ID
     const { error } = await supabase
@@ -133,6 +161,12 @@ export async function updateMultipleTasks(taskIds: string[], updates: Partial<Ta
     console.error("Erro na edição em massa:", error);
     throw new Error(error.message);
   }
+
+  // Propagate to subtasks
+  await supabase
+    .from('tasks')
+    .update(dataToSave)
+    .in('parent_id', taskIds);
 
   revalidatePath('/labdiv');
   revalidatePath('/servidor');

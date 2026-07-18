@@ -6,7 +6,7 @@ import { Badge, getBadgeColorClass } from './Badge';
 import { TaskFormModal } from './TaskFormModal';
 import { BulkEditModal } from './BulkEditModal';
 import { OptionsEditorModal } from './OptionsEditorModal';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { updateTaskOrders, saveTask, deleteMultipleTasks, updateMultipleTasks, saveTaskColumn } from '@/app/(dashboard)/actions';
 import { Preferences } from '@capacitor/preferences';
@@ -245,6 +245,9 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const [dropPosition, setDropPosition] = useState<'top' | 'bottom'>('top');
 
+  const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
+  const isAurtistic = pathname?.includes('aurtistic');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
@@ -622,6 +625,15 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
     }
   };
 
+  const scrollToTop = () => {
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+      mainElement.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const uniqueStatuses = useMemo(() => {
     const statusCol = initialColumns.find(c => c.key === 'status');
     const predefined = statusCol ? statusCol.options.map(o => o.value) : ['não iniciada', 'em progresso', 'falta testar', 'completa', 'descartada'];
@@ -736,9 +748,18 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
           primaryDiff = pA - pB;
           break;
         case 'categoria':
+          const colCat = columns.find(c => c.key === 'categoria');
           const cA = a.categoria || '';
           const cB = b.categoria || '';
-          primaryDiff = cA.localeCompare(cB);
+          if (colCat && colCat.options && colCat.options.length > 0) {
+            const idxA = colCat.options.findIndex(opt => opt.value === cA);
+            const idxB = colCat.options.findIndex(opt => opt.value === cB);
+            const finalIdxA = idxA === -1 ? 9999 : idxA;
+            const finalIdxB = idxB === -1 ? 9999 : idxB;
+            primaryDiff = finalIdxA - finalIdxB;
+          } else {
+            primaryDiff = cA.localeCompare(cB);
+          }
           break;
         case 'prioridade_desc':
           primaryDiff = getPriorityWeight(b.prioridade) - getPriorityWeight(a.prioridade);
@@ -755,9 +776,18 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
         default:
           if (sortBy.startsWith('custom_')) {
             const colKey = sortBy.replace('custom_', '');
-            const vA = (a.custom_fields as any)?.[colKey] || '';
-            const vB = (b.custom_fields as any)?.[colKey] || '';
-            primaryDiff = vA.localeCompare(vB);
+            const col = columns.find(c => c.key === colKey);
+            const vA = (a as any)[colKey] ?? (a.custom_fields as any)?.[colKey] ?? '';
+            const vB = (b as any)[colKey] ?? (b.custom_fields as any)?.[colKey] ?? '';
+            if (col && col.options && col.options.length > 0) {
+              const idxA = col.options.findIndex(opt => opt.value === vA);
+              const idxB = col.options.findIndex(opt => opt.value === vB);
+              const finalIdxA = idxA === -1 ? 9999 : idxA;
+              const finalIdxB = idxB === -1 ? 9999 : idxB;
+              primaryDiff = finalIdxA - finalIdxB;
+            } else {
+              primaryDiff = vA.localeCompare(vB);
+            }
           }
           break;
       }
@@ -842,13 +872,13 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                     );
                   }
                   if (sortKey === 'categoria') {
-                    return <button key="categoria" onClick={() => setSortBy('categoria')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'categoria' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Categoria (A-Z)</button>;
+                    return <button key="categoria" onClick={() => setSortBy('categoria')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === 'categoria' ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>Categoria</button>;
                   }
                   
                   const col = columns.find(c => c.key === sortKey);
                   if (col) {
                     return (
-                      <button key={sortKey} onClick={() => setSortBy(`custom_${sortKey}`)} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === `custom_${sortKey}` ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>{col.name} (A-Z)</button>
+                      <button key={sortKey} onClick={() => setSortBy(`custom_${sortKey}`)} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 ${sortBy === `custom_${sortKey}` ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}>{col.name}</button>
                     );
                   }
 
@@ -897,32 +927,45 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
             let options: string[] = [];
             let isSelected: (val: string) => boolean = () => false;
             let onToggle: (val: string) => void = () => {};
+            let onClear: () => void = () => {};
+            let isAllSelected = false;
             let isHidden = false;
 
             if (filterKey === 'responsavel') {
               options = uniqueUsers;
               isSelected = (v) => selectedUsers.includes(v);
               onToggle = (v) => toggleFilter(selectedUsers, setSelectedUsers, v);
+              onClear = () => setSelectedUsers([]);
+              isAllSelected = selectedUsers.length === 0;
               if (isPersonalScope) isHidden = true;
             } else if (filterKey === 'dimensao') {
               options = uniqueDimensions;
               isSelected = (v) => selectedDimensions.includes(v);
               onToggle = (v) => toggleFilter(selectedDimensions, setSelectedDimensions, v);
+              onClear = () => setSelectedDimensions([]);
+              isAllSelected = selectedDimensions.length === 0;
             } else if (filterKey === 'status') {
               options = uniqueStatuses;
               isSelected = (v) => selectedStatuses.includes(v);
               onToggle = (v) => toggleFilter(selectedStatuses, setSelectedStatuses, v);
+              onClear = () => setSelectedStatuses([]);
+              isAllSelected = selectedStatuses.length === 0;
             } else if (filterKey === 'categoria') {
               options = uniqueCategories;
               isSelected = (v) => selectedCategories.includes(v);
               onToggle = (v) => toggleFilter(selectedCategories, setSelectedCategories, v);
+              onClear = () => setSelectedCategories([]);
+              isAllSelected = selectedCategories.length === 0;
             } else if (col) {
               // Coluna dinâmica
               options = col.options.map(o => o.value);
               isSelected = (v) => (customFilters[filterKey] || []).includes(v);
               onToggle = (v) => toggleCustomFilter(filterKey, v);
+              onClear = () => setCustomFilters(prev => ({ ...prev, [filterKey]: [] }));
+              isAllSelected = (customFilters[filterKey] || []).length === 0;
             }
 
+            options = options.filter(o => o && o.trim() !== '');
             if (isHidden || options.length === 0) return null;
 
             return (
@@ -930,11 +973,11 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                 <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider shrink-0">
                   {col ? col.name : filterKey}:
                 </span>
-                {filterKey === 'dimensao' && options.length > 1 && (
+                {options.length > 1 && (
                   <button 
-                    onClick={() => setSelectedDimensions([])}
+                    onClick={onClear}
                     className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0
-                      ${selectedDimensions.length === 0 ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
+                      ${isAllSelected ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}
                   >
                     Todas
                   </button>
@@ -983,7 +1026,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               )}
             </div>
 
-            <div className="flex items-center gap-3 order-1 md:order-2 w-full md:w-auto justify-end shrink-0">
+            <div className="flex items-center gap-3 order-1 md:order-2 w-full md:w-auto justify-end shrink-0 flex-wrap md:flex-nowrap">
               <div className="relative shrink-0" ref={filterMenuRef}>
               <button 
                 onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
@@ -1394,7 +1437,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {selectedTasks.size > 0 && (
         <button 
           onClick={() => setIsBulkEditModalOpen(true)}
-          className="fixed bottom-56 md:bottom-40 right-6 bg-[#9D4EDD] hover:bg-[#8A3BCE] text-[#FFFFFF] p-3 rounded-full shadow-[0_8px_32px_rgba(157,78,221,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group"
+          className={`fixed right-6 bg-[#9D4EDD] hover:bg-[#8A3BCE] text-[#FFFFFF] p-3 rounded-full shadow-[0_8px_32px_rgba(157,78,221,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-72 md:bottom-56' : 'bottom-56 md:bottom-40'}`}
           title="Editar Selecionadas"
         >
           <span className="material-symbols-outlined font-bold">edit</span>
@@ -1404,13 +1447,22 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {/* Floating Add Task Button */}
       <button 
         onClick={handleNew}
-        className="fixed bottom-40 md:bottom-24 right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group"
+        className={`fixed right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-56 md:bottom-40' : 'bottom-40 md:bottom-24'}`}
         title="Nova Tarefa"
       >
         <span className="material-symbols-outlined font-bold">add</span>
       </button>
 
-
+      {/* Floating Scroll to Top Button */}
+      {isAurtistic && (
+        <button 
+          onClick={scrollToTop}
+          className="fixed bottom-40 md:bottom-24 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
+          title="Ir para o topo"
+        >
+          <span className="material-symbols-outlined">arrow_upward</span>
+        </button>
+      )}
 
       {/* Floating Scroll to Bottom Button */}
       <button 
@@ -1545,6 +1597,8 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
 
                   {columns.map(col => {
                     if (col.type !== 'select') return null;
+                    const staticKeys = ['status', 'categoria', 'responsavel', 'dimensao', 'prioridade', 'prazo', 'manual'];
+                    if (staticKeys.includes(col.key)) return null;
                     const isSelected = quickFilters.includes(col.key);
                     return (
                       <label key={col.id} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-[#252525] rounded-md transition-colors">
@@ -1590,6 +1644,8 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                   {columns.length > 0 && <hr className="border-[#2D2D2D] my-2" />}
 
                   {columns.map(col => {
+                    const staticKeys = ['status', 'categoria', 'responsavel', 'dimensao', 'prioridade', 'prazo', 'manual'];
+                    if (staticKeys.includes(col.key)) return null;
                     const isSelected = quickSorts.includes(col.key);
                     return (
                       <label key={col.id} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-[#252525] rounded-md transition-colors">
@@ -1600,7 +1656,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                             setQuickSorts(newSorts);
                           }}
                         />
-                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#8E8E8E] group-hover:text-[#A0A0A0]'}`}>{col.name} (A-Z)</span>
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-[#8E8E8E] group-hover:text-[#A0A0A0]'}`}>{col.name}</span>
                       </label>
                     );
                   })}

@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Aurtistic Planner',
   webDir: 'public',
   server: {
-    url: 'https://stangorliniweb.vercel.app/aurtistic',
+    url: 'https://hub-lab-div.vercel.app/aurtistic',
     cleartext: true
   }
 };

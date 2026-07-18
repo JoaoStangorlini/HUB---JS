@@ -24,7 +24,6 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@android:drawable/ic_menu_edit"
-        android:tint="#AAAAAA"
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:padding="4dp"
         android:layout_marginStart="8dp" />

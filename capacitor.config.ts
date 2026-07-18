@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Stangorlini Web',
   webDir: 'public',
   server: {
-    url: 'https://stangorliniweb.vercel.app',
+    url: 'https://hub-lab-div.vercel.app',
     cleartext: true
   }
 };
