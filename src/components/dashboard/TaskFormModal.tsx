@@ -137,6 +137,37 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
     }
   };
 
+  const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setLoading(true);
+    try {
+      const { parseTasksFromCSV } = await import('@/utils/csv');
+      const tasks = await parseTasksFromCSV(file);
+      if (tasks.length === 0) {
+        alert("O arquivo CSV está vazio ou inválido.");
+        setLoading(false);
+        return;
+      }
+      
+      const { saveTask } = await import('@/app/(dashboard)/actions');
+      for (const t of tasks) {
+        await saveTask({ ...t, user_id: formData.user_id });
+      }
+      
+      alert(`${tasks.length} tarefas importadas com sucesso!`);
+      onClose(); // Fechar o modal após importar
+      
+      // We might need to refresh the page, but saving tasks via actions revalidates paths
+    } catch (err) {
+      alert("Erro ao importar CSV: " + String(err));
+    } finally {
+      setLoading(false);
+    }
+    e.target.value = '';
+  };
+
   const handleDelete = async () => {
     if (!task || !task.id) return;
     if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return;
@@ -428,7 +459,13 @@ export function TaskFormModal({ isOpen, onClose, task, uniqueCategories, uniqueD
           <div className="mt-8 flex justify-between">
             {task ? (
               <button type="button" onClick={handleDelete} disabled={loading} className="text-[#db4437] text-sm hover:underline font-semibold">Excluir Tarefa</button>
-            ) : <div />}
+            ) : (
+              <label className={`text-[#9D4EDD] text-sm hover:underline font-semibold cursor-pointer flex items-center gap-1 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <span className="material-symbols-outlined text-[18px]">upload</span>
+                Importar CSV
+                <input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} disabled={loading} />
+              </label>
+            )}
             <div className="flex gap-4">
               <button type="button" onClick={onClose} disabled={loading} className="px-6 py-2 border border-[#2D2D2D] text-white rounded-md hover:bg-[#252525] text-sm font-semibold transition-colors">Cancelar</button>
               <button type="submit" disabled={loading} className="px-6 py-2 bg-[#FFCC00] text-black rounded-md hover:bg-[#e6b800] text-sm font-bold transition-colors shadow-sm disabled:opacity-50">

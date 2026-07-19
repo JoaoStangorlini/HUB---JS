@@ -69,3 +69,30 @@ export async function logoutAurtistic() {
   revalidatePath('/', 'layout');
   redirect('/aurtistic/login');
 }
+
+export async function deleteAurtisticProfile() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  // Deletar todas as tarefas do usuário logado
+  const { error: tasksError } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('user_id', user.id);
+
+  if (tasksError) throw new Error("Erro ao apagar tarefas: " + tasksError.message);
+
+  // Deletar o perfil do usuário
+  const { error: profileError } = await supabase
+    .from('user_profiles')
+    .delete()
+    .eq('id', user.id);
+
+  if (profileError) throw new Error("Erro ao apagar perfil: " + profileError.message);
+
+  // Fazer logout para encerrar a sessão já que o auth.users a princípio não podemos deletar sem master key
+  await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
+  redirect('/aurtistic/login');
+}

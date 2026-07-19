@@ -23,10 +23,15 @@ android {
     }
     signingConfigs {
         release {
+            def keystoreProperties = new Properties()
+            def keystorePropertiesFile = rootProject.file('local.properties')
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+            }
             storeFile file('aurtistic.keystore')
-            storePassword 'Arc@no-39R'
-            keyAlias 'upload'
-            keyPassword 'Arc@no-39R'
+            storePassword keystoreProperties['keystore.password']
+            keyAlias keystoreProperties['keystore.alias']
+            keyPassword keystoreProperties['keystore.alias_password']
         }
     }
     buildTypes {

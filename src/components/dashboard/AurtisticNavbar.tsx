@@ -1,13 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { logoutAurtistic } from '@/app/(dashboard)/aurtistic/actions';
 
 export default function AurtisticNavbar() {
   const [user, setUser] = useState<any>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -20,8 +23,16 @@ export default function AurtisticNavbar() {
       setUser(session?.user || null);
     });
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsSettingsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
       authListener.subscription.unsubscribe();
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [supabase.auth]);
 
@@ -30,9 +41,61 @@ export default function AurtisticNavbar() {
       await logoutAurtistic();
     } catch (e) {
       console.error(e);
-      // Fallback
       await supabase.auth.signOut();
       router.push('/aurtistic/login');
+    }
+  };
+
+  const handleExportCSV = async () => {
+    setIsSettingsOpen(false);
+    if (!user) return;
+    const { data } = await supabase.from('tasks').select('*').eq('is_personal', true).eq('user_id', user.id);
+    if (data && data.length > 0) {
+      // Import on demand to save bundle size
+      const { downloadCSV } = await import('@/utils/csv');
+      downloadCSV(data, `aurtistic_tarefas_${new Date().toISOString().split('T')[0]}.csv`);
+    } else {
+      alert("Você não possui tarefas para exportar.");
+    }
+  };
+
+  const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsSettingsOpen(false);
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    try {
+      const { parseTasksFromCSV } = await import('@/utils/csv');
+      const tasks = await parseTasksFromCSV(file);
+      if (tasks.length === 0) {
+        alert("O arquivo CSV está vazio ou inválido.");
+        return;
+      }
+      
+      const { saveTask } = await import('@/app/(dashboard)/actions');
+      for (const t of tasks) {
+        await saveTask({ ...t, user_id: user.id });
+      }
+      
+      alert(`${tasks.length} tarefas importadas com sucesso!`);
+      router.refresh();
+    } catch (err) {
+      alert("Erro ao importar CSV: " + String(err));
+    }
+    e.target.value = ''; // Reset input
+  };
+
+  const handleDeleteProfile = async () => {
+    if (!confirm('ATENÇÃO: Você está prestes a excluir PERMANENTEMENTE todas as suas tarefas e seu perfil. Tem certeza disso?')) return;
+    
+    setIsSettingsOpen(false);
+    setIsDeleting(true);
+    try {
+      const { deleteAurtisticProfile } = await import('@/app/(dashboard)/aurtistic/actions');
+      await deleteAurtisticProfile();
+    } catch (err) {
+      alert("Erro ao deletar perfil: " + String(err));
+      setIsDeleting(false);
     }
   };
 
@@ -54,26 +117,78 @@ export default function AurtisticNavbar() {
         <div className="flex justify-center items-center flex-1">
           <Link 
             href="/"
-            className="text-[#8E8E8E] hover:text-[#FFCC00] font-bold text-sm transition-colors flex items-center gap-2"
+            className="text-[#8E8E8E] hover:text-[#FFCC00] font-bold text-xs md:text-sm transition-colors flex items-center gap-1 md:gap-2"
             title="Outros projetos do autor"
           >
-            <span className="material-symbols-outlined text-[18px]">open_in_new</span>
-            <span className="hidden md:inline">Outros projetos do autor</span>
+            <span className="material-symbols-outlined text-[16px] md:text-[18px]">open_in_new</span>
+            <span className="md:hidden whitespace-nowrap">Mais do autor</span>
+            <span className="hidden md:inline whitespace-nowrap">Outros projetos do autor</span>
           </Link>
         </div>
 
         {/* Right: Auth State */}
         <div className="flex justify-end items-center gap-4">
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 relative" ref={dropdownRef}>
               <span className="text-[#A0A0A0] text-sm hidden sm:inline">Olá, <strong className="text-white">{displayName}</strong></span>
-              <button 
-                onClick={handleLogout}
-                className="bg-[#2D2D2D] hover:bg-[#FF4343] text-white hover:text-white px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-2"
-              >
-                <span className="material-symbols-outlined text-[18px]">logout</span>
-                <span className="hidden sm:inline">Sair</span>
-              </button>
+              
+              <div className="relative">
+                <button 
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  className="bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[18px]">settings</span>
+                  <span className="hidden sm:inline">Configurações</span>
+                </button>
+
+                {isSettingsOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-xl overflow-hidden py-1 z-50">
+                    <button 
+                      onClick={handleExportCSV}
+                      className="w-full text-left px-4 py-2 text-sm text-[#E0E0E0] hover:bg-[#2D2D2D] hover:text-white transition-colors flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">download</span>
+                      Baixar tarefas (CSV)
+                    </button>
+                    
+                    <label className="w-full text-left px-4 py-2 text-sm text-[#E0E0E0] hover:bg-[#2D2D2D] hover:text-white transition-colors flex items-center gap-2 cursor-pointer">
+                      <span className="material-symbols-outlined text-[18px]">upload</span>
+                      Importar tarefas (CSV)
+                      <input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
+                    </label>
+
+                    <Link 
+                      href="/aurtistic/privacy-policy"
+                      onClick={() => setIsSettingsOpen(false)}
+                      className="w-full text-left px-4 py-2 text-sm text-[#E0E0E0] hover:bg-[#2D2D2D] hover:text-white transition-colors flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">policy</span>
+                      Política de Privacidade
+                    </Link>
+
+                    <div className="h-[1px] bg-[#2D2D2D] my-1" />
+
+                    <button 
+                      onClick={handleDeleteProfile}
+                      disabled={isDeleting}
+                      className="w-full text-left px-4 py-2 text-sm text-[#db4437] hover:bg-[#db4437]/10 transition-colors flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete_forever</span>
+                      {isDeleting ? 'Excluindo...' : 'Excluir perfil e tarefas'}
+                    </button>
+
+                    <div className="h-[1px] bg-[#2D2D2D] my-1" />
+
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-[#E0E0E0] hover:bg-[#2D2D2D] hover:text-[#db4437] transition-colors flex items-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">logout</span>
+                      Sair
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <Link 
