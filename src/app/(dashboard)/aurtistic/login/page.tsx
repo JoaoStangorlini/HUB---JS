@@ -47,13 +47,12 @@ export default function AurtisticLoginPage() {
           {!isLogin && (
             <div>
               <label className="block text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2" htmlFor="name">
-                Nome ou Apelido
+                Nome (Opcional)
               </label>
               <input
                 id="name"
                 name="name"
                 type="text"
-                required={!isLogin}
                 className="w-full bg-[#131313] border border-[#2D2D2D] text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#FFCC00] transition-colors"
                 placeholder="Como prefere ser chamado?"
               />
@@ -61,16 +60,16 @@ export default function AurtisticLoginPage() {
           )}
 
           <div>
-            <label className="block text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2" htmlFor="email">
-              Email
+            <label className="block text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2" htmlFor="username">
+              Usuário
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="username"
+              name="username"
+              type="text"
               required
               className="w-full bg-[#131313] border border-[#2D2D2D] text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#FFCC00] transition-colors"
-              placeholder="seu@email.com"
+              placeholder="seu_usuario"
             />
           </div>
           
@@ -88,6 +87,23 @@ export default function AurtisticLoginPage() {
               placeholder="••••••••"
             />
           </div>
+
+          {!isLogin && (
+            <div>
+              <label className="block text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2" htmlFor="confirmPassword">
+                Repetir Senha
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required={!isLogin}
+                minLength={6}
+                className="w-full bg-[#131313] border border-[#2D2D2D] text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#FFCC00] transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
           
           <button
             type="submit"

@@ -7,12 +7,13 @@ import { createClient } from '@/utils/supabase/server';
 export async function loginAurtistic(formData: FormData) {
   const supabase = await createClient();
 
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  };
+  const username = (formData.get('username') as string)?.trim() || '';
+  const password = formData.get('password') as string;
+  
+  // Transformar usuário em email falso para o Supabase
+  const email = `${username}@aurtistic.local`;
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     redirect('/aurtistic/login?error=Credenciais inválidas');
@@ -25,16 +26,25 @@ export async function loginAurtistic(formData: FormData) {
 export async function signupAurtistic(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get('email') as string;
+  const username = (formData.get('username') as string)?.trim() || '';
   const password = formData.get('password') as string;
-  const name = formData.get('name') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
+  const name = (formData.get('name') as string)?.trim() || '';
+
+  if (password !== confirmPassword) {
+    redirect('/aurtistic/login?error=As senhas não coincidem.');
+  }
+
+  // Transformar usuário em email falso para o Supabase
+  const email = `${username}@aurtistic.local`;
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        full_name: name,
+        full_name: name || username,
+        username: username,
       }
     }
   });
