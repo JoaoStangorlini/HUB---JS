@@ -5,6 +5,8 @@ import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { logoutAurtistic } from '@/app/(dashboard)/aurtistic/actions';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 export default function AurtisticNavbar() {
   const [user, setUser] = useState<any>(null);
@@ -99,6 +101,18 @@ export default function AurtisticNavbar() {
     }
   };
 
+  const openAuthorProjects = async () => {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url: 'https://stangorliniweb.vercel.app/' });
+      } else {
+        window.open('https://stangorliniweb.vercel.app/', '_blank');
+      }
+    } catch (e) {
+      window.open('https://stangorliniweb.vercel.app/', '_blank');
+    }
+  };
+
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
 
   return (
@@ -115,34 +129,31 @@ export default function AurtisticNavbar() {
 
         {/* Center: Outros Projetos */}
         <div className="flex justify-center items-center flex-1">
-          <Link 
-            href="/"
+          <button 
+            onClick={openAuthorProjects}
             className="text-[#8E8E8E] hover:text-[#FFCC00] font-bold text-xs md:text-sm transition-colors flex items-center gap-1 md:gap-2"
             title="Outros projetos do autor"
           >
             <span className="material-symbols-outlined text-[16px] md:text-[18px]">open_in_new</span>
             <span className="md:hidden whitespace-nowrap">Mais do autor</span>
             <span className="hidden md:inline whitespace-nowrap">Outros projetos do autor</span>
-          </Link>
+          </button>
         </div>
 
         {/* Right: Auth State */}
         <div className="flex justify-end items-center gap-4">
           {user ? (
-            <div className="flex items-center gap-3 relative" ref={dropdownRef}>
-              <span className="text-[#A0A0A0] text-sm hidden sm:inline">Olá, <strong className="text-white">{displayName}</strong></span>
-              
-              <div className="relative">
-                <button 
-                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                  className="bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-[18px]">settings</span>
-                  <span className="hidden sm:inline">Configurações</span>
-                </button>
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-[#2D2D2D] transition-colors"
+              >
+                <span className="text-[#A0A0A0] text-sm hidden sm:inline">Olá, <strong className="text-white">{displayName}</strong></span>
+                <span className="material-symbols-outlined text-[20px] text-[#8E8E8E] hover:text-white transition-colors">settings</span>
+              </button>
 
-                {isSettingsOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-xl overflow-hidden py-1 z-50">
+              {isSettingsOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg shadow-xl overflow-hidden py-1 z-50">
                     <button 
                       onClick={handleExportCSV}
                       className="w-full text-left px-4 py-2 text-sm text-[#E0E0E0] hover:bg-[#2D2D2D] hover:text-white transition-colors flex items-center gap-2"
@@ -188,7 +199,6 @@ export default function AurtisticNavbar() {
                     </button>
                   </div>
                 )}
-              </div>
             </div>
           ) : (
             <Link 

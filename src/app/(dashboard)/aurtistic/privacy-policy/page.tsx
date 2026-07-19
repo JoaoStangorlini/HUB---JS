@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
               Armazenamento das Tarefas
             </h2>
             <p className="leading-relaxed text-[#A0A0A0]">
-              As suas tarefas são armazenadas na nossa infraestrutura em nuvem (via Supabase) garantindo o sincronismo caso você utilize múltiplos dispositivos. Estes dados são privados, criptografados em repouso e protegidos por regras rígidas de segurança (Row Level Security), de forma que apenas o seu usuário autenticado tem acesso ao seu próprio conteúdo. Ninguém mais.
+              As suas tarefas e links rápidos são armazenadas na nossa infraestrutura em nuvem (via Supabase) garantindo o sincronismo caso você utilize múltiplos dispositivos. Estes dados são privados, criptografados em repouso e protegidos por regras rígidas de segurança (Row Level Security), de forma que apenas o seu usuário autenticado tem acesso ao seu próprio conteúdo. Ninguém mais.
             </p>
           </section>
 
