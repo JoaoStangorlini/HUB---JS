@@ -184,7 +184,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                 const newTask = {
                   id: taskId,
                   nome: taskName,
-                  status: 'não iniciada',
+                  status: 'rascunho',
                   is_favorite: true,
                   ordem: 0,
                   prazo: new Date().toISOString(),

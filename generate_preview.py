@@ -32,7 +32,7 @@ def create_preview(path, title_text, bg_color="#1A1A1A"):
     
     # Tasks
     tasks = [
-        {"name": "Reunião com o Ortega", "color": "#409D4EDD", "fill": "#229D4EDD"},
+        {"name": "Tomar medicamentos", "color": "#409D4EDD", "fill": "#229D4EDD"},
         {"name": "Ler capítulo 1 do livro", "color": "#404DA8FF", "fill": "#224DA8FF"},
         {"name": "Comprar mantimentos", "color": "#40E02424", "fill": "#22E02424"}
     ]
@@ -55,5 +55,5 @@ aurtistic_path = "/home/stangorlini/stangorlini.web/Aurtistic/android/app/src/ma
 stangorlini_path = "/home/stangorlini/stangorlini.web/android/app/src/main/res/drawable/widget_preview_image.png"
 
 create_preview(aurtistic_path, "Todas ▼")
-create_preview(stangorlini_path, "HUB ▼")
+create_preview(stangorlini_path, "Trabalho ▼")
 print("PNG Previews created.")

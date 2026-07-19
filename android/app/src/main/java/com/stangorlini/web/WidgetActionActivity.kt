@@ -119,7 +119,6 @@ class WidgetActionActivity : Activity() {
     private fun showCreateTaskDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_create_task, null)
         val inputName = dialogView.findViewById<android.widget.EditText>(R.id.input_task_name)
-        val inputDimension = dialogView.findViewById<android.widget.EditText>(R.id.input_task_dimension)
         val btnCancel = dialogView.findViewById<android.widget.Button>(R.id.btn_cancel)
         val btnSave = dialogView.findViewById<android.widget.Button>(R.id.btn_save)
 
@@ -135,11 +134,10 @@ class WidgetActionActivity : Activity() {
         
         btnSave.setOnClickListener {
             val taskName = inputName.text.toString().trim()
-            val taskDimension = inputDimension.text.toString().trim()
             if (taskName.isNotEmpty()) {
                 val tempId = java.util.UUID.randomUUID().toString()
-                savePendingCreateUpdate(tempId, taskName, taskDimension)
-                optimisticCreateUpdate(tempId, taskName, taskDimension)
+                savePendingCreateUpdate(tempId, taskName)
+                optimisticCreateUpdate(tempId, taskName)
                 // We do NOT launch MainActivity. Let the user stay on home screen.
             }
             dialog.dismiss()
@@ -154,7 +152,7 @@ class WidgetActionActivity : Activity() {
         dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
     }
 
-    private fun savePendingCreateUpdate(taskId: String, taskName: String, taskDimension: String) {
+    private fun savePendingCreateUpdate(taskId: String, taskName: String) {
         val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
         val pendingJson = prefs.getString("pending_widget_updates", "[]")
         try {
@@ -163,13 +161,12 @@ class WidgetActionActivity : Activity() {
             obj.put("action", "create")
             obj.put("taskId", taskId)
             obj.put("taskName", taskName)
-            obj.put("taskDimension", taskDimension)
             arr.put(obj)
             prefs.edit().putString("pending_widget_updates", arr.toString()).apply()
         } catch (e: Exception) { e.printStackTrace() }
     }
 
-    private fun optimisticCreateUpdate(taskId: String, taskName: String, taskDimension: String) {
+    private fun optimisticCreateUpdate(taskId: String, taskName: String) {
         val prefs = getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
         val tasksJson = prefs.getString("favorite_tasks", "[]")
         try {
@@ -177,9 +174,8 @@ class WidgetActionActivity : Activity() {
             val newTask = JSONObject()
             newTask.put("id", taskId)
             newTask.put("nome", taskName)
-            newTask.put("status", "não iniciada")
+            newTask.put("status", "rascunho")
             newTask.put("is_favorite", true)
-            newTask.put("dimensao", taskDimension)
             // Add at the beginning
             val newArr = JSONArray()
             newArr.put(newTask)
