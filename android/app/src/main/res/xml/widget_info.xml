@@ -10,4 +10,5 @@
     android:initialLayout="@layout/widget_favorites"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
+    android:previewLayout="@layout/widget_favorites"
     android:previewImage="@mipmap/ic_launcher" />
