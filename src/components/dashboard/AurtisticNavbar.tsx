@@ -51,13 +51,14 @@ export default function AurtisticNavbar() {
         </div>
 
         {/* Center: Outros Projetos */}
-        <div className="hidden md:flex justify-center items-center flex-1">
+        <div className="flex justify-center items-center flex-1">
           <Link 
             href="/"
             className="text-[#8E8E8E] hover:text-[#FFCC00] font-bold text-sm transition-colors flex items-center gap-2"
+            title="Outros projetos do autor"
           >
             <span className="material-symbols-outlined text-[18px]">open_in_new</span>
-            Outros projetos do autor
+            <span className="hidden md:inline">Outros projetos do autor</span>
           </Link>
         </div>
 

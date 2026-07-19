@@ -39,6 +39,24 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
         return android.graphics.Color.parseColor(defaultColor)
     }
 
+    private fun getDimensionDrawables(dimensionName: String): Pair<Int, String> {
+        val text = dimensionName.lowercase().trim()
+        return when {
+            text.contains("usp") -> Pair(R.drawable.widget_item_bg_usp, "#404DA8FF")
+            text.contains("hub") -> Pair(R.drawable.widget_item_bg_hub, "#409D4EDD")
+            text.contains("urgente") -> Pair(R.drawable.widget_item_bg_urgente, "#40F14343")
+            text.contains("livros") -> Pair(R.drawable.widget_item_bg_livros, "#40FFCC00")
+            text.contains("filmes") || text.contains("series") || text.contains("séries") -> Pair(R.drawable.widget_item_bg_filmes, "#40FFE066")
+            text.contains("tatuagens") || text.contains("tattoo") -> Pair(R.drawable.widget_item_bg_tatuagens, "#40D39BFE")
+            text.contains("cin") -> Pair(R.drawable.widget_item_bg_cin, "#40E0E0E0")
+            text.contains("compras") -> Pair(R.drawable.widget_item_bg_compras, "#4069F0AE")
+            text.contains("stangorlini") || text.contains("web") -> Pair(R.drawable.widget_item_bg_stangorlini, "#403B82F6")
+            text.contains("fotografia") || text.contains("foto") -> Pair(R.drawable.widget_item_bg_fotografia, "#40EC4899")
+            text.contains("hobbys") || text.contains("hobby") -> Pair(R.drawable.widget_item_bg_hobbys, "#400F9D58")
+            else -> Pair(R.drawable.widget_item_bg_default, "#40FFCC00")
+        }
+    }
+
     override fun onCreate() {
         loadData()
     }
@@ -59,7 +77,7 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
             val filteredList = mutableListOf<org.json.JSONObject>()
             for (i in 0 until allTasks.length()) {
                 val task = allTasks.getJSONObject(i)
-                if (selectedDim.isEmpty() || selectedDim == "Todas as Dimensões") {
+                if (selectedDim.isEmpty() || selectedDim == "Todas") {
                     filteredList.add(task)
                 } else if (selectedDim == "Favoritas") {
                     if (task.optBoolean("is_favorite", false)) {
@@ -78,9 +96,13 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
             filteredList.sortWith(Comparator { t1, t2 ->
                 val p1 = t1.optString("prazo", "")
                 val p2 = t2.optString("prazo", "")
-                if (p1.isEmpty() && p2.isEmpty()) return@Comparator 0
-                if (p1.isEmpty()) return@Comparator 1
-                if (p2.isEmpty()) return@Comparator -1
+                
+                val p1Empty = p1.isEmpty() || p1 == "null"
+                val p2Empty = p2.isEmpty() || p2 == "null"
+                
+                if (p1Empty && p2Empty) return@Comparator 0
+                if (p1Empty) return@Comparator 1
+                if (p2Empty) return@Comparator -1
                 
                 try {
                     val d1 = sdf.parse(p1)?.time ?: Long.MAX_VALUE
@@ -109,8 +131,12 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
             val task = tasksArray.getJSONObject(position)
             val name = task.optString("nome", "Sem título")
             val prazo = task.optString("prazo", "")
+            val dimensaoStr = task.optString("dimensao", "")
             
             views.setTextViewText(R.id.task_name, name)
+            
+            val dimProps = getDimensionDrawables(dimensaoStr)
+            views.setInt(R.id.widget_item_container, "setBackgroundResource", dimProps.first)
             
             if (prazo.isNotEmpty() && prazo != "null") {
                 try {
@@ -155,15 +181,19 @@ class FavoritesWidgetFactory(private val context: Context) : RemoteViewsService.
                             else -> "#FFCC00"
                         }
                         views.setTextColor(R.id.task_date, android.graphics.Color.parseColor(textColor))
+                        views.setInt(R.id.task_date, "setBackgroundColor", android.graphics.Color.parseColor(dimProps.second))
+                        views.setViewVisibility(R.id.task_date, android.view.View.VISIBLE)
                         
                         val status = task.optString("status", "")
                         views.setInt(R.id.task_status, "setColorFilter", getStatusColor(status))
                     }
                 } catch (e: Exception) {
                     views.setTextViewText(R.id.task_date, "")
+                    views.setViewVisibility(R.id.task_date, android.view.View.GONE)
                 }
             } else {
                 views.setTextViewText(R.id.task_date, "")
+                views.setViewVisibility(R.id.task_date, android.view.View.GONE)
             }
 
             // Fill-in Intent for status click

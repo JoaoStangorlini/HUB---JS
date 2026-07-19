@@ -48,7 +48,7 @@ class FavoritesWidgetProvider : AppWidgetProvider() {
             // Set dynamic title based on selected dimension
             val prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE)
             val selectedDim = prefs.getString("widget_filter_dimension", "") ?: ""
-            val titleText = if (selectedDim.isEmpty()) "Todas as Dimensões ▼" else "$selectedDim ▼"
+            val titleText = if (selectedDim.isEmpty()) "Todas ▼" else "$selectedDim ▼"
             views.setTextViewText(R.id.widget_title, titleText)
             
             // Show star only if Favoritas
