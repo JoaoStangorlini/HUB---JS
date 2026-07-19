@@ -32,9 +32,10 @@ def create_preview(path, title_text, bg_color="#1A1A1A"):
     
     # Tasks
     tasks = [
-        {"name": "Tomar medicamentos", "color": "#409D4EDD", "fill": "#229D4EDD"},
-        {"name": "Ler capítulo 1 do livro", "color": "#404DA8FF", "fill": "#224DA8FF"},
-        {"name": "Comprar mantimentos", "color": "#40E02424", "fill": "#22E02424"}
+        {"name": "Nova Tarefa (Rascunho)", "color": "#408E8E8E", "fill": "#228E8E8E", "tag": "Rascunho"},
+        {"name": "Tomar medicamentos", "color": "#40E0E0E0", "fill": "#22E0E0E0", "tag": "Não iniciada"},
+        {"name": "Ler capítulo 1 do livro", "color": "#404285F4", "fill": "#224285F4", "tag": "Em progresso"},
+        {"name": "Comprar mantimentos", "color": "#40F4B400", "fill": "#22F4B400", "tag": "Falta testar"}
     ]
     
     y = 120
@@ -44,8 +45,8 @@ def create_preview(path, title_text, bg_color="#1A1A1A"):
         # draw text
         draw.text((60, y+35), task["name"], fill="#FFFFFF", font=font_task)
         # draw tag
-        draw.rounded_rectangle([480, y+30, 540, y+70], radius=10, fill=task["color"])
-        draw.text((495, y+45), "Hoje", fill="#FFFFFF", font=font_date)
+        draw.rounded_rectangle([390, y+30, 540, y+70], radius=10, fill=task["color"])
+        draw.text((405, y+45), task["tag"], fill="#FFFFFF", font=font_date)
         y += 130
         
     img.save(path)
