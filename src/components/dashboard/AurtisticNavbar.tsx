@@ -13,6 +13,7 @@ export default function AurtisticNavbar() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -111,15 +112,19 @@ export default function AurtisticNavbar() {
 
   const displayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
 
+  const customLabels = profile?.features_config?.labels || {};
+  const customLinks = profile?.features_config?.custom_links || {};
+
   const tabMetadata: Record<string, { name: string; href: string }> = {
-    tasks: { name: 'Tarefas', href: '/' },
-    resumo: { name: 'Resumo', href: '/resumo' },
-    curriculo: { name: 'Currículo', href: '/curriculo' },
-    portfolio: { name: 'Portfólio', href: '/portfolio' }
+    tasks: { name: customLabels.tasks || 'Tarefas', href: '/' },
+    resumo: { name: customLabels.resumo || 'Resumo', href: '/resumo' },
+    curriculo: { name: customLabels.curriculo || 'Currículo', href: '/curriculo' },
+    portfolio: { name: customLabels.portfolio || 'Portfólio', href: '/portfolio' },
+    extra: { name: customLabels.extra || 'Aba Extra', href: customLinks.extra || '#' }
   };
 
   const activeTabs = profile?.features_config?.active || ['tasks', 'resumo', 'curriculo', 'portfolio'];
-  const orderedTabs = profile?.features_config?.order || ['tasks', 'resumo', 'curriculo', 'portfolio'];
+  const orderedTabs = profile?.features_config?.order || ['tasks', 'resumo', 'curriculo', 'portfolio', 'extra'];
   const visibleTabs = orderedTabs.filter((t: string) => activeTabs.includes(t));
 
   return (
@@ -146,7 +151,23 @@ export default function AurtisticNavbar() {
           {visibleTabs.map((key: string) => {
             const tab = tabMetadata[key];
             if (!tab) return null;
+            const isExternal = tab.href.startsWith('http://') || tab.href.startsWith('https://');
             const isActive = pathname === tab.href;
+
+            if (isExternal) {
+              return (
+                <a 
+                  key={key}
+                  href={tab.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[#A0A0A0] hover:text-[#9D4EDD] transition-colors"
+                >
+                  {tab.name}
+                </a>
+              );
+            }
+
             return (
               <Link 
                 key={key}
@@ -238,8 +259,58 @@ export default function AurtisticNavbar() {
               Entrar
             </Link>
           )}
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-[#2D2D2D] bg-[#1A1A1A] text-white hover:border-[#FFCC00] transition-colors shrink-0"
+          >
+            <span className="material-symbols-outlined text-[20px]">{isMobileMenuOpen ? 'close' : 'menu'}</span>
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu Panel */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-[#121212]/95 backdrop-blur-xl border-b border-[#2D2D2D] px-6 py-4 space-y-3 animate-in fade-in slide-in-from-top duration-200">
+          {visibleTabs.map((key: string) => {
+            const tab = tabMetadata[key];
+            if (!tab) return null;
+            const isExternal = tab.href.startsWith('http://') || tab.href.startsWith('https://');
+            const isActive = pathname === tab.href;
+
+            if (isExternal) {
+              return (
+                <a 
+                  key={key}
+                  href={tab.href}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block py-2 text-sm font-medium text-[#A0A0A0] hover:text-[#FFCC00] transition-colors"
+                >
+                  {tab.name} ↗
+                </a>
+              );
+            }
+
+            return (
+              <Link 
+                key={key}
+                href={tab.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block py-2 text-sm font-medium transition-colors ${
+                  isActive 
+                    ? 'text-[#9D4EDD] font-bold border-l-2 border-[#FFCC00] pl-2' 
+                    : 'text-[#A0A0A0] hover:text-white'
+                }`}
+              >
+                {tab.name}
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </header>
   );
 }

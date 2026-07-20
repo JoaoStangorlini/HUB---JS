@@ -37,18 +37,38 @@ export default function AurtisticWorkspaceClient({
   const [isSaving, setIsSaving] = useState(false);
 
   // Features configuration local state
+  // Features configuration local state
   const featuresConfig = profile?.features_config || {
     active: ['tasks', 'resumo', 'curriculo', 'portfolio'],
     order: ['tasks', 'resumo', 'curriculo', 'portfolio'],
-    layout_style: 'default'
+    layout_style: 'default',
+    labels: {
+      tasks: 'Tarefas',
+      resumo: 'Resumo',
+      curriculo: 'Currículo',
+      portfolio: 'Portfólio',
+      extra: 'Aba Extra'
+    },
+    custom_links: {
+      extra: ''
+    }
   };
 
-  const [activeFeatures, setActiveFeatures] = useState<string[]>(featuresConfig.active);
-  const [featuresOrder, setFeaturesOrder] = useState<string[]>(featuresConfig.order);
+  const [activeFeatures, setActiveFeatures] = useState<string[]>(featuresConfig.active || ['tasks', 'resumo', 'curriculo', 'portfolio']);
+  const [featuresOrder, setFeaturesOrder] = useState<string[]>(featuresConfig.order || ['tasks', 'resumo', 'curriculo', 'portfolio']);
+  const [labels, setLabels] = useState<Record<string, string>>(featuresConfig.labels || {
+    tasks: 'Tarefas',
+    resumo: 'Resumo',
+    curriculo: 'Currículo',
+    portfolio: 'Portfólio',
+    extra: 'Aba Extra'
+  });
+  const [customLinks, setCustomLinks] = useState<Record<string, string>>(featuresConfig.custom_links || {
+    extra: ''
+  });
 
   // Toggle active feature
   const handleToggleFeature = (feature: string) => {
-    // Tasks must always be an option, but we let them toggle if they want, but usually it should be toggled
     if (activeFeatures.includes(feature)) {
       if (feature === 'tasks' && activeFeatures.length === 1) {
         alert("Você deve manter pelo menos uma ferramenta ativa.");
@@ -57,6 +77,10 @@ export default function AurtisticWorkspaceClient({
       setActiveFeatures(activeFeatures.filter(f => f !== feature));
     } else {
       setActiveFeatures([...activeFeatures, feature]);
+      // Ensure it is in the ordered list too
+      if (!featuresOrder.includes(feature)) {
+        setFeaturesOrder([...featuresOrder, feature]);
+      }
     }
   };
 
@@ -79,7 +103,9 @@ export default function AurtisticWorkspaceClient({
       const updatedConfig = {
         active: activeFeatures,
         order: featuresOrder,
-        layout_style: featuresConfig.layout_style || 'default'
+        layout_style: featuresConfig.layout_style || 'default',
+        labels,
+        custom_links: customLinks
       };
       await saveUserProfileData({ features_config: updatedConfig });
       setProfile({ ...profile, features_config: updatedConfig });
@@ -104,7 +130,8 @@ export default function AurtisticWorkspaceClient({
     tasks: 'Tarefas (Planner)',
     resumo: 'Resumo Profissional',
     curriculo: 'Currículo',
-    portfolio: 'Portfólio'
+    portfolio: 'Portfólio',
+    extra: 'Aba Extra (Personalizável)'
   };
 
   return (
@@ -163,6 +190,37 @@ export default function AurtisticWorkspaceClient({
                       className="w-4 h-4 rounded text-[#9D4EDD] focus:ring-[#9D4EDD] bg-[#1A1A1A] border-[#2D2D2D]"
                     />
                   </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Rename active tabs */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-[#FFCC00] uppercase tracking-wider">Nomes das Abas (Personalização)</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {activeFeatures.map(key => (
+                  <div key={key} className="p-4 bg-[#242424] border border-[#2D2D2D] rounded-xl space-y-2">
+                    <span className="text-xs text-[#A0A0A0] uppercase font-bold">{featureLabels[key]}</span>
+                    <input
+                      type="text"
+                      value={labels[key] || ''}
+                      onChange={e => setLabels({ ...labels, [key]: e.target.value })}
+                      placeholder={`Ex: ${featureLabels[key].split(' ')[0]}`}
+                      className="w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9D4EDD]"
+                    />
+                    {key === 'extra' && (
+                      <div className="pt-2 border-t border-[#2D2D2D]/60 mt-2">
+                        <label className="block text-[10px] text-[#A0A0A0] uppercase font-bold mb-1">URL do Link (Ex: site externo ou rota)</label>
+                        <input
+                          type="text"
+                          value={customLinks.extra || ''}
+                          onChange={e => setCustomLinks({ ...customLinks, extra: e.target.value })}
+                          placeholder="https://exemplo.com"
+                          className="w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#9D4EDD]"
+                        />
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
