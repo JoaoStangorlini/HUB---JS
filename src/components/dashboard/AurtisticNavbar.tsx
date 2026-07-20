@@ -54,7 +54,7 @@ export default function AurtisticNavbar() {
     } catch (e) {
       console.error(e);
       await supabase.auth.signOut();
-      router.push('/login');
+      router.push('/aurtistic/login');
     }
   };
 
@@ -253,7 +253,7 @@ export default function AurtisticNavbar() {
             </div>
           ) : (
             <Link 
-              href="/login"
+              href="/aurtistic/login"
               className="bg-[#FFCC00] text-[#121212] px-5 py-2 rounded-md text-sm font-bold hover:bg-[#e6b800] transition-colors"
             >
               Entrar

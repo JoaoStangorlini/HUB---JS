@@ -37,11 +37,32 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
 
   const [projects, setProjects] = useState<PortfolioProject[]>(initialPortfolioData);
 
+  const [iframeUrl, setIframeUrl] = useState(() => {
+    return profile?.features_config?.gallery_iframe_url || "https://stangorliniphotography.pic-time.com/-portiflio/slidesblog/6a1cf17dfd03398d7fddb00d?slideshowview=AAAAANYAAABdtAdQQXgvsHwiv1E6mUSMuiUAaFz7JkxgkxMPtvfv0JMhf8GQnlaaNiCsf9oYGmXGq7VPHE3RyL2-1gnGziP0iVtidPlPKhb4rzJeFOAgYQ";
+  });
+  const [iframeTitle, setIframeTitle] = useState(() => {
+    return profile?.features_config?.gallery_iframe_title || "Galeria de Fotografia";
+  });
+
   const handleSave = async (dataToSave = projects) => {
     setIsSaving(true);
     try {
-      await saveUserProfileData({ portfolio: dataToSave });
-      setProfile({ ...profile, portfolio: dataToSave });
+      const updatedFeaturesConfig = {
+        ...(profile?.features_config || {}),
+        gallery_iframe_url: iframeUrl,
+        gallery_iframe_title: iframeTitle
+      };
+      
+      await saveUserProfileData({ 
+        portfolio: dataToSave,
+        features_config: updatedFeaturesConfig
+      });
+      
+      setProfile({ 
+        ...profile, 
+        portfolio: dataToSave,
+        features_config: updatedFeaturesConfig
+      });
       setIsEditing(false);
     } catch (e) {
       alert("Erro ao salvar portfólio: " + String(e));
@@ -53,18 +74,18 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
   const handleUseDefaultTemplate = () => {
     const template: PortfolioProject[] = [
       {
-        title: 'HUB LabDiv',
-        description: 'Plataforma completa de comunicação e difusão científica do IFUSP, com fluxo de informações e artes integradas.',
-        link: 'https://hub-lab-div.vercel.app',
-        tags: ['PWA', 'Next.js', 'Supabase', 'TailwindCSS'],
-        image_url: '/labdiv-logo.png'
+        title: 'Meu Projeto Incível',
+        description: 'Descrição curta do projeto, destacando os problemas resolvidos e tecnologias utilizadas.',
+        link: 'https://github.com/seu-usuario/projeto',
+        tags: ['React', 'TypeScript', 'TailwindCSS'],
+        image_url: ''
       },
       {
-        title: 'Aurtistic',
-        description: 'Um gerenciador pessoal completo de tarefas e rotinas acadêmicas, focado em organização e produtividade sem distrações.',
-        link: '/aurtistic',
-        tags: ['SaaS', 'Capacitor', 'Supabase', 'React'],
-        image_url: '/aurtistic-icon.png'
+        title: 'Outro Projeto Relevante',
+        description: 'Um segundo projeto prático para demonstrar suas habilidades técnicas e arquitetura.',
+        link: 'https://github.com/seu-usuario/projeto-dois',
+        tags: ['Node.js', 'PostgreSQL', 'Docker'],
+        image_url: ''
       }
     ];
     setProjects(template);
@@ -94,7 +115,7 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
           <span className="material-symbols-outlined text-[64px] text-[#FFCC00] mb-4">folder_special</span>
           <h2 className="text-2xl font-bold text-white mb-2">Configure seu Portfólio</h2>
           <p className="text-[#A0A0A0] text-sm mb-6">
-            Seu Portfólio de Projetos está vazio. Você pode preenchê-lo do zero ou pré-carregar os projetos modelo do João Paulo.
+            Seu Portfólio de Projetos está vazio. Você pode preenchê-lo do zero ou pré-carregar os projetos modelo padrão.
           </p>
           {!isReadOnly ? (
             <div className="flex flex-col gap-3">
@@ -103,7 +124,7 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
                 className="w-full py-2.5 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-                Usar Modelo Padrão (Estilo João)
+                Usar Modelo Padrão
               </button>
               <button 
                 onClick={() => setIsEditing(true)}
@@ -140,6 +161,8 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
               <button 
                 onClick={() => {
                   setProjects(initialPortfolioData);
+                  setIframeUrl(profile?.features_config?.gallery_iframe_url || "https://stangorliniphotography.pic-time.com/-portiflio/slidesblog/6a1cf17dfd03398d7fddb00d?slideshowview=AAAAANYAAABdtAdQQXgvsHwiv1E6mUSMuiUAaFz7JkxgkxMPtvfv0JMhf8GQnlaaNiCsf9oYGmXGq7VPHE3RyL2-1gnGziP0iVtidPlPKhb4rzJeFOAgYQ");
+                  setIframeTitle(profile?.features_config?.gallery_iframe_title || "Galeria de Fotografia");
                   setIsEditing(false);
                 }}
                 className="px-4 py-2 text-sm text-[#A0A0A0] hover:text-white transition-colors animate-fade-in"
@@ -244,6 +267,36 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
               </div>
             ))}
           </div>
+          
+          {/* Iframe config */}
+          <div className="border-t border-[#2D2D2D]/60 pt-6 mt-6 space-y-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#FFCC00]">photo_library</span>
+              Galeria de Fotografia / Blog (Iframe)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-[#A0A0A0] mb-1">Link do Iframe da Galeria</label>
+                <input 
+                  type="text"
+                  value={iframeUrl}
+                  onChange={e => setIframeUrl(e.target.value)}
+                  placeholder="https://exemplo.com/galeria"
+                  className="w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#9D4EDD]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[#A0A0A0] mb-1">Título da Galeria</label>
+                <input 
+                  type="text"
+                  value={iframeTitle}
+                  onChange={e => setIframeTitle(e.target.value)}
+                  placeholder="Ex: Minha Galeria de Fotos"
+                  className="w-full bg-[#1A1A1A] border border-[#2D2D2D] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#9D4EDD]"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         /* VISUAL PREVIEW / VIEW MODE */
@@ -307,21 +360,23 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
           </div>
 
           {/* Galeria de Fotografia */}
-          <div className="pt-8 border-t border-[#2D2D2D]/50 space-y-6">
-            <div>
-              <h2 className="text-3xl font-['Bukra'] font-bold text-white border-l-4 border-[#FFCC00] pl-4">Galeria de Fotografia</h2>
-              <p className="text-[#A0A0A0] mt-2">Trabalhos fotográficos e ensaios autorais.</p>
+          {iframeUrl && (
+            <div className="pt-8 border-t border-[#2D2D2D]/50 space-y-6">
+              <div>
+                <h2 className="text-3xl font-['Bukra'] font-bold text-white border-l-4 border-[#FFCC00] pl-4">{iframeTitle || "Galeria de Fotografia"}</h2>
+                <p className="text-[#A0A0A0] mt-2">Trabalhos fotográficos e ensaios autorais.</p>
+              </div>
+              <div className="w-full h-[650px] rounded-2xl overflow-hidden border border-[#2D2D2D] bg-[#1A1A1A] relative shadow-lg">
+                <iframe
+                  src={iframeUrl}
+                  className="w-full h-full border-none"
+                  allowFullScreen
+                  loading="lazy"
+                  title={iframeTitle || "Galeria de Fotografia"}
+                />
+              </div>
             </div>
-            <div className="w-full h-[650px] rounded-2xl overflow-hidden border border-[#2D2D2D] bg-[#1A1A1A] relative shadow-lg">
-              <iframe
-                src="https://stangorliniphotography.pic-time.com/-portiflio/slidesblog/6a1cf17dfd03398d7fddb00d?slideshowview=AAAAANYAAABdtAdQQXgvsHwiv1E6mUSMuiUAaFz7JkxgkxMPtvfv0JMhf8GQnlaaNiCsf9oYGmXGq7VPHE3RyL2-1gnGziP0iVtidPlPKhb4rzJeFOAgYQ"
-                className="w-full h-full border-none"
-                allowFullScreen
-                loading="lazy"
-                title="Galeria de Fotografia - Stangorlini Photography"
-              />
-            </div>
-          </div>
+          )}
         </main>
       )}
     </div>

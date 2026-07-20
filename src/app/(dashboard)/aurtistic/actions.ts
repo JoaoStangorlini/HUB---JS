@@ -29,7 +29,6 @@ export async function signupAurtistic(formData: FormData) {
   const username = (formData.get('username') as string)?.trim() || '';
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
-  const name = (formData.get('name') as string)?.trim() || '';
 
   if (password !== confirmPassword) {
     redirect('/aurtistic/login?error=As senhas não coincidem.');
@@ -43,7 +42,7 @@ export async function signupAurtistic(formData: FormData) {
     password,
     options: {
       data: {
-        full_name: name || username,
+        full_name: username,
         username: username,
       }
     }

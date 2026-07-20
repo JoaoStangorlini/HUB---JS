@@ -44,20 +44,6 @@ export default function AurtisticLoginPage() {
 
         {/* Forms */}
         <form className="flex flex-col gap-4" action={isLogin ? loginAurtistic : signupAurtistic}>
-          {!isLogin && (
-            <div>
-              <label className="block text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2" htmlFor="name">
-                Nome (Opcional)
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                className="w-full bg-[#131313] border border-[#2D2D2D] text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#FFCC00] transition-colors"
-                placeholder="Como prefere ser chamado?"
-              />
-            </div>
-          )}
 
           <div>
             <label className="block text-xs font-bold text-[#8E8E8E] uppercase tracking-wider mb-2" htmlFor="username">

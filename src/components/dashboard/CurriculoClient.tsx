@@ -90,49 +90,46 @@ export default function CurriculoClient({ initialProfile, isReadOnly = false }: 
 
   const handleUseDefaultTemplate = () => {
     const template: CVData = {
-      name: 'João Paulo Stangorlini de Carvalho',
-      role: 'Estudante de Física (USP) | Desenvolvedor | Fotógrafo | Educador | Designer',
-      phone: '(11) 967840-1823',
-      email: 'joaopaulostangorlini@usp.br',
-      address: 'Rua Arthur Soter Lopes da Silva, 88',
-      github: '/JoaoStangorlini',
-      summary: 'Estudante de Física no Instituto de Física (USP - Butantã) com perfil voltado à tecnologia e educação. Experiência prática em desenvolvimento Web (PWA), design (web e gráfico), otimização, manutenção e montagem de hardware de alta performance, sala de aula e monitorias em ambientes de difusão científica/inovação. Experiência básica de cálculo e execução de instalações elétricas (residenciais).',
+      name: 'Seu Nome Completo',
+      role: 'Desenvolvedor Full-Stack | Designer UX/UI',
+      phone: '(11) 99999-9999',
+      email: 'seuemail@exemplo.com',
+      address: 'São Paulo, SP',
+      github: '/seu-usuario',
+      summary: 'Resumo profissional contendo seus principais objetivos, realizações e motivações. Edite este conteúdo clicando no botão Editar no topo do card.',
       experiences: [
         {
-          role: 'Monitor de Inovação e Tecnologias Imersivas',
-          company: 'DigiLab (Inova USP)',
-          period: '2025 - Presente',
+          role: 'Desenvolvedor Frontend Pleno',
+          company: 'Empresa de Tecnologia S.A.',
+          period: '2023 - Presente',
           bullets: [
-            'Operação e Suporte em VR/AR: Mediação técnica em experiências de Realidade Virtual e Aumentada.',
-            'Troubleshooting em Tempo Real: Resolução de falhas de hardware e software sob pressão durante eventos.',
-            'Estudo de Sistemas Imersivos: Pesquisa sobre o funcionamento físico e técnico de dispositivos de VR.',
-            'Atendimento Bilíngue: Suporte técnico e conversação em Inglês para visitantes.'
+            'Desenvolvimento de aplicações responsivas utilizando React e Next.js.',
+            'Otimização de performance web e acessibilidade.',
+            'Colaboração próxima com equipes de design e gerenciamento de produto.'
           ]
         },
         {
-          role: 'Monitor de Difusão Científica',
-          company: 'Parque CienTec – USP',
-          period: '2024 - 2025',
+          role: 'Desenvolvedor Frontend Júnior',
+          company: 'Soluções Digitais Ltda',
+          period: '2021 - 2023',
           bullets: [
-            'Comunicação científica e mediação de experimentos de Física e Astronomia.',
-            'Adaptação de conceitos complexos para diversos níveis de público.',
-            'Desenvolvimento de planos de aulas e planejamento de possíveis novas atividades.'
+            'Manutenção de sistemas legados e criação de novas landing pages.',
+            'Integração de APIs RESTful.',
+            'Testes unitários e correção de bugs.'
           ]
         }
       ],
       education: [
         {
-          institution: 'Instituto de Física da Universidade de São Paulo (USP)',
-          period: '2024 - 2029',
-          degree: 'Licenciatura em Física (em andamento)',
+          institution: 'Universidade de Tecnologia',
+          period: '2018 - 2022',
+          degree: 'Bacharelado em Ciência da Computação',
           bullets: [
-            'Bolsista PAPFE (apoio à permanência e formação estudantil).',
-            'Bolsista PUB (Programa Unificado de Bolsas) – Atuação no parque de Ciências e tecnologia USP Cientec.',
-            'Projetos AEX (Apoio à Extensão): Atuação no Digital Lab / Inova USP e palestrante no programa "De Volta à Escola | Eu na USP".'
+            'Participação em projetos acadêmicos de desenvolvimento de software.'
           ]
         }
       ],
-      skills: ['HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React.js', 'Next.js', 'SQL', 'Git & GitHub', 'Física Geral', 'Design Gráfico', 'Montagem de Hardware', 'Inglês Intermediário']
+      skills: ['React.js', 'Next.js', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'Git', 'SQL']
     };
     setCvData(template);
     handleSave(template);
@@ -199,7 +196,7 @@ export default function CurriculoClient({ initialProfile, isReadOnly = false }: 
           <span className="material-symbols-outlined text-[64px] text-[#FFCC00] mb-4">badge</span>
           <h2 className="text-2xl font-bold text-white mb-2">Configure seu Currículo</h2>
           <p className="text-[#A0A0A0] text-sm mb-6">
-            Seu Currículo Profissional está vazio. Você pode preenchê-lo do zero ou pré-carregar o modelo padrão do João Paulo.
+            Seu Currículo Profissional está vazio. Você pode preenchê-lo do zero ou pré-carregar o modelo padrão.
           </p>
           {!isReadOnly ? (
             <div className="flex flex-col gap-3">
@@ -208,7 +205,7 @@ export default function CurriculoClient({ initialProfile, isReadOnly = false }: 
                 className="w-full py-2.5 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-                Usar Modelo Padrão (Estilo João)
+                Usar Modelo Padrão
               </button>
               <button 
                 onClick={() => setIsEditing(true)}

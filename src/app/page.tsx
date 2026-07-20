@@ -12,7 +12,7 @@ export default async function AurtisticPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/aurtistic/login');
   }
 
   // 1. Pessoal tasks

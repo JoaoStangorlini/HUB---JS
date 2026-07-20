@@ -12,7 +12,7 @@ export default async function CurriculoPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/aurtistic/login');
   }
 
   const profile = await getUserProfile();
