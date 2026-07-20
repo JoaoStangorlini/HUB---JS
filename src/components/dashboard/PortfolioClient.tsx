@@ -8,6 +8,7 @@ import Image from 'next/image';
 
 interface PortfolioClientProps {
   initialProfile: any;
+  isReadOnly?: boolean;
 }
 
 
@@ -19,7 +20,7 @@ interface PortfolioProject {
   image_url: string;
 }
 
-export default function PortfolioClient({ initialProfile }: PortfolioClientProps) {
+export default function PortfolioClient({ initialProfile, isReadOnly = false }: PortfolioClientProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -95,21 +96,25 @@ export default function PortfolioClient({ initialProfile }: PortfolioClientProps
           <p className="text-[#A0A0A0] text-sm mb-6">
             Seu Portfólio de Projetos está vazio. Você pode preenchê-lo do zero ou pré-carregar os projetos modelo do João Paulo.
           </p>
-          <div className="flex flex-col gap-3">
-            <button 
-              onClick={handleUseDefaultTemplate}
-              className="w-full py-2.5 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-              Usar Modelo Padrão (Estilo João)
-            </button>
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="w-full py-2.5 bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white font-bold rounded-lg text-sm transition-colors"
-            >
-              Adicionar Projetos
-            </button>
-          </div>
+          {!isReadOnly ? (
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleUseDefaultTemplate}
+                className="w-full py-2.5 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+                Usar Modelo Padrão (Estilo João)
+              </button>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="w-full py-2.5 bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white font-bold rounded-lg text-sm transition-colors"
+              >
+                Adicionar Projetos
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs text-[#8E8E8E]">Nenhum conteúdo publicado por este usuário ainda.</p>
+          )}
         </div>
       </div>
     );
@@ -121,13 +126,6 @@ export default function PortfolioClient({ initialProfile }: PortfolioClientProps
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 border-b border-[#2D2D2D]/30 pb-4">
         <div>
           <div className="flex items-center gap-3">
-            <Image 
-              src="/aurtistic-icon.png" 
-              alt="Aurtistic Logo" 
-              width={36} 
-              height={36}
-              className="h-9 w-9 object-contain"
-            />
             <h1 className="text-3xl font-black text-white font-['Bukra'] tracking-tighter">
               Aurtistic <span className="text-[#FFCC00] text-lg font-bold font-sans align-middle ml-2">creative manager</span>
             </h1>
@@ -136,35 +134,37 @@ export default function PortfolioClient({ initialProfile }: PortfolioClientProps
         </div>
 
         {/* Action buttons */}
-        <div className="flex gap-3">
-          {isEditing && (
+        {!isReadOnly && (
+          <div className="flex gap-3">
+            {isEditing && (
+              <button 
+                onClick={() => {
+                  setProjects(initialPortfolioData);
+                  setIsEditing(false);
+                }}
+                className="px-4 py-2 text-sm text-[#A0A0A0] hover:text-white transition-colors animate-fade-in"
+              >
+                Cancelar
+              </button>
+            )}
             <button 
+              disabled={isSaving}
               onClick={() => {
-                setProjects(initialPortfolioData);
-                setIsEditing(false);
+                if (isEditing) {
+                  handleSave();
+                } else {
+                  setIsEditing(true);
+                }
               }}
-              className="px-4 py-2 text-sm text-[#A0A0A0] hover:text-white transition-colors animate-fade-in"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2D2D2D] hover:border-[#FFCC00] text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
             >
-              Cancelar
+              <span className="material-symbols-outlined text-[18px] text-[#FFCC00]">
+                {isEditing ? 'done' : 'edit'}
+              </span>
+              {isSaving ? 'Salvando...' : isEditing ? 'Salvar Alterações' : 'Editar Subespaço'}
             </button>
-          )}
-          <button 
-            disabled={isSaving}
-            onClick={() => {
-              if (isEditing) {
-                handleSave();
-              } else {
-                setIsEditing(true);
-              }
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2D2D2D] hover:border-[#FFCC00] text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-[18px] text-[#FFCC00]">
-              {isEditing ? 'done' : 'edit'}
-            </span>
-            {isSaving ? 'Salvando...' : isEditing ? 'Salvar Alterações' : 'Editar Subespaço'}
-          </button>
-        </div>
+          </div>
+        )}
       </div>
 
 

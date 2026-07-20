@@ -4,52 +4,47 @@
 import React, { useState } from 'react';
 import { saveUserProfileData } from '@/app/(dashboard)/actions';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface ResumoClientProps {
   initialProfile: any;
+  isReadOnly?: boolean;
 }
 
 
-export default function ResumoClient({ initialProfile }: ResumoClientProps) {
+export default function ResumoClient({ initialProfile, isReadOnly = false }: ResumoClientProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Parse resumo JSON or fallback to standard structure
-  const defaultResumo = {
-    tagline: 'FOTÓGRAFO & DEV & FÍSICO',
-    title: 'SEU NOME AQUI',
-    subtitle: 'Descreva sua atuação principal, projetos de pesquisa ou especialidades.',
-    button1_text: 'Agendar Reunião',
-    button1_url: '#',
-    button2_text: 'Ver GitHub',
-    button2_url: '#',
-    profile_image_url: '/perfil.jpeg',
-    description: 'Escreva um resumo detalhado sobre você, sua formação, objetivos profissionais e principais conquistas.'
+  // Parse resumo JSON
+  let initialResumoData = {
+    tagline: '',
+    title: '',
+    subtitle: '',
+    button1_text: '',
+    button1_url: '',
+    button2_text: '',
+    button2_url: '',
+    profile_image_url: '',
+    description: ''
   };
 
-  let initialResumoData = defaultResumo;
   try {
     if (profile?.resumo) {
-      initialResumoData = JSON.parse(profile.resumo);
+      initialResumoData = typeof profile.resumo === 'string' ? JSON.parse(profile.resumo) : profile.resumo;
     }
   } catch (e) {
-    // If it's pure text, convert to object
-    if (profile?.resumo) {
-      initialResumoData = { ...defaultResumo, description: profile.resumo };
-    }
+    console.error(e);
   }
 
   const [resumoData, setResumoData] = useState(initialResumoData);
 
-  const handleSave = async (dataToSave = resumoData) => {
+  const handleSave = async () => {
     setIsSaving(true);
     try {
-      const jsonStr = JSON.stringify(dataToSave);
-      await saveUserProfileData({ resumo: jsonStr });
-      setProfile({ ...profile, resumo: jsonStr });
+      await saveUserProfileData({ resumo: JSON.stringify(resumoData) });
+      setProfile({ ...profile, resumo: resumoData });
       setIsEditing(false);
     } catch (e) {
       alert("Erro ao salvar resumo: " + String(e));
@@ -62,7 +57,7 @@ export default function ResumoClient({ initialProfile }: ResumoClientProps) {
     const template = {
       tagline: 'FOTÓGRAFO & DEV & FÍSICO',
       title: 'JOÃO PAULO STANGORLINI',
-      subtitle: 'Focando em pesquisa científica, desenvolvimento full-stack e organization acadêmica através do Aurtistic.',
+      subtitle: 'Focando em pesquisa científica, desenvolvimento full-stack e organização acadêmica através do Aurtistic.',
       button1_text: 'Agendar Reunião',
       button1_url: 'https://calendar.app.google/tELr1q8ky4G98EL58',
       button2_text: 'Ver GitHub',
@@ -71,36 +66,46 @@ export default function ResumoClient({ initialProfile }: ResumoClientProps) {
       description: 'Estudante de Física no Instituto de Física (USP - Butantã) com perfil voltado à tecnologia e educação. Experiência prática em desenvolvimento Web (PWA), design (web e gráfico), otimização, manutenção e montagem de hardware de alta performance.'
     };
     setResumoData(template);
-    handleSave(template);
+    setIsSaving(true);
+    saveUserProfileData({ resumo: JSON.stringify(template) })
+      .then(() => {
+        setProfile({ ...profile, resumo: template });
+        setIsEditing(false);
+      })
+      .catch(e => alert("Erro: " + String(e)))
+      .finally(() => setIsSaving(false));
   };
 
-  // If empty (no custom or default setup), show blank setup screen
   const isSetupEmpty = !profile?.resumo;
 
   if (isSetupEmpty && !isEditing) {
     return (
       <div className="min-h-full flex flex-col items-center justify-center p-8 bg-[#121212] text-center">
         <div className="max-w-md p-8 bg-[#1A1A1A] border border-[#2D2D2D] rounded-2xl shadow-xl backdrop-blur-md">
-          <span className="material-symbols-outlined text-[64px] text-[#FFCC00] mb-4">description</span>
+          <span className="material-symbols-outlined text-[64px] text-[#FFCC00] mb-4">badge</span>
           <h2 className="text-2xl font-bold text-white mb-2">Configure seu Resumo</h2>
           <p className="text-[#A0A0A0] text-sm mb-6">
-            Sua seção de Resumo Profissional está vazia. Você pode iniciar escrevendo do zero ou usar nosso modelo padrão inspirado no João Paulo.
+            Seu Resumo Profissional está vazio. Você pode preenchê-lo do zero ou pré-carregar os dados modelo do João Paulo.
           </p>
-          <div className="flex flex-col gap-3">
-            <button 
-              onClick={handleUseDefaultTemplate}
-              className="w-full py-2.5 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
-              Usar Modelo Padrão (Estilo João)
-            </button>
-            <button 
-              onClick={() => setIsEditing(true)}
-              className="w-full py-2.5 bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white font-bold rounded-lg text-sm transition-colors"
-            >
-              Escrever do Zero
-            </button>
-          </div>
+          {!isReadOnly ? (
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleUseDefaultTemplate}
+                className="w-full py-2.5 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
+                Usar Modelo Padrão (Estilo João)
+              </button>
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="w-full py-2.5 bg-[#2D2D2D] hover:bg-[#3D3D3D] text-white font-bold rounded-lg text-sm transition-colors"
+              >
+                Preencher Manualmente
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs text-[#8E8E8E]">Nenhum conteúdo publicado por este usuário ainda.</p>
+          )}
         </div>
       </div>
     );
@@ -112,13 +117,6 @@ export default function ResumoClient({ initialProfile }: ResumoClientProps) {
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 border-b border-[#2D2D2D]/30 pb-4">
         <div>
           <div className="flex items-center gap-3">
-            <Image 
-              src="/aurtistic-icon.png" 
-              alt="Aurtistic Logo" 
-              width={36} 
-              height={36}
-              className="h-9 w-9 object-contain"
-            />
             <h1 className="text-3xl font-black text-white font-['Bukra'] tracking-tighter">
               Aurtistic <span className="text-[#FFCC00] text-lg font-bold font-sans align-middle ml-2">creative manager</span>
             </h1>
@@ -127,35 +125,37 @@ export default function ResumoClient({ initialProfile }: ResumoClientProps) {
         </div>
 
         {/* Action buttons */}
-        <div className="flex gap-3">
-          {isEditing && (
+        {!isReadOnly && (
+          <div className="flex gap-3">
+            {isEditing && (
+              <button 
+                onClick={() => {
+                  setResumoData(initialResumoData);
+                  setIsEditing(false);
+                }}
+                className="px-4 py-2 text-sm text-[#A0A0A0] hover:text-white transition-colors animate-fade-in"
+              >
+                Cancelar
+              </button>
+            )}
             <button 
+              disabled={isSaving}
               onClick={() => {
-                setResumoData(initialResumoData);
-                setIsEditing(false);
+                if (isEditing) {
+                  handleSave();
+                } else {
+                  setIsEditing(true);
+                }
               }}
-              className="px-4 py-2 text-sm text-[#A0A0A0] hover:text-white transition-colors animate-fade-in"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2D2D2D] hover:border-[#FFCC00] text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
             >
-              Cancelar
+              <span className="material-symbols-outlined text-[18px] text-[#FFCC00]">
+                {isEditing ? 'done' : 'edit'}
+              </span>
+              {isSaving ? 'Salvando...' : isEditing ? 'Salvar Alterações' : 'Editar Subespaço'}
             </button>
-          )}
-          <button 
-            disabled={isSaving}
-            onClick={() => {
-              if (isEditing) {
-                handleSave();
-              } else {
-                setIsEditing(true);
-              }
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2D2D2D] hover:border-[#FFCC00] text-white rounded-lg text-sm font-bold transition-all disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-[18px] text-[#FFCC00]">
-              {isEditing ? 'done' : 'edit'}
-            </span>
-            {isSaving ? 'Salvando...' : isEditing ? 'Salvar Alterações' : 'Editar Subespaço'}
-          </button>
-        </div>
+          </div>
+        )}
       </div>
 
 

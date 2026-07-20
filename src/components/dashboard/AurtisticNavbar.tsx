@@ -137,9 +137,9 @@ export default function AurtisticNavbar() {
             <Image 
               src="/aurtistic-icon.png" 
               alt="Aurtistic Logo" 
-              width={40} 
-              height={40}
-              className="h-8 w-8 md:h-10 md:w-10 object-contain"
+              width={64} 
+              height={64}
+              className="h-10 w-10 md:h-14 md:w-14 object-contain"
             />
             <span className="font-['Bukra'] font-black text-lg md:text-xl text-white tracking-tight">Aurtistic</span>
           </Link>

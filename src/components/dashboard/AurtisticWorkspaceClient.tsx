@@ -35,6 +35,20 @@ export default function AurtisticWorkspaceClient({
   );
   const [showConfig, setShowConfig] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const handleShareSpace = () => {
+    // Standard link as requested: https://aurtistic.vercel.app/username/
+    const shareLink = `https://aurtistic.vercel.app/${profile?.username || ''}/`;
+    navigator.clipboard.writeText(shareLink).then(() => {
+      setToastMessage("Link do espaço copiado com sucesso!");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }).catch(err => {
+      alert("Erro ao copiar link: " + String(err));
+    });
+  };
 
   // Features configuration local state
   // Features configuration local state
@@ -135,18 +149,19 @@ export default function AurtisticWorkspaceClient({
   };
 
   return (
-    <div className="min-h-full flex flex-col p-4 md:p-8 bg-[#121212]">
+    <div className="min-h-full flex flex-col p-4 md:p-8 bg-[#121212] relative">
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-8 right-8 z-[99] bg-[#9D4EDD] text-white px-5 py-3 rounded-xl shadow-[0_4px_20px_rgba(157,78,221,0.4)] border border-[#b57cff] flex items-center gap-2 animate-in fade-in slide-in-from-bottom duration-300">
+          <span className="material-symbols-outlined text-[20px]">share</span>
+          <span className="text-sm font-bold">{toastMessage}</span>
+        </div>
+      )}
+
       {/* Workspace Header */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
           <div className="flex items-center gap-3">
-            <Image 
-              src="/aurtistic-icon.png" 
-              alt="Aurtistic Logo" 
-              width={36} 
-              height={36}
-              className="h-9 w-9 object-contain"
-            />
             <h1 className="text-3xl font-black text-white font-['Bukra'] tracking-tighter">
               Aurtistic <span className="text-[#FFCC00] text-lg font-bold font-sans align-middle ml-2">creative manager</span>
             </h1>
@@ -156,6 +171,13 @@ export default function AurtisticWorkspaceClient({
 
         {/* Action buttons */}
         <div className="flex gap-3">
+          <button 
+            onClick={handleShareSpace}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2D2D2D] hover:border-[#9D4EDD] text-white rounded-lg text-sm font-bold transition-all"
+          >
+            <span className="material-symbols-outlined text-[18px] text-[#9D4EDD]">share</span>
+            Compartilhar Espaço
+          </button>
           <button 
             onClick={() => setShowConfig(!showConfig)}
             className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] border border-[#2D2D2D] hover:border-[#FFCC00] text-white rounded-lg text-sm font-bold transition-all"

@@ -340,6 +340,10 @@ export async function getUserProfile() {
     }
   ];
 
+  const defaultUsername = user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' 
+    ? 'joao' 
+    : (user.email ? user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9._-]/g, '') : 'user');
+
   if (!data) {
     // Create one if it doesn't exist
     const newProfile = { 
@@ -354,10 +358,21 @@ export async function getUserProfile() {
       },
       resumo: user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? JSON.stringify(joaoResumo) : null,
       curriculo: user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? joaoCV : [],
-      portfolio: user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? joaoPortfolio : []
+      portfolio: user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? joaoPortfolio : [],
+      username: defaultUsername
     };
     await supabase.from('user_profiles').insert(newProfile);
     return newProfile;
+  }
+
+  // Generate username for existing user if they don't have one
+  if (!data.username) {
+    try {
+      await supabase.from('user_profiles').update({ username: defaultUsername }).eq('id', user.id);
+      data.username = defaultUsername;
+    } catch(err) {
+      console.error("Error setting username:", err);
+    }
   }
 
   // Se já existe mas está sem as informações do João (ex: acabaram de rodar a migração e colunas estão nulas)
