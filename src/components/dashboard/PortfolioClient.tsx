@@ -305,6 +305,23 @@ export default function PortfolioClient({ initialProfile }: PortfolioClientProps
               </div>
             ))}
           </div>
+
+          {/* Galeria de Fotografia */}
+          <div className="pt-8 border-t border-[#2D2D2D]/50 space-y-6">
+            <div>
+              <h2 className="text-3xl font-['Bukra'] font-bold text-white border-l-4 border-[#FFCC00] pl-4">Galeria de Fotografia</h2>
+              <p className="text-[#A0A0A0] mt-2">Trabalhos fotográficos e ensaios autorais.</p>
+            </div>
+            <div className="w-full h-[650px] rounded-2xl overflow-hidden border border-[#2D2D2D] bg-[#1A1A1A] relative shadow-lg">
+              <iframe
+                src="https://stangorliniphotography.pic-time.com/-portiflio/slidesblog/6a1cf17dfd03398d7fddb00d?slideshowview=AAAAANYAAABdtAdQQXgvsHwiv1E6mUSMuiUAaFz7JkxgkxMPtvfv0JMhf8GQnlaaNiCsf9oYGmXGq7VPHE3RyL2-1gnGziP0iVtidPlPKhb4rzJeFOAgYQ"
+                className="w-full h-full border-none"
+                allowFullScreen
+                loading="lazy"
+                title="Galeria de Fotografia - Stangorlini Photography"
+              />
+            </div>
+          </div>
         </main>
       )}
     </div>
