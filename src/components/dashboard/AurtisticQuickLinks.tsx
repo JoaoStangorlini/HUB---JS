@@ -1,7 +1,9 @@
+// Este programa é um software livre (Licença AGPLv3)
 'use client';
 
 import React, { useState } from 'react';
 import { saveQuickLinks } from '@/app/(dashboard)/actions';
+import { systemLinks, CopyableQuickLink } from './QuickLinks';
 
 interface QuickLink {
   name: string;
@@ -37,35 +39,39 @@ export function AurtisticQuickLinks({ initialLinks }: { initialLinks: QuickLink[
   };
 
   return (
-    <div className="flex flex-col gap-3 mb-6">
+    <div className="flex flex-col gap-4 mb-6">
+      {/* Links do Servidor e LabDiv */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-semibold text-[#8E8E8E] uppercase tracking-wider mr-2 hidden md:inline">Links Gerais:</span>
+        {systemLinks.map((link) => (
+          <CopyableQuickLink 
+            key={link.name} 
+            name={link.name} 
+            href={link.href} 
+            icon={link.icon} 
+            hoverClass={link.hoverClass} 
+          />
+        ))}
+      </div>
+
+      {/* Meus Links Customizados */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[11px] font-semibold text-[#8E8E8E] uppercase tracking-wider mr-2 hidden md:inline">Meus Links:</span>
         
         {links.map((link, idx) => (
-          <div key={idx} className="relative group flex items-center">
-            <a 
-              href={link.href} 
-              target="_blank" 
-              rel="noreferrer" 
-              className="group flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] border border-[#FFCC00]/50 hover:border-[#FFCC00] hover:text-[#FFCC00] rounded-full text-xs font-medium text-[#A0A0A0] transition-all duration-300"
-            >
-              <span className="material-symbols-outlined text-[16px]">link</span>
-              {link.name}
-            </a>
-            {isEditing && (
-              <button 
-                onClick={() => removeLink(idx)}
-                className="absolute -top-1.5 -right-1.5 bg-[#F14343] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] hover:scale-110 transition-transform"
-              >
-                <span className="material-symbols-outlined text-[12px]">close</span>
-              </button>
-            )}
-          </div>
+          <CopyableQuickLink 
+            key={idx}
+            name={link.name}
+            href={link.href}
+            icon={<span className="material-symbols-outlined text-[16px]">link</span>}
+            isEditing={isEditing}
+            onRemove={() => removeLink(idx)}
+          />
         ))}
 
         <button 
           onClick={() => setIsEditing(!isEditing)}
-          className={`ml-2 px-2 py-1 rounded text-xs font-bold transition-colors ${isEditing ? 'bg-[#9D4EDD] text-white' : 'bg-[#2D2D2D] text-[#8E8E8E] hover:text-white hover:bg-[#3D3D3D]'}`}
+          className={`ml-2 px-2.5 py-1 rounded text-xs font-bold transition-colors ${isEditing ? 'bg-[#9D4EDD] text-white' : 'bg-[#2D2D2D] text-[#8E8E8E] hover:text-white hover:bg-[#3D3D3D]'}`}
         >
           {isEditing ? 'Concluir' : '+ Adicionar'}
         </button>
