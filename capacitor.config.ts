@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.stangorlini.web',
+  appId: 'com.stangorlini.aurtistic',
   appName: 'Aurtistic',
   webDir: 'public',
   server: {

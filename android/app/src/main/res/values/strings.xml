@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Aurtistic</string>
     <string name="title_activity_main">Aurtistic</string>
-    <string name="package_name">com.stangorlini.web</string>
-    <string name="custom_url_scheme">com.stangorlini.web</string>
+    <string name="package_name">com.stangorlini.aurtistic</string>
+    <string name="custom_url_scheme">com.stangorlini.aurtistic</string>
 </resources>
