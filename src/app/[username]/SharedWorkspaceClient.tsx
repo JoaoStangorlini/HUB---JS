@@ -78,7 +78,7 @@ export default function SharedWorkspaceClient({ profile }: SharedWorkspaceClient
 
           {/* Tabs Navigation */}
           {visibleTabs.length > 0 && (
-            <nav className="flex flex-wrap gap-2">
+            <nav className="hidden md:flex flex-wrap gap-2">
               {visibleTabs.map((key: string) => {
                 const isSelected = activeTab === key;
                 const label = customLabels[key] || defaultLabels[key] || key;
@@ -120,10 +120,60 @@ export default function SharedWorkspaceClient({ profile }: SharedWorkspaceClient
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto h-full">
+        <div className="max-w-5xl mx-auto h-full pb-20 md:pb-0">
           {renderActiveTabContent()}
         </div>
       </main>
+
+      {/* Mobile Bottom Floating Pill Nav */}
+      {visibleTabs.length > 0 && (
+        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-[#1A1A1A]/95 backdrop-blur-xl border border-[#2D2D2D] rounded-full p-2 flex items-center gap-1 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+            {visibleTabs.map((key: string) => {
+              const isSelected = activeTab === key;
+              const label = customLabels[key] || defaultLabels[key] || key;
+
+              const tabIcons: Record<string, string> = {
+                resumo: 'home',
+                curriculo: 'contact_page',
+                portfolio: 'photo_camera',
+                extra: 'link'
+              };
+              const icon = tabIcons[key] || 'link';
+
+              if (key === 'extra') {
+                const targetUrl = customLinks.extra || '#';
+                return (
+                  <a
+                    key={key}
+                    href={targetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center rounded-full text-[#8E8E8E] hover:text-white px-3 py-2.5"
+                  >
+                    <span className="material-symbols-outlined text-[22px]">{icon}</span>
+                  </a>
+                );
+              }
+
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
+                    isSelected 
+                      ? 'bg-[#9D4EDD]/20 text-[#9D4EDD] px-5 py-2.5 gap-2' 
+                      : 'text-[#8E8E8E] hover:text-white px-3 py-2.5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[22px]">{icon}</span>
+                  {isSelected && <span className="text-xs font-bold whitespace-nowrap">{label}</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

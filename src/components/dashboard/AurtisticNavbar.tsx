@@ -13,7 +13,6 @@ export default function AurtisticNavbar() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
@@ -128,20 +127,21 @@ export default function AurtisticNavbar() {
   const visibleTabs = orderedTabs.filter((t: string) => activeTabs.includes(t));
 
   return (
-    <header className="sticky top-0 w-full z-50 bg-[#121212]/90 backdrop-blur-xl border-b border-[#2D2D2D] shrink-0">
-      <div className="flex justify-between items-center px-4 md:px-6 py-4 max-w-7xl mx-auto w-full gap-4">
+    <>
+      <header className="sticky top-0 w-full z-50 bg-[#121212]/90 backdrop-blur-xl border-b border-[#2D2D2D] shrink-0">
+        <div className="flex justify-between items-center px-4 md:px-6 py-0 max-w-7xl mx-auto w-full gap-4">
         
         {/* Left: Logo */}
         <div className="flex justify-start items-center gap-2">
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center">
             <Image 
-              src="/aurtistic-icon.png" 
+              src="/feature_graphic_final_black.png" 
               alt="Aurtistic Logo" 
-              width={64} 
-              height={64}
-              className="h-10 w-10 md:h-14 md:w-14 object-contain"
+              width={550} 
+              height={268}
+              className="h-28 md:h-44 w-auto object-contain"
+              priority
             />
-            <span className="font-['Bukra'] font-black text-lg md:text-xl text-white tracking-tight">Aurtistic</span>
           </Link>
         </div>
 
@@ -260,36 +260,38 @@ export default function AurtisticNavbar() {
             </Link>
           )}
 
-          {/* Mobile Menu Toggle Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-[#2D2D2D] bg-[#1A1A1A] text-white hover:border-[#FFCC00] transition-colors shrink-0"
-          >
-            <span className="material-symbols-outlined text-[20px]">{isMobileMenuOpen ? 'close' : 'menu'}</span>
-          </button>
         </div>
       </div>
+    </header>
 
-      {/* Mobile Menu Panel */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#121212]/95 backdrop-blur-xl border-b border-[#2D2D2D] px-6 py-4 space-y-3 animate-in fade-in slide-in-from-top duration-200">
+      {/* Mobile Bottom Floating Pill Nav */}
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[99]">
+        <div className="bg-[#1A1A1A]/95 backdrop-blur-xl border border-[#2D2D2D] rounded-full p-2 flex items-center gap-1 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
           {visibleTabs.map((key: string) => {
             const tab = tabMetadata[key];
             if (!tab) return null;
             const isExternal = tab.href.startsWith('http://') || tab.href.startsWith('https://');
             const isActive = pathname === tab.href;
 
+            const tabIcons: Record<string, string> = {
+              tasks: 'task_alt',
+              resumo: 'home',
+              curriculo: 'contact_page',
+              portfolio: 'photo_camera',
+              extra: 'link'
+            };
+            const icon = tabIcons[key] || 'link';
+
             if (isExternal) {
               return (
-                <a 
+                <a
                   key={key}
                   href={tab.href}
-                  target="_blank" 
+                  target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block py-2 text-sm font-medium text-[#A0A0A0] hover:text-[#FFCC00] transition-colors"
+                  className="flex items-center justify-center rounded-full text-[#8E8E8E] hover:text-white px-3 py-2.5"
                 >
-                  {tab.name} ↗
+                  <span className="material-symbols-outlined text-[22px]">{icon}</span>
                 </a>
               );
             }
@@ -298,20 +300,20 @@ export default function AurtisticNavbar() {
               <Link 
                 key={key}
                 href={tab.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`block py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
                   isActive 
-                    ? 'text-[#9D4EDD] font-bold border-l-2 border-[#FFCC00] pl-2' 
-                    : 'text-[#A0A0A0] hover:text-white'
+                    ? 'bg-[#9D4EDD]/20 text-[#9D4EDD] px-5 py-2.5 gap-2' 
+                    : 'text-[#8E8E8E] hover:text-white px-3 py-2.5'
                 }`}
               >
-                {tab.name}
+                <span className="material-symbols-outlined text-[22px]">{icon}</span>
+                {isActive && <span className="text-xs font-bold whitespace-nowrap">{tab.name}</span>}
               </Link>
             );
           })}
         </div>
-      )}
-    </header>
+      </div>
+    </>
   );
 }
 
