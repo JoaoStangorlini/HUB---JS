@@ -25,7 +25,7 @@ android {
 }
 
 base {
-    archivesName = "stangorlini web"
+    archivesName = "aurtistic"
 }
 
 dependencies {

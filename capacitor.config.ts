@@ -2,10 +2,10 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.stangorlini.web',
-  appName: 'Stangorlini Web',
+  appName: 'Aurtistic',
   webDir: 'public',
   server: {
-    url: 'https://stangorliniweb.vercel.app/',
+    url: 'https://aurtistic.vercel.app/',
     cleartext: true
   }
 };

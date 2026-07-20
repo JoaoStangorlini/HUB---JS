@@ -101,12 +101,12 @@ export default function AurtisticNavbar() {
   const openAuthorProjects = async () => {
     try {
       if (Capacitor.isNativePlatform()) {
-        await Browser.open({ url: 'https://stangorliniweb.vercel.app/' });
+        await Browser.open({ url: 'https://aurtistic.vercel.app/' });
       } else {
-        window.open('https://stangorliniweb.vercel.app/', '_blank');
+        window.open('https://aurtistic.vercel.app/', '_blank');
       }
     } catch (e) {
-      window.open('https://stangorliniweb.vercel.app/', '_blank');
+      window.open('https://aurtistic.vercel.app/', '_blank');
     }
   };
 
