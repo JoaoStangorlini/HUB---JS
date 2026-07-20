@@ -129,7 +129,7 @@ export default function AurtisticNavbar() {
   return (
     <>
       <header className="sticky top-0 w-full z-50 bg-[#121212]/90 backdrop-blur-xl border-b border-[#2D2D2D] shrink-0">
-        <div className="flex justify-between items-center px-4 md:px-6 py-0 max-w-7xl mx-auto w-full gap-4">
+        <div className="flex justify-between items-center px-4 md:px-8 py-2 w-full gap-4">
         
         {/* Left: Logo */}
         <div className="flex justify-start items-center gap-2">
@@ -137,9 +137,9 @@ export default function AurtisticNavbar() {
             <Image 
               src="/feature_graphic_final_black.png" 
               alt="Aurtistic Logo" 
-              width={550} 
-              height={268}
-              className="h-28 md:h-44 w-auto object-contain"
+              width={438} 
+              height={100}
+              className="h-8 md:h-12 w-auto object-contain"
               priority
             />
           </Link>
