@@ -236,7 +236,15 @@ export default function PortfolioClient({ initialProfile, isReadOnly = false }: 
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[#A0A0A0] mb-1">URL da Imagem / Logo</label>
+                    <label className="flex items-center gap-1 text-xs text-[#A0A0A0] mb-1">
+                      URL da Imagem / Logo
+                      <div className="relative group flex items-center">
+                        <span className="material-symbols-outlined text-[14px] text-[#8E8E8E] cursor-help">help</span>
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-[#1A1A1A] border border-[#FFCC00]/30 text-[#E0E0E0] text-[11px] rounded-lg shadow-2xl z-[100] normal-case tracking-normal leading-relaxed text-center font-normal">
+                          Dica: Você pode enviar a imagem em um chat do Discord ou no site Imgur, clicar com o botão direito sobre ela e selecionar "Copiar endereço da imagem".
+                        </div>
+                      </div>
+                    </label>
                     <input 
                       type="text"
                       value={proj.image_url}

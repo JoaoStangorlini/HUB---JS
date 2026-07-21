@@ -33,6 +33,8 @@ interface CVData {
   email: string;
   address: string;
   github: string;
+  instagram?: string;
+  linkedin?: string;
   summary: string;
   experiences: CVExperience[];
   education: CVEducation[];
@@ -51,7 +53,9 @@ export default function CurriculoClient({ initialProfile, isReadOnly = false }: 
     phone: '(00) 00000-0000',
     email: 'seu.email@exemplo.com',
     address: 'Cidade - Estado',
-    github: '/seu-github',
+    github: '',
+    instagram: '',
+    linkedin: '',
     summary: 'Breve resumo sobre sua trajetória...',
     experiences: [],
     education: [],
@@ -337,6 +341,26 @@ export default function CurriculoClient({ initialProfile, isReadOnly = false }: 
                   className="w-full bg-[#242424] border border-[#2D2D2D] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#9D4EDD]"
                 />
               </div>
+              <div>
+                <label className="block text-xs text-[#A0A0A0] mb-1">Usuário do LinkedIn</label>
+                <input 
+                  type="text"
+                  value={cvData.linkedin || ''}
+                  onChange={e => setCvData({...cvData, linkedin: e.target.value})}
+                  placeholder="Ex: /in/joaostangorlini"
+                  className="w-full bg-[#242424] border border-[#2D2D2D] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#9D4EDD]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[#A0A0A0] mb-1">Usuário do Instagram</label>
+                <input 
+                  type="text"
+                  value={cvData.instagram || ''}
+                  onChange={e => setCvData({...cvData, instagram: e.target.value})}
+                  placeholder="Ex: @stangorlini"
+                  className="w-full bg-[#242424] border border-[#2D2D2D] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#9D4EDD]"
+                />
+              </div>
             </div>
           </div>
 
@@ -535,6 +559,18 @@ export default function CurriculoClient({ initialProfile, isReadOnly = false }: 
                 <div className="flex items-center gap-2">
                   <span className="text-[#FFCC00] font-bold">GitHub:</span>
                   <a href={`https://github.com${cvData.github.startsWith('/') ? '' : '/'}${cvData.github}`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors underline">{cvData.github}</a>
+                </div>
+              )}
+              {cvData.linkedin && (
+                <div className="flex items-center gap-2">
+                  <span className="text-[#FFCC00] font-bold">LinkedIn:</span>
+                  <a href={`https://linkedin.com${cvData.linkedin.startsWith('/') ? '' : '/in/'}${cvData.linkedin}`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors underline">{cvData.linkedin}</a>
+                </div>
+              )}
+              {cvData.instagram && (
+                <div className="flex items-center gap-2">
+                  <span className="text-[#FFCC00] font-bold">Instagram:</span>
+                  <a href={`https://instagram.com/${cvData.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors underline">{cvData.instagram}</a>
                 </div>
               )}
             </div>
