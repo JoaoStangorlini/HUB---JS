@@ -95,7 +95,7 @@ export default function AurtisticLoginPage() {
             type="submit"
             className={`w-full mt-4 font-bold py-3 rounded-lg transition-colors focus:ring-4 focus:outline-none ${isLogin ? 'bg-[#FFCC00] text-[#121212] hover:bg-[#e6b800] focus:ring-[#FFCC00]/20' : 'bg-[#9D4EDD] text-white hover:bg-[#8836ce] focus:ring-[#9D4EDD]/20'}`}
           >
-            {isLogin ? 'Entrar no Planner' : 'Criar minha Conta'}
+            {isLogin ? 'Entrar no Aurtistic' : 'Criar minha Conta'}
           </button>
         </form>
 

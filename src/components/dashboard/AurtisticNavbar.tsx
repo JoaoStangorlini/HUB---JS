@@ -16,7 +16,7 @@ export default function AurtisticNavbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   useEffect(() => {
     if (user) {
@@ -24,7 +24,7 @@ export default function AurtisticNavbar() {
         if (data) setProfile(data);
       });
     }
-  }, [user]);
+  }, [user, supabase]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -46,7 +46,7 @@ export default function AurtisticNavbar() {
       authListener.subscription.unsubscribe();
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [supabase.auth]);
+  }, [supabase]);
 
   const handleLogout = async () => {
     try {
@@ -61,7 +61,20 @@ export default function AurtisticNavbar() {
   const handleExportCSV = async () => {
     setIsSettingsOpen(false);
     if (!user) return;
-    const { data } = await supabase.from('tasks').select('*').eq('is_personal', true).eq('user_id', user.id);
+    let query = supabase.from('tasks').select('*');
+    
+    if (user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e') {
+      // Admin: Pega tudo dele + compartilhadas
+      query = query.or(`user_id.eq.${user.id},is_personal.is.null,is_personal.eq.false`);
+    } else if (user.id === '7dcfe172-1cf0-4389-9abd-f340b1408386') {
+      // LabDiv: Pega as dele + HUB compartilhadas
+      query = query.or(`user_id.eq.${user.id},and(dimensao.eq.HUB,or(is_personal.is.null,is_personal.eq.false))`);
+    } else {
+      // Normal user: Apenas as pessoais dele
+      query = query.eq('is_personal', true).eq('user_id', user.id);
+    }
+    
+    const { data } = await query;
     if (data && data.length > 0) {
       // Import on demand to save bundle size
       const { downloadCSV } = await import('@/utils/csv');
