@@ -208,6 +208,8 @@ export default function AurtisticNavbar() {
                 <div className="w-7 h-7 rounded-full overflow-hidden bg-[#2D2D2D] flex items-center justify-center border border-[#FFCC00] shrink-0">
                   {user?.user_metadata?.avatar_url ? (
                     <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : user?.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? (
+                    <img src="/perfil.jpeg" alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <span className="material-symbols-outlined text-[16px] text-white">person</span>
                   )}
