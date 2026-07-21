@@ -2,11 +2,10 @@ import { login } from '@/app/login/actions'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+export default async function LoginPage(props: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const searchParams = await props.searchParams;
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const next = typeof searchParams?.next === 'string' ? searchParams.next : '';

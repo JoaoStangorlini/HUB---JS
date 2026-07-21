@@ -8,7 +8,8 @@ declare global {
   }
 }
 
-declare const self: ServiceWorkerGlobalScope;
+// @ts-ignore
+declare const self: any;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,

@@ -15,13 +15,13 @@ export const saveTask = async (task: Partial<Task>) => {
   }
 };
 
-export const deleteTask = async (id: string, cascade: boolean = false) => {
+export const deleteTask = async (id: string) => {
   try {
-    return await deleteTaskServer(id, cascade);
+    return await deleteTaskServer(id);
   } catch (err: any) {
     if (err.message?.includes('Failed to fetch') || !window.navigator.onLine) {
       console.warn('Offline: Queueing deleteTask mutation');
-      await pushMutation({ type: 'delete', taskId: id, payload: { cascade } });
+      await pushMutation({ type: 'delete', taskId: id, payload: {} });
       return;
     }
     throw err;
