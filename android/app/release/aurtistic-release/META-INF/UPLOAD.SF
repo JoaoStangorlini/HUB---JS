@@ -1,6 +1,6 @@
 Signature-Version: 1.0
 Created-By: Signflinger
-SHA-256-Digest-Manifest: SlLOB0AlcRmvXTZwYwR4Qhb2VRe7KIeOdQ157vh/v80=
+SHA-256-Digest-Manifest: XO8mdo5YLQ9UR/KAf1B7jT+3Z4QHpUyzXWAEgAceTTM=
 
 Name: BUNDLE-METADATA/com.android.tools.build.gradle/app-metadata.prop
  erties
@@ -101,7 +101,7 @@ Name: base/dex/classes.dex
 SHA-256-Digest: moIIdQEGweuIzxgKXMYJbMu2yAj3VSrGtdZuuPafNmw=
 
 Name: base/manifest/AndroidManifest.xml
-SHA-256-Digest: fJnYu3dUavZpuaUiBsTZI/jLOLB0yRc02KuGkJWPygY=
+SHA-256-Digest: fXgbYXdqrdZlamrfiUMowhXkTPlJz3wrFKEdv9r/mow=
 
 Name: base/res/anim-v21/fragment_fast_out_extra_slow_in.xml
 SHA-256-Digest: jS4uyqNlbcrZhNtn8U31F2m/lpBVY3ruQE7hUwExG/U=
