@@ -10,7 +10,7 @@ interface QuickLink {
   href: string;
 }
 
-export function AurtisticQuickLinks({ initialLinks }: { initialLinks: QuickLink[] }) {
+export function AurtisticQuickLinks({ initialLinks, userId }: { initialLinks: QuickLink[], userId?: string }) {
   const [links, setLinks] = useState<QuickLink[]>(initialLinks);
   const [isEditing, setIsEditing] = useState(false);
   const [newLinkName, setNewLinkName] = useState('');
@@ -41,18 +41,20 @@ export function AurtisticQuickLinks({ initialLinks }: { initialLinks: QuickLink[
   return (
     <div className="flex flex-col gap-4 mb-6">
       {/* Links do Servidor e LabDiv */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[11px] font-semibold text-[#8E8E8E] uppercase tracking-wider mr-2 hidden md:inline">Links Gerais:</span>
-        {systemLinks.map((link) => (
-          <CopyableQuickLink 
-            key={link.name} 
-            name={link.name} 
-            href={link.href} 
-            icon={link.icon} 
-            hoverClass={link.hoverClass} 
-          />
-        ))}
-      </div>
+      {(userId === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' || userId === '7dcfe172-1cf0-4389-9abd-f340b1408386') && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-semibold text-[#8E8E8E] uppercase tracking-wider mr-2 hidden md:inline">Links Gerais:</span>
+          {systemLinks.map((link) => (
+            <CopyableQuickLink 
+              key={link.name} 
+              name={link.name} 
+              href={link.href} 
+              icon={link.icon} 
+              hoverClass={link.hoverClass} 
+            />
+          ))}
+        </div>
+      )}
 
       {/* Meus Links Customizados */}
       <div className="flex flex-wrap items-center gap-2">

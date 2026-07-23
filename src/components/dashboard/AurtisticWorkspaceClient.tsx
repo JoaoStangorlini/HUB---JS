@@ -344,7 +344,7 @@ export default function AurtisticWorkspaceClient({
         <div>
           {/* Quick links block */}
           <div className="mb-4">
-            <AurtisticQuickLinks initialLinks={profile?.quick_links || []} />
+            <AurtisticQuickLinks initialLinks={profile?.quick_links || []} userId={userId} />
           </div>
 
           
@@ -353,6 +353,7 @@ export default function AurtisticWorkspaceClient({
             initialTasks={getCurrentTasks()} 
             initialColumns={columns} 
             isPersonalScope={activeTaskScope === 'pessoal'} 
+            userId={userId}
             initialQuickFilters={profile?.quick_filters || ['responsavel', 'dimensao']} 
             initialQuickSorts={profile?.quick_sorts || ['status', 'prazo', 'prioridade', 'manual']}
           />

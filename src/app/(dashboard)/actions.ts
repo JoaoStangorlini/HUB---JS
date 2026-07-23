@@ -348,11 +348,17 @@ export async function getUserProfile() {
     // Create one if it doesn't exist
     const newProfile = { 
       id: user.id, 
-      quick_links: [], 
+      quick_links: user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? [] : [
+        { name: "Google", href: "https://www.google.com" },
+        { name: "YouTube", href: "https://www.youtube.com" },
+        { name: "ChatGPT", href: "https://chat.openai.com" }
+      ], 
       quick_filters: ['responsavel', 'dimensao'], 
       quick_sorts: ['status', 'prazo', 'prioridade', 'manual'],
       features_config: {
-        active: ["tasks", "resumo", "curriculo", "portfolio"],
+        active: user.id === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' 
+          ? ["tasks", "resumo", "curriculo", "portfolio"] 
+          : ["tasks"],
         order: ["tasks", "resumo", "curriculo", "portfolio"],
         layout_style: "default"
       },

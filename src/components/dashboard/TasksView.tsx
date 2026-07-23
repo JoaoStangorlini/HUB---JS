@@ -82,7 +82,7 @@ const HighlightedText = ({ text, highlight }: { text: string | null, highlight: 
   );
 };
 
-export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], isPersonalScope = false, initialQuickFilters = ['responsavel', 'dimensao'], initialQuickSorts = ['status', 'prazo', 'prioridade', 'manual'] }: { initialTasks: Task[], initialColumns?: TaskColumn[], isPersonalScope?: boolean, initialQuickFilters?: string[], initialQuickSorts?: string[] }) {
+export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], isPersonalScope = false, userId, initialQuickFilters = ['responsavel', 'dimensao'], initialQuickSorts = ['status', 'prazo', 'prioridade', 'manual'] }: { initialTasks: Task[], initialColumns?: TaskColumn[], isPersonalScope?: boolean, userId?: string, initialQuickFilters?: string[], initialQuickSorts?: string[] }) {
 
   const searchParams = useSearchParams();
   const globalQuery = searchParams.get('q') || '';
@@ -297,29 +297,50 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
   const [quickEdit, setQuickEdit] = useState<{
     taskId: string;
     field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao';
-    top: number;
+    top: number | 'auto';
+    bottom?: number | 'auto';
     left: number;
     value: string | null;
   } | null>(null);
 
   useEffect(() => {
     const handleClickOutside = () => setQuickEdit(null);
+    const handleScroll = () => setQuickEdit(null);
     if (quickEdit) {
       window.addEventListener('click', handleClickOutside);
+      window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
     }
-    return () => window.removeEventListener('click', handleClickOutside);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, { capture: true });
+    };
   }, [quickEdit]);
 
   const handleBadgeClick = (e: React.MouseEvent, task: Task, field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao') => {
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
-    setQuickEdit({
-      taskId: task.id,
-      field,
-      top: rect.bottom + 4,
-      left: rect.left,
-      value: task[field] || ''
-    });
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceNeeded = 250;
+
+    if (spaceBelow < spaceNeeded) {
+      setQuickEdit({
+        taskId: task.id,
+        field,
+        top: 'auto',
+        bottom: window.innerHeight - rect.top + 4,
+        left: rect.left,
+        value: task[field] || ''
+      });
+    } else {
+      setQuickEdit({
+        taskId: task.id,
+        field,
+        top: rect.bottom + 4,
+        bottom: 'auto',
+        left: rect.left,
+        value: task[field] || ''
+      });
+    }
   };
 
   const handleFavoriteToggle = async (e: React.MouseEvent, taskId: string) => {
@@ -682,34 +703,47 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
   }, [localTasks, columns]);
 
   const uniqueCategories = useMemo(() => {
+    const isJoao = userId === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e';
     const catCol = columns.find(c => c.key === 'categoria');
-    const predefined = catCol ? catCol.options.map(o => o.value) : ['Programar', 'Design', 'Marketing', 'Geral'];
+    let predefined = catCol ? catCol.options.map(o => o.value) : ['Programar', 'Design', 'Marketing', 'Geral'];
+    if (!isJoao) predefined = ['Trabalho', 'Estudo', 'Casa', 'Geral'];
+    
     const fromTasks = localTasks.map(t => t.categoria).filter(Boolean) as string[];
     return Array.from(new Set([...predefined, ...fromTasks]));
-  }, [localTasks, columns]);
+  }, [localTasks, columns, userId]);
 
   const uniqueUsers = useMemo(() => {
+    const isJoao = userId === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e';
     const userCol = columns.find(c => c.key === 'responsavel');
-    const predefined = userCol ? userCol.options.map(o => o.value) : ['João', 'Andy', 'Leo', 'Dani', 'Lorenzo', 'Nacky'];
+    let predefined = userCol ? userCol.options.map(o => o.value) : ['João', 'Andy', 'Leo', 'Dani', 'Lorenzo', 'Nacky'];
+    if (!isJoao) predefined = ['Você'];
+
     const fromTasks = localTasks.map(t => t.responsavel).filter(Boolean) as string[];
     return Array.from(new Set([...predefined, ...fromTasks])).sort();
-  }, [localTasks, columns]);
+  }, [localTasks, columns, userId]);
 
   const uniqueDimensions = useMemo(() => {
+    const isJoao = userId === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e';
     const dimCol = columns.find(c => c.key === 'dimensao');
-    const predefined = dimCol ? dimCol.options.map(o => o.value) : ['HUB', 'Aurtistic'];
+    let predefined = dimCol ? dimCol.options.map(o => o.value) : ['Pessoal', 'Trabalho', 'Estudos', 'Saúde'];
+    
+    // For non-Stangorlini users, ignore the database options since they are polluted with Stangorlini's tags
+    if (!isJoao) {
+      predefined = ['Pessoal', 'Trabalho', 'Estudos', 'Saúde'];
+    }
+
     const fromTasks = localTasks.map(t => t.dimensao).filter(Boolean) as string[];
     let dims = Array.from(new Set([...predefined, ...fromTasks]));
-    
+
     // Remove "favoritas" que estava repetido com visibilidade
     dims = dims.filter(d => d !== 'favoritas');
-    
-    if (isPersonalScope) {
+
+    if (isPersonalScope && isJoao) {
       dims = dims.filter(d => !['HUB', 'cin', 'stangorlini.web', 'tatuagens'].includes(d));
     }
-    
+
     return dims.sort();
-  }, [localTasks, columns, isPersonalScope]);
+  }, [localTasks, columns, isPersonalScope, userId]);
 
   const toggleFilter = (list: string[], setList: (l: string[]) => void, value: string) => {
     if (list.includes(value)) {
@@ -735,41 +769,45 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       tasks = tasks.filter(t => 
-        (t.nome && t.nome.toLowerCase().includes(term)) || 
+        t.parent_id || (t.nome && t.nome.toLowerCase().includes(term)) || 
         (t.descricao && t.descricao.toLowerCase().includes(term))
       );
     }
     // 2. Filter Statuses
     if (selectedStatuses.length > 0) {
-      tasks = tasks.filter(t => t.status && selectedStatuses.includes(t.status));
+      tasks = tasks.filter(t => t.parent_id || (t.status && selectedStatuses.includes(t.status)));
     }
     // 2.5 Filter Favorites
     if (showFavoritesOnly) {
-      tasks = tasks.filter(t => t.is_favorite);
+      tasks = tasks.filter(t => t.parent_id || t.is_favorite);
     }
     // 2.6 Filter Drafts
     if (showDraftsOnly) {
-      tasks = tasks.filter(t => t.status === 'rascunho');
+      tasks = tasks.filter(t => t.parent_id || t.status === 'rascunho');
     }
     // 3. Filter Categories
     if (selectedCategories.length > 0) {
-      tasks = tasks.filter(t => t.categoria && selectedCategories.includes(t.categoria));
+      tasks = tasks.filter(t => t.parent_id || (t.categoria && selectedCategories.includes(t.categoria)));
     }
     // 4. Filter Users
     if (selectedUsers.length > 0) {
-      tasks = tasks.filter(t => t.responsavel && selectedUsers.includes(t.responsavel));
+      tasks = tasks.filter(t => t.parent_id || (t.responsavel && selectedUsers.includes(t.responsavel)));
     }
     // 5. Filter Dimensions
     if (selectedDimensions.length > 0) {
       if (selectedDimensions.includes('favoritas')) {
         tasks = tasks.filter(t => 
-           (t.is_favorite && selectedDimensions.includes('favoritas')) ||
+           t.parent_id || (t.is_favorite && selectedDimensions.includes('favoritas')) ||
            (t.dimensao && selectedDimensions.includes(t.dimensao))
         );
       } else {
-        tasks = tasks.filter(t => t.dimensao && selectedDimensions.includes(t.dimensao));
+        tasks = tasks.filter(t => t.parent_id || (t.dimensao && selectedDimensions.includes(t.dimensao)));
       }
     }
+
+    // Keep only children whose parents survived the filtering
+    const survivingParentIds = new Set(tasks.filter(t => !t.parent_id).map(t => t.id));
+    tasks = tasks.filter(t => !t.parent_id || survivingParentIds.has(t.parent_id));
 
     // 5. Sort
     tasks.sort((a, b) => {
@@ -777,10 +815,10 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       
       switch(sortBy) {
         case 'status':
-          primaryDiff = getStatusWeight(a.status) - getStatusWeight(b.status);
+          primaryDiff = getStatusWeight(b.status) - getStatusWeight(a.status);
           break;
         case 'status_inv':
-          primaryDiff = getStatusWeight(b.status) - getStatusWeight(a.status);
+          primaryDiff = getStatusWeight(a.status) - getStatusWeight(b.status);
           break;
         case 'prazo':
           const pA = a.prazo ? new Date(a.prazo).getTime() : Infinity;
@@ -834,10 +872,10 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
 
       if (primaryDiff !== 0) return primaryDiff;
       
-      // Secundário: created_at ASC (mais antigas no topo, mais novas no fundo)
+      // Secundário: created_at DESC (mais novas no topo, mais antigas no fundo)
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
       const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-      return dateA - dateB;
+      return dateB - dateA;
     });
 
     const interleaved: Task[] = [];
@@ -1255,7 +1293,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               </div>
               <button 
                 onClick={handleNew}
-                className="bg-[#FFCC00] text-[#121212] font-bold text-sm px-4 py-2 rounded-md hover:bg-[#e6b800] transition-colors shadow-sm shrink-0"
+                className={`bg-[#FFCC00] text-[#121212] font-bold text-sm px-4 py-2 rounded-md hover:bg-[#e6b800] transition-colors shadow-sm shrink-0 ${localTasks.length === 0 ? 'animate-pulse ring-4 ring-[#FFCC00]/50' : ''}`}
               >
                 + Nova Tarefa
               </button>
@@ -1283,11 +1321,46 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                   }
                 }} checked={selectedTasks.size === processedTasks.length && processedTasks.length > 0} />
               </th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider text-center w-[60px]">Ação</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider w-[220px]">Nome</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Status</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Prioridade</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Categoria</th>
+              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider text-center w-[60px]">
+                <div className="flex items-center justify-center gap-1 relative group/tooltip cursor-help w-fit mx-auto">
+                  Ação <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
+                    Botões de edição e sub-tarefas.
+                  </div>
+                </div>
+              </th>
+              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider w-[220px]">
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  Nome <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-left font-normal normal-case tracking-normal left-0">
+                    O nome principal da sua tarefa.
+                  </div>
+                </div>
+              </th>
+              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  Status <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
+                    O estágio atual da tarefa (Ex: Em progresso).
+                  </div>
+                </div>
+              </th>
+              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  Prioridade <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
+                    Nível de urgência (Alta, Média, Baixa).
+                  </div>
+                </div>
+              </th>
+              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  Categoria <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
+                    O tipo de ação (Ex: Programar, Estudar).
+                  </div>
+                </div>
+              </th>
               {!isPersonalScope && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Responsável</th>}
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Criada em</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Início</th>
@@ -1295,10 +1368,24 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               {hasAnyPrazo && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Dias Restantes</th>}
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Concluída em</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Freq.</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Dimensão</th>
+              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  Dimensão <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
+                    A grande área da sua vida (Pessoal, Saúde, etc).
+                  </div>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
+            {localTasks.length === 0 && (
+              <tr>
+                <td colSpan={14} className="p-8 text-center text-[#8E8E8E]">
+                  Nenhuma tarefa encontrada. Clique em <span className="text-[#FFCC00] font-bold">+ Nova Tarefa</span> para começar.
+                </td>
+              </tr>
+            )}
             {processedTasks.map(task => (
               <React.Fragment key={task.id}>
               <tr 
@@ -1482,7 +1569,67 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
             )}
           </div>
         ))}
-        {processedTasks.length === 0 && (
+        {localTasks.length === 0 && (
+          <div className="p-4 bg-[#1A1A1A] rounded-lg border border-[#FFCC00]/50 shadow-sm relative animate-pulse-slow">
+            <div className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                  Bem-vindo! Tarefa de exemplo.
+                  <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                    <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                    <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-left font-normal normal-case tracking-normal left-0">
+                      O nome principal da sua tarefa.
+                    </div>
+                  </div>
+                </h3>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
+                <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Status</span>
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
+                    O estágio atual da tarefa (Ex: Em progresso).
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
+                <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Dimensão</span>
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
+                    A grande área da sua vida (Pessoal, Saúde, etc).
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
+                <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Prioridade</span>
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
+                    Nível de urgência (Alta, Média, Baixa).
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
+                <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Categoria</span>
+                <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
+                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
+                    O tipo de ação (Ex: Programar, Estudar).
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 text-center text-[#8E8E8E] text-xs">
+              Nenhuma tarefa encontrada.<br/>Clique em <span className="text-[#FFCC00] font-bold">+ Nova Tarefa</span> para começar.
+            </div>
+          </div>
+        )}
+        {processedTasks.length === 0 && localTasks.length > 0 && (
           <div className="p-8 text-center text-[#8E8E8E] text-sm bg-[#1A1A1A] rounded-lg border border-[#2D2D2D]">
             Nenhuma tarefa encontrada.
           </div>
@@ -1512,7 +1659,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {/* Floating Add Task Button */}
       <button 
         onClick={handleNew}
-        className={`fixed right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-56 md:bottom-40' : 'bottom-40 md:bottom-24'}`}
+        className={`fixed right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-56 md:bottom-40' : 'bottom-40 md:bottom-24'} ${localTasks.length === 0 ? 'animate-pulse ring-4 ring-[#FFCC00]/50' : ''}`}
         title="Nova Tarefa"
       >
         <span className="material-symbols-outlined font-bold">add</span>
@@ -1575,7 +1722,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {quickEdit && (
         <div 
           className="fixed z-[100] bg-[#1A1A1A] border border-[#2D2D2D] rounded-md shadow-[0_8px_32px_rgba(0,0,0,0.8)] overflow-hidden min-w-[140px]"
-          style={{ top: quickEdit.top, left: quickEdit.left }}
+          style={{ top: quickEdit.top, bottom: quickEdit.bottom, left: quickEdit.left }}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="max-h-[250px] overflow-y-auto flex flex-col py-1">
