@@ -102,6 +102,25 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
   
   const [localTasks, setLocalTasks] = useState(initialTasks);
 
+
+  const [visibleExtraCols, setVisibleExtraCols] = useState<string[]>(userId === 'f2f1e6c9-a178-433f-9d87-37d6ce7ec94e' ? ['responsavel', 'concluida_em', 'frequencia'] : []);
+  
+  useEffect(() => {
+    import('@capacitor/preferences').then(({ Preferences }) => {
+      Preferences.get({ key: 'visibleExtraCols' }).then(res => {
+        if (res.value) setVisibleExtraCols(JSON.parse(res.value));
+      });
+    });
+  }, []);
+
+  const toggleExtraCol = (col: string) => {
+    const newCols = visibleExtraCols.includes(col) ? visibleExtraCols.filter(c => c !== col) : [...visibleExtraCols, col];
+    setVisibleExtraCols(newCols);
+    import('@capacitor/preferences').then(({ Preferences }) => {
+      Preferences.set({ key: 'visibleExtraCols', value: JSON.stringify(newCols) });
+    });
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
@@ -231,7 +250,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                   status: 'rascunho',
                   is_favorite: true,
                   ordem: 0,
-                  prazo: new Date().toISOString(),
+                  prazo: new Date(Date.now() + 7 * 86400000).toISOString(),
                   dimensao: taskDimension || ''
                 };
                 newTasks.unshift(newTask as any);
@@ -294,6 +313,28 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
   const pathname = usePathname();
   const isAurtistic = pathname?.includes('aurtistic');
 
+
+  const [activeTooltip, setActiveTooltip] = useState<{
+    text: string;
+    top: number | 'auto';
+    bottom?: number | 'auto';
+    left: number;
+  } | null>(null);
+
+  const handleTooltipClick = (e: React.MouseEvent, text: string) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceNeeded = 100;
+
+    setActiveTooltip({
+      text,
+      top: spaceBelow < spaceNeeded ? 'auto' : rect.bottom + 5,
+      bottom: spaceBelow < spaceNeeded ? window.innerHeight - rect.top + 5 : 'auto',
+      left: Math.max(10, rect.left - 64)
+    });
+  };
+
   const [quickEdit, setQuickEdit] = useState<{
     taskId: string;
     field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao';
@@ -304,9 +345,9 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
   } | null>(null);
 
   useEffect(() => {
-    const handleClickOutside = () => setQuickEdit(null);
-    const handleScroll = () => setQuickEdit(null);
-    if (quickEdit) {
+    const handleClickOutside = () => { setQuickEdit(null); setActiveTooltip(null); };
+    const handleScroll = () => { setQuickEdit(null); setActiveTooltip(null); };
+    if (quickEdit || activeTooltip) {
       window.addEventListener('click', handleClickOutside);
       window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
     }
@@ -314,7 +355,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       window.removeEventListener('click', handleClickOutside);
       window.removeEventListener('scroll', handleScroll, { capture: true });
     };
-  }, [quickEdit]);
+  }, [quickEdit, activeTooltip]);
 
   const handleBadgeClick = (e: React.MouseEvent, task: Task, field: 'status' | 'responsavel' | 'prioridade' | 'categoria' | 'dimensao') => {
     e.stopPropagation();
@@ -944,8 +985,8 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                     return (
                       <React.Fragment key="prioridade">
                         <span className="text-[10px] text-[#8E8E8E] px-1 font-bold uppercase tracking-wider hidden sm:inline ml-1">Prio:</span>
-                        <button onClick={() => setSortBy('prioridade_desc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_desc' ? getBadgeColorClass('prioridade', 'alta') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[14px]">arrow_upward</span> Alta</button>
-                        <button onClick={() => setSortBy('prioridade_asc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_asc' ? getBadgeColorClass('prioridade', 'baixa') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[14px]">arrow_downward</span> Baixa</button>
+                        <button onClick={() => setSortBy('prioridade_desc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_desc' ? getBadgeColorClass('prioridade', 'alta') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[12px]">arrow_upward</span> Alta</button>
+                        <button onClick={() => setSortBy('prioridade_asc')} className={`px-3 py-1 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center gap-1 ${sortBy === 'prioridade_asc' ? getBadgeColorClass('prioridade', 'baixa') : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#9D4EDD]/50 hover:text-white'}`}><span className="material-symbols-outlined text-[12px]">arrow_downward</span> Baixa</button>
                       </React.Fragment>
                     );
                   }
@@ -975,7 +1016,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                 className={`h-[26px] px-2 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center gap-1
                   ${showFavoritesOnly ? 'bg-[#FFCC00]/20 border-[#FFCC00] text-[#FFCC00]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#FFCC00]/50 hover:text-white'}`}
             >
-                <span className={`material-symbols-outlined text-[14px] ${showFavoritesOnly ? 'text-[#FFCC00]' : ''}`}>star</span>
+                <span className={`material-symbols-outlined text-[12px] ${showFavoritesOnly ? 'text-[#FFCC00]' : ''}`}>star</span>
             </button>
 
             <button
@@ -983,7 +1024,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                 className={`h-[26px] px-3 text-[11px] rounded-md border transition-colors font-bold shrink-0 flex items-center justify-center gap-1
                   ${showDraftsOnly ? 'bg-[#8E8E8E]/20 border-[#8E8E8E] text-[#8E8E8E]' : 'bg-[#1A1A1A] border-[#FFCC00] text-[#8E8E8E] hover:border-[#8E8E8E]/50 hover:text-white'}`}
             >
-                <span className={`material-symbols-outlined text-[14px] ${showDraftsOnly ? 'text-[#8E8E8E]' : ''}`}>draft</span> Rascunhos
+                <span className={`material-symbols-outlined text-[12px] ${showDraftsOnly ? 'text-[#8E8E8E]' : ''}`}>draft</span> Rascunhos
             </button>
             
             {uniqueStatuses.map(s => (
@@ -1323,7 +1364,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               </th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider text-center w-[60px]">
                 <div className="flex items-center justify-center gap-1 relative group/tooltip cursor-help w-fit mx-auto">
-                  Ação <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  Ação <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
                     Botões de edição e sub-tarefas.
                   </div>
@@ -1331,7 +1372,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               </th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider w-[220px]">
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  Nome <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  Nome <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-left font-normal normal-case tracking-normal left-0">
                     O nome principal da sua tarefa.
                   </div>
@@ -1339,7 +1380,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               </th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  Status <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  Status <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
                     O estágio atual da tarefa (Ex: Em progresso).
                   </div>
@@ -1347,7 +1388,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               </th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  Prioridade <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  Prioridade <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
                     Nível de urgência (Alta, Média, Baixa).
                   </div>
@@ -1355,22 +1396,22 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               </th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  Categoria <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  Categoria <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal left-1/2 -translate-x-1/2">
                     O tipo de ação (Ex: Programar, Estudar).
                   </div>
                 </div>
               </th>
-              {!isPersonalScope && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Responsável</th>}
+              {visibleExtraCols.includes("responsavel") && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Responsável</th>}
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Criada em</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Início</th>
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Prazo</th>
               {hasAnyPrazo && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Dias Restantes</th>}
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Concluída em</th>
-              <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Freq.</th>
+              {visibleExtraCols.includes("concluida_em") && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Concluída em</th>}
+              {visibleExtraCols.includes("frequencia") && <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">Freq.</th>}
               <th className="p-4 text-xs font-semibold text-[#8E8E8E] uppercase tracking-wider">
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  Dimensão <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  Dimensão <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
                     A grande área da sua vida (Pessoal, Saúde, etc).
                   </div>
@@ -1523,11 +1564,23 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
             
             <div className="mt-1 pl-6 pr-2">
               <div className="flex justify-between items-center text-center mb-1 gap-1">
-                <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider flex-1 truncate">Status</span>
-                <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider flex-1 truncate">Prio</span>
-                <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider flex-1 truncate">Categ</span>
-                <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider flex-1 truncate">Resp</span>
-                <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider flex-1 truncate">Dim</span>
+                <div className="flex-1 flex justify-center items-center gap-1">
+  <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider truncate">Status</span>
+  <div className="flex items-center gap-1 cursor-pointer" onClick={(e) => handleTooltipClick(e, "Estágio atual.")}><span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span></div>
+</div>
+                <div className="flex-1 flex justify-center items-center gap-1">
+  <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider truncate">Prio</span>
+  <div className="flex items-center gap-1 cursor-pointer" onClick={(e) => handleTooltipClick(e, "Nível de urgência.")}><span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span></div>
+</div>
+                <div className="flex-1 flex justify-center items-center gap-1">
+  <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider truncate">Categ</span>
+  <div className="flex items-center gap-1 cursor-pointer" onClick={(e) => handleTooltipClick(e, "Tipo de ação.")}><span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span></div>
+</div>
+                {visibleExtraCols.includes("responsavel") && <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider flex-1 truncate">Resp</span>}
+                <div className="flex-1 flex justify-center items-center gap-1">
+  <span className="text-[9px] text-[#8E8E8E] font-semibold uppercase tracking-wider truncate">Dim</span>
+  <div className="flex items-center gap-1 cursor-pointer" onClick={(e) => handleTooltipClick(e, "Área da vida.")}><span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span></div>
+</div>
               </div>
               <div className="flex justify-between items-center text-center gap-1">
                 <div className="flex-1 flex justify-center overflow-hidden" onClick={(e) => handleBadgeClick(e, task, 'status')}><div className="cursor-pointer hover:opacity-80 transition-opacity inline-block"><Badge type="status" value={task.status} /></div></div>
@@ -1576,7 +1629,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
                 <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
                   Bem-vindo! Tarefa de exemplo.
                   <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                    <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                    <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                     <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-left font-normal normal-case tracking-normal left-0">
                       O nome principal da sua tarefa.
                     </div>
@@ -1589,7 +1642,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
                 <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Status</span>
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
                     O estágio atual da tarefa (Ex: Em progresso).
                   </div>
@@ -1598,7 +1651,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
                 <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Dimensão</span>
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
                     A grande área da sua vida (Pessoal, Saúde, etc).
                   </div>
@@ -1607,7 +1660,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
                 <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Prioridade</span>
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
                     Nível de urgência (Alta, Média, Baixa).
                   </div>
@@ -1616,7 +1669,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
               <div className="flex items-center justify-between text-[10px] bg-[#252525] p-2 rounded">
                 <span className="text-[#8E8E8E] font-bold uppercase tracking-wider">Categoria</span>
                 <div className="flex items-center gap-1 relative group/tooltip cursor-help w-fit">
-                  <span className="material-symbols-outlined text-[14px] text-[#FFCC00]">help</span>
+                  <span className="material-symbols-outlined text-[6px] text-[#8E8E8E]">help</span>
                   <div className="absolute top-full mt-2 w-48 p-2 bg-[#121212] text-white text-[11px] rounded border border-[#2D2D2D] shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible z-50 text-center font-normal normal-case tracking-normal right-0">
                     O tipo de ação (Ex: Programar, Estudar).
                   </div>
@@ -1649,7 +1702,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {selectedTasks.size > 0 && (
         <button 
           onClick={() => setIsBulkEditModalOpen(true)}
-          className={`fixed right-6 bg-[#9D4EDD] hover:bg-[#8A3BCE] text-[#FFFFFF] p-3 rounded-full shadow-[0_8px_32px_rgba(157,78,221,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-72 md:bottom-56' : 'bottom-56 md:bottom-40'}`}
+          className={`fixed right-6 bg-[#9D4EDD] hover:bg-[#8A3BCE] text-[#FFFFFF] p-3 rounded-full shadow-[0_8px_32px_rgba(157,78,221,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-[22rem] md:bottom-56' : 'bottom-72 md:bottom-40'}`}
           title="Editar Selecionadas"
         >
           <span className="material-symbols-outlined font-bold">edit</span>
@@ -1659,7 +1712,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {/* Floating Add Task Button */}
       <button 
         onClick={handleNew}
-        className={`fixed right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-56 md:bottom-40' : 'bottom-40 md:bottom-24'} ${localTasks.length === 0 ? 'animate-pulse ring-4 ring-[#FFCC00]/50' : ''}`}
+        className={`fixed right-6 bg-[#FFCC00] hover:bg-[#e6b800] text-[#121212] p-3 rounded-full shadow-[0_8px_32px_rgba(255,204,0,0.3)] transition-all duration-300 flex items-center justify-center z-[999] group ${isAurtistic ? 'bottom-72 md:bottom-40' : 'bottom-56 md:bottom-24'} ${localTasks.length === 0 ? 'animate-pulse ring-4 ring-[#FFCC00]/50' : ''}`}
         title="Nova Tarefa"
       >
         <span className="material-symbols-outlined font-bold">add</span>
@@ -1669,7 +1722,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {isAurtistic && (
         <button 
           onClick={scrollToTop}
-          className="fixed bottom-40 md:bottom-24 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
+          className="fixed bottom-56 md:bottom-24 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
           title="Ir para o topo"
         >
           <span className="material-symbols-outlined">arrow_upward</span>
@@ -1679,7 +1732,7 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
       {/* Floating Scroll to Bottom Button */}
       <button 
         onClick={scrollToBottom}
-        className="fixed bottom-24 md:bottom-8 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
+        className="fixed bottom-40 md:bottom-8 right-6 bg-[#1A1A1A] hover:bg-[#9D4EDD]/10 border border-[#FFCC00]/50 hover:border-[#9D4EDD] text-[#8E8E8E] hover:text-[#9D4EDD] p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center z-[999] group"
         title="Ir para o fundo (Mais Recentes)"
       >
         <span className="material-symbols-outlined">arrow_downward</span>
@@ -1716,6 +1769,18 @@ export function TasksView({ initialTasks: rawInitialTasks, initialColumns = [], 
             setColumns(prev => prev.map(c => c.id === updatedColumn.id ? updatedColumn : c));
           }}
         />
+      )}
+
+      
+      {/* Active Tooltip Dropdown */}
+      {activeTooltip && (
+        <div
+          className="fixed z-[100] w-32 p-2 bg-[#121212] text-white text-[10px] rounded border border-[#2D2D2D] shadow-xl text-center font-normal normal-case tracking-normal"
+          style={{ top: activeTooltip.top, bottom: activeTooltip.bottom, left: activeTooltip.left }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {activeTooltip.text}
+        </div>
       )}
 
       {/* Quick Edit Dropdown */}

@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { saveQuickLinks } from '@/app/(dashboard)/actions';
 import { systemLinks, CopyableQuickLink } from './QuickLinks';
+import { saveLinksToCache, getLinksFromCache } from '@/lib/offlineSync';
 
 interface QuickLink {
   name: string;
@@ -16,10 +17,28 @@ export function AurtisticQuickLinks({ initialLinks, userId }: { initialLinks: Qu
   const [newLinkName, setNewLinkName] = useState('');
   const [newLinkHref, setNewLinkHref] = useState('');
 
+  React.useEffect(() => {
+    const syncLinks = async () => {
+      if (window.navigator.onLine) {
+        if (initialLinks && initialLinks.length > 0) {
+          await saveLinksToCache(initialLinks);
+        }
+      } else {
+        const cached = await getLinksFromCache();
+        if (cached && cached.length > 0) {
+          setLinks(cached);
+        }
+      }
+    };
+    syncLinks();
+  }, [initialLinks]);
+
+
   const handleSave = async (updatedLinks: QuickLink[]) => {
     setLinks(updatedLinks);
     try {
-      await saveQuickLinks(updatedLinks);
+      await saveQuickLinks(updatedLinks).catch(() => console.log('Offline: links update queued'));
+      await saveLinksToCache(updatedLinks);
     } catch (e: any) {
       alert("Erro ao salvar links: " + e.message);
     }

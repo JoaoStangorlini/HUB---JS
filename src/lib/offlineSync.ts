@@ -1,9 +1,11 @@
 import { Task } from '@/types';
 
 const DB_NAME = 'AurtisticOfflineDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Bump version for new stores
 const TASKS_STORE = 'tasksCache';
 const MUTATIONS_STORE = 'mutationsQueue';
+const PROFILE_STORE = 'profileCache';
+const LINKS_STORE = 'linksCache';
 
 export type MutationType = 'create' | 'update' | 'delete';
 
@@ -26,6 +28,12 @@ const openDB = (): Promise<IDBDatabase> => {
       }
       if (!db.objectStoreNames.contains(MUTATIONS_STORE)) {
         db.createObjectStore(MUTATIONS_STORE, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(PROFILE_STORE)) {
+        db.createObjectStore(PROFILE_STORE, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(LINKS_STORE)) {
+        db.createObjectStore(LINKS_STORE, { keyPath: 'id' });
       }
     };
 
@@ -108,5 +116,58 @@ export const removeMutation = async (id: string) => {
   return new Promise((resolve, reject) => {
     tx.oncomplete = () => resolve(true);
     tx.onerror = () => reject(tx.error);
+  });
+};
+
+// --- Profile Cache ---
+export const saveProfileToCache = async (profile: any) => {
+  if (typeof window === 'undefined') return;
+  const db = await openDB();
+  const tx = db.transaction(PROFILE_STORE, 'readwrite');
+  const store = tx.objectStore(PROFILE_STORE);
+  // We use a fixed ID 'current_profile' for the active user's profile
+  store.put({ id: 'current_profile', data: profile });
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+};
+
+export const getProfileFromCache = async (): Promise<any> => {
+  if (typeof window === 'undefined') return null;
+  const db = await openDB();
+  const tx = db.transaction(PROFILE_STORE, 'readonly');
+  const store = tx.objectStore(PROFILE_STORE);
+  const request = store.get('current_profile');
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result?.data || null);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+// --- Links Cache ---
+export const saveLinksToCache = async (links: any[]) => {
+  if (typeof window === 'undefined') return;
+  const db = await openDB();
+  const tx = db.transaction(LINKS_STORE, 'readwrite');
+  const store = tx.objectStore(LINKS_STORE);
+  store.put({ id: 'current_links', data: links });
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+  });
+};
+
+export const getLinksFromCache = async (): Promise<any[]> => {
+  if (typeof window === 'undefined') return [];
+  const db = await openDB();
+  const tx = db.transaction(LINKS_STORE, 'readonly');
+  const store = tx.objectStore(LINKS_STORE);
+  const request = store.get('current_links');
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result?.data || []);
+    request.onerror = () => reject(request.error);
   });
 };

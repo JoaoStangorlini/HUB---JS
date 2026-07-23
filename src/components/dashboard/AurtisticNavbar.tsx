@@ -12,6 +12,7 @@ import { Browser } from '@capacitor/browser';
 export default function AurtisticNavbar() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -27,12 +28,42 @@ export default function AurtisticNavbar() {
   }, [user, supabase]);
 
   useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData?.session?.user) {
+          setUser(sessionData.session.user);
+        } else {
+          const { getProfileFromCache } = await import('@/lib/offlineSync');
+          const cached = await getProfileFromCache();
+          if (cached) {
+            setUser({ id: cached.id, user_metadata: cached });
+            setProfile(cached);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+
     supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-    });
+      if (data?.user) {
+        setUser(data.user);
+      }
+    }).catch(() => {});
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
+      if (session?.user) {
+        setUser(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setProfile(null);
+      }
+      setLoading(false);
     });
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -199,7 +230,9 @@ export default function AurtisticNavbar() {
 
         {/* Right: Auth State / Settings Dropdown */}
         <div className="flex justify-end items-center gap-4">
-          {user ? (
+          {loading ? (
+            <div className="w-8 h-8 rounded-full bg-[#2D2D2D] animate-pulse"></div>
+          ) : user ? (
             <div className="relative" ref={dropdownRef}>
               <div 
                 onClick={() => setIsSettingsOpen(!isSettingsOpen)}

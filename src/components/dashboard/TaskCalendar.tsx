@@ -57,7 +57,24 @@ export default function TaskCalendar({ tasks, currentDate, onDateChange, onTaskC
     const todayStr = new Date().toISOString().split('T')[0];
     const isToday = cellDateStr === todayStr;
 
-    const dayTasks = tasks.filter(t => t.prazo && t.prazo.startsWith(cellDateStr));
+    const cellDate = new Date(year, month, d);
+    const dayOfWeek = cellDate.getDay();
+    const dayOfWeekNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const cellDayName = dayOfWeekNames[dayOfWeek];
+
+    const dayTasks = tasks.filter(t => {
+      // Direct match
+      if (t.prazo && t.prazo.startsWith(cellDateStr)) return true;
+      
+      // Recurrence match
+      if (t.frequencia && t.status !== 'completa' && t.status !== 'descartada') {
+        const freq = t.frequencia;
+        if (freq === 'Diária') return true;
+        if (freq.startsWith('Semanal - ') && freq.includes(cellDayName)) return true;
+        if (freq.startsWith('Mensal - Dia ') && freq.includes(String(d))) return true;
+      }
+      return false;
+    });
 
     const isSelected = selectedDateStr === cellDateStr;
 
@@ -136,7 +153,21 @@ export default function TaskCalendar({ tasks, currentDate, onDateChange, onTaskC
             <div className="overflow-x-auto custom-scrollbar">
               <div className="min-w-[700px] flex flex-col gap-2">
                 {/* Column Headers */}
-                {tasks.filter(t => t.prazo && t.prazo.startsWith(selectedDateStr)).length > 0 && (
+                {tasks.filter(t => {
+  if (t.prazo && t.prazo.startsWith(selectedDateStr)) return true;
+  if (t.frequencia && t.status !== 'completa' && t.status !== 'descartada') {
+    const d = parseInt(selectedDateStr.split('-')[2]);
+    const cellDate = new Date(parseInt(selectedDateStr.split('-')[0]), parseInt(selectedDateStr.split('-')[1]) - 1, d);
+    const dayOfWeekNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const cellDayName = dayOfWeekNames[cellDate.getDay()];
+    
+    const freq = t.frequencia;
+    if (freq === 'Diária') return true;
+    if (freq.startsWith('Semanal - ') && freq.includes(cellDayName)) return true;
+    if (freq.startsWith('Mensal - Dia ') && freq.includes(String(d))) return true;
+  }
+  return false;
+}).length > 0 && (
                   <div className="grid grid-cols-[1fr_80px_70px_80px_80px_80px] gap-2 items-center text-[10px] font-bold text-[#8E8E8E] uppercase tracking-wider px-3 pb-2 border-b border-[#2D2D2D] mb-1">
                     <div>Nome</div>
                     <div className="text-center">Status</div>
@@ -147,8 +178,36 @@ export default function TaskCalendar({ tasks, currentDate, onDateChange, onTaskC
                   </div>
                 )}
 
-                {tasks.filter(t => t.prazo && t.prazo.startsWith(selectedDateStr)).length > 0 ? (
-                  tasks.filter(t => t.prazo && t.prazo.startsWith(selectedDateStr)).map(task => {
+                {tasks.filter(t => {
+  if (t.prazo && t.prazo.startsWith(selectedDateStr)) return true;
+  if (t.frequencia && t.status !== 'completa' && t.status !== 'descartada') {
+    const d = parseInt(selectedDateStr.split('-')[2]);
+    const cellDate = new Date(parseInt(selectedDateStr.split('-')[0]), parseInt(selectedDateStr.split('-')[1]) - 1, d);
+    const dayOfWeekNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const cellDayName = dayOfWeekNames[cellDate.getDay()];
+    
+    const freq = t.frequencia;
+    if (freq === 'Diária') return true;
+    if (freq.startsWith('Semanal - ') && freq.includes(cellDayName)) return true;
+    if (freq.startsWith('Mensal - Dia ') && freq.includes(String(d))) return true;
+  }
+  return false;
+}).length > 0 ? (
+                  tasks.filter(t => {
+  if (t.prazo && t.prazo.startsWith(selectedDateStr)) return true;
+  if (t.frequencia && t.status !== 'completa' && t.status !== 'descartada') {
+    const d = parseInt(selectedDateStr.split('-')[2]);
+    const cellDate = new Date(parseInt(selectedDateStr.split('-')[0]), parseInt(selectedDateStr.split('-')[1]) - 1, d);
+    const dayOfWeekNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const cellDayName = dayOfWeekNames[cellDate.getDay()];
+    
+    const freq = t.frequencia;
+    if (freq === 'Diária') return true;
+    if (freq.startsWith('Semanal - ') && freq.includes(cellDayName)) return true;
+    if (freq.startsWith('Mensal - Dia ') && freq.includes(String(d))) return true;
+  }
+  return false;
+}).map(task => {
                     const dimClass = getBadgeColorClass('dimensao', task.dimensao);
                     const match = dimClass.match(/text-\[(#[0-9a-fA-F]{6})\]/);
                     const dotColor = match ? match[1] : '#FFCC00';

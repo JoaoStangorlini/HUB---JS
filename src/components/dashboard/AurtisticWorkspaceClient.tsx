@@ -7,6 +7,7 @@ import { Task, TaskColumn } from '@/types';
 import { TasksView } from './TasksView';
 import { AurtisticQuickLinks } from './AurtisticQuickLinks';
 import { saveUserProfileData } from '@/app/(dashboard)/actions';
+import { saveProfileToCache, getProfileFromCache } from '@/lib/offlineSync';
 
 interface AurtisticWorkspaceClientProps {
   initialProfile: any;
@@ -81,6 +82,28 @@ export default function AurtisticWorkspaceClient({
     extra: ''
   });
 
+
+  React.useEffect(() => {
+    const syncProfile = async () => {
+      if (window.navigator.onLine) {
+        if (initialProfile) {
+          await saveProfileToCache(initialProfile);
+        }
+      } else {
+        const cached = await getProfileFromCache();
+        if (cached) {
+          setProfile(cached);
+          const config = cached.features_config || {};
+          if (config.active) setActiveFeatures(config.active);
+          if (config.order) setFeaturesOrder(config.order);
+          if (config.labels) setLabels(config.labels);
+          if (config.custom_links) setCustomLinks(config.custom_links);
+        }
+      }
+    };
+    syncProfile();
+  }, [initialProfile]);
+
   // Toggle active feature
   const handleToggleFeature = (feature: string) => {
     if (activeFeatures.includes(feature)) {
@@ -121,7 +144,8 @@ export default function AurtisticWorkspaceClient({
         labels,
         custom_links: customLinks
       };
-      await saveUserProfileData({ features_config: updatedConfig });
+      await saveUserProfileData({ features_config: updatedConfig }).catch(() => console.log('Offline: profile update queued'));
+      await saveProfileToCache({ ...profile, features_config: updatedConfig });
       setProfile({ ...profile, features_config: updatedConfig });
       setShowConfig(false);
       // Reload page to update Navbar
